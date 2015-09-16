@@ -8,7 +8,7 @@
   <description>USM integration for UnionVMS.</description>
 
 	<properties>
-		<information.service.version>LATEST</information.service.version>
+		<information.service.version>1.2.0-SNAPSHOT</information.service.version>
 		<javaee.version>7.0</javaee.version>
 		<jjwt.version>0.4</jjwt.version>
 	</properties>
