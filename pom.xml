@@ -3,12 +3,12 @@
   <groupId>eu.europa.ec.mare.usm</groupId>
   <artifactId>usm4uvms</artifactId>
   <packaging>jar</packaging>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.2-SNAPSHOT</version>
   <name>usm4uvms</name>
   <description>USM integration for UnionVMS.</description>
 
 	<properties>
-		<information.service.version>1.2.0-SNAPSHOT</information.service.version>
+		<information.service.version>1.4-SNAPSHOT</information.service.version>
 		<javaee.version>7.0</javaee.version>
 		<jjwt.version>0.4</jjwt.version>
 	</properties>
