@@ -20,6 +20,8 @@ import eu.europa.ec.mare.usm.information.service.InformationService;
 @Provider
 public class UnionVMSFeatureFilter implements ContainerRequestFilter {
 
+	private static String UNION_VMS_APPLICATION = "Union-VMS";
+
     @Context
     ResourceInfo resourceInfo; 
 
@@ -70,12 +72,9 @@ public class UnionVMSFeatureFilter implements ContainerRequestFilter {
             return false;
         }
 
-        UnionVMSModule application = UnionVMSModule.valueOf(servletContext.getInitParameter("usmApplication"));
-        if (application == null) {
-        	return false;
-        }
+		String applicationName = getApplicationName();
 
-        UserContext ctx = getUserContext(userName, application);
+        UserContext ctx = getUserContext(userName, applicationName);
         if (ctx == null || ctx.getContextSet() == null) {
             return false;
         }
@@ -86,7 +85,7 @@ public class UnionVMSFeatureFilter implements ContainerRequestFilter {
             }
 
             for (Feature f : c.getRole().getFeatures()) {
-                if (application.name().equals(f.getApplicationName()) && feature.name().equals(f.getFeatureName())) {
+                if (applicationName.equals(f.getApplicationName()) && feature.name().equals(f.getFeatureName())) {
                     return true;
                 }
             }
@@ -95,9 +94,23 @@ public class UnionVMSFeatureFilter implements ContainerRequestFilter {
         return false;
     }
 
-    private UserContext getUserContext(String userName, UnionVMSModule application) {
+	private String getApplicationName() {
+		String cfgName = servletContext.getInitParameter("usmApplication");
+		if (cfgName == null) {
+			return UNION_VMS_APPLICATION;
+		}
+
+		UnionVMSModule application = UnionVMSModule.valueOf(cfgName);
+		if (application == null) {
+			return UNION_VMS_APPLICATION;
+		}
+
+		return application.name();
+	}
+
+    private UserContext getUserContext(String userName, String applicationName) {
         UserContextQuery query = new UserContextQuery();
-        query.setApplicationName(application.name());
+        query.setApplicationName(applicationName);
         query.setUserName(userName);
         return infoService.getUserContext(query);
     }
