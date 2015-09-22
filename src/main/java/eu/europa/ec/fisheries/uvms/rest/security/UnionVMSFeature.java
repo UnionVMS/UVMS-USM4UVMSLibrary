@@ -21,36 +21,26 @@ public enum UnionVMSFeature {
 	
     /** Viewing movements */
     viewMovements,
+    /** Viewing manual movements */
+    viewManualMovements,
     /** Managing movements */
-    manageMovements,
-	/** View movement search groups */
-	viewMovementGroups,
-	/** Manage movement search groups */
-	manageMovementGroups,
-    /** Accessing movement configuration */
-    movementConfig,
+    manageManualMovements,
 
-    /** Viewing exchange logs */
-    viewExchangeLog,
-	/** Updating exchange log */
-	updateExchangeLog,
-    /** Resending exchange logs */
-    resendExchangeLog,
-    /** Forwarding exchange logs */
-    forwardExchangeLog,
-    /** Viewing sending queue */
-    viewSendingQueue,
-    /** Pausing messages in sending queue */
-    manageSendingQueue,
-    /** Viewing transmission status */
-    viewTransmissionStatus,
-    /** Starting and stopping transmissions */
-    manageTransmissionStatus,
-    /** Accessing exchange log configuration */
-    exchangeConfig,
+    /** Viewing exchange */
+    viewExchange,
+    /** Managing sending queue */
+    manageExchangeSendingQueue,
+    /** Managing transmission statuses */
+    manageExchangeTransmissionStatuses,
 
-    /** Viewing audit logs */
-    viewAuditLogs,
-    /** Accessing audit log configuration */
-    auditLogConfig
+    /** Rules */
+    viewAlarmRules,
+    manageAlarmRules,
+    viewAlarmsHoldingTable,
+    manageAlarmsHoldingTable,
+    viewAlarmsOpenTickets,
+    manageAlarmsOpenTickets,
+    
+    /** Viewing audit */
+    viewAudit
 }
