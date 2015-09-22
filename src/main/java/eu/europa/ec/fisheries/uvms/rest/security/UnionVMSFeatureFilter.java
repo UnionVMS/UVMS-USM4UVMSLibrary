@@ -31,6 +31,11 @@ public class UnionVMSFeatureFilter implements ContainerRequestFilter {
     @Context
     private ServletContext servletContext;
 
+    /**
+     * FIXME the service might not be running locally (it might be running within a different physical machine)
+     * The following injection needs to be  changed into configurable lookup
+     * (most probably, configured by the InitialContext of the hosting application)
+     */
     @EJB
     private InformationService infoService;
 
