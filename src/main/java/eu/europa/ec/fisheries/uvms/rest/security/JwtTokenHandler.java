@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  */
 public class JwtTokenHandler {
   private static final Logger LOGGER = LoggerFactory.getLogger(JwtTokenHandler.class);
-  private static final String PROPERTIES_FILE = "/jwt.properties";
+  private static final String PROPERTIES_FILE = "jwt.properties";
   private static final String PROP_KEY = "secretKey";
   private static final String PROP_SUBJECT = "subject";
   private static final String PROP_ISSUER = "issuer";
@@ -48,7 +48,7 @@ public class JwtTokenHandler {
    */
   public JwtTokenHandler() 
   {
-    InputStream is = getClass().getResourceAsStream(PROPERTIES_FILE);
+    InputStream is = getClass().getClassLoader().getResourceAsStream(PROPERTIES_FILE);
     if (is != null) {
       try {
         properties.load(is);
@@ -80,7 +80,7 @@ public class JwtTokenHandler {
       long now = System.currentTimeMillis();
 
       // Claims
-      Claims claims = (Claims) Jwts.claims();
+      Claims claims = Jwts.claims();
       claims.setId(properties.getProperty(PROP_ID, DEFAULT_ID));
       claims.setIssuer(properties.getProperty(PROP_ISSUER, DEFAULT_ISSUER));
       claims.setSubject(properties.getProperty(PROP_SUBJECT, DEFAULT_SUBJECT));

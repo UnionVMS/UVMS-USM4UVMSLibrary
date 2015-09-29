@@ -2,42 +2,31 @@ package eu.europa.ec.fisheries.uvms.rest.security;
 
 import java.io.IOException;
 
-import javax.ejb.EJB;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
 import eu.europa.ec.mare.usm.information.domain.Feature;
 import eu.europa.ec.mare.usm.information.domain.UserContext;
-import eu.europa.ec.mare.usm.information.domain.UserContextQuery;
-import eu.europa.ec.mare.usm.information.service.InformationService;
 
 @Provider
-public class UnionVMSFeatureFilter implements ContainerRequestFilter {
-
-	private static String UNION_VMS_APPLICATION = "Union-VMS";
+public class UnionVMSFeatureFilter extends AbstractUSMHandler implements ContainerRequestFilter {
 
     @Context
-    ResourceInfo resourceInfo; 
-
-    @Context
-    private HttpServletRequest servletRequest;
+    ResourceInfo resourceInfo;
 
     @Context
     private ServletContext servletContext;
 
-    /**
-     * FIXME the service might not be running locally (it might be running within a different physical machine)
-     * The following injection needs to be  changed into configurable lookup
-     * (most probably, configured by the InitialContext of the hosting application)
-     */
-    @EJB
-    private InformationService infoService;
+    @Context
+    private HttpServletRequest servletRequest;
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
@@ -52,11 +41,11 @@ public class UnionVMSFeatureFilter implements ContainerRequestFilter {
             return;
         }
 
-        if (!hasFeature(servletRequest.getRemoteUser(), feature, null, null)) {
+        if (!hasFeature(feature, null, null)) {
             requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
-            		.header("content-type", "text/plain")
-            		.entity("User cannot access the resource.")
-            		.build());
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+                    .entity("User cannot access the resource.")
+                    .build());
         }
     }
 
@@ -72,14 +61,14 @@ public class UnionVMSFeatureFilter implements ContainerRequestFilter {
         return ctx.getScope() == null || ctx.getScope().getScopeName().equals(scope);
     }
 
-    private boolean hasFeature(String userName, UnionVMSFeature feature, String roleName, String scopeName) {
-        if (userName == null) {
+    private boolean hasFeature(UnionVMSFeature feature, String roleName, String scopeName) {
+        if (servletRequest.getRemoteUser() == null) {
             return false;
         }
 
-		String applicationName = getApplicationName();
+		String applicationName = getApplicationName(servletContext);
 
-        UserContext ctx = getUserContext(userName, applicationName);
+        UserContext ctx = getUserContext(servletRequest.getRemoteUser(), getApplicationName(servletContext));
         if (ctx == null || ctx.getContextSet() == null) {
             return false;
         }
@@ -99,24 +88,4 @@ public class UnionVMSFeatureFilter implements ContainerRequestFilter {
         return false;
     }
 
-	private String getApplicationName() {
-		String cfgName = servletContext.getInitParameter("usmApplication");
-		if (cfgName == null) {
-			return UNION_VMS_APPLICATION;
-		}
-
-		UnionVMSModule application = UnionVMSModule.valueOf(cfgName);
-		if (application == null) {
-			return UNION_VMS_APPLICATION;
-		}
-
-		return application.name();
-	}
-
-    private UserContext getUserContext(String userName, String applicationName) {
-        UserContextQuery query = new UserContextQuery();
-        query.setApplicationName(applicationName);
-        query.setUserName(userName);
-        return infoService.getUserContext(query);
-    }
 }

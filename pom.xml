@@ -3,7 +3,7 @@
     <groupId>eu.europa.ec.mare.usm</groupId>
     <artifactId>usm4uvms</artifactId>
     <packaging>jar</packaging>
-    <version>0.0.6-SNAPSHOT</version>
+    <version>0.0.7-SNAPSHOT</version>
     <name>usm4uvms</name>
     <description>USM integration for UnionVMS.</description>
 
@@ -33,15 +33,156 @@
 
     <dependencies>
 
-        <!--FIXME
-                This dependency needs to be removed and to use either REST or JMS calls instead.
-                Be aware that USM services could be running on a different physical machine from the module that is dependent on usm4uvms.
-        -->
-        <dependency>
-            <groupId>eu.europa.ec.mare.usm</groupId>
-            <artifactId>Information-Service</artifactId>
-            <version>${information.service.version}</version>
-        </dependency>
+	<!--	<dependency>
+			<groupId>eu.europa.ec.fisheries.uvms</groupId>
+			<artifactId>uvms-commons</artifactId>
+		</dependency>-->
+
+<!--
+		<dependency>
+			<groupId>com.vividsolutions</groupId>
+			<artifactId>jts</artifactId>
+		</dependency>
+-->
+
+	<!--	<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+		</dependency>-->
+
+		<!--<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>-->
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<scope>provided</scope>
+			<version>2.6.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<scope>provided</scope>
+			<version>2.6.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<scope>provided</scope>
+			<version>2.6.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+			<version>4.11</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.jboss.arquillian</groupId>
+			<artifactId>arquillian-bom</artifactId>
+			<type>pom</type>
+			<scope>test</scope>
+			<version>1.1.8.Final</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.arquillian.junit</groupId>
+			<artifactId>arquillian-junit-container</artifactId>
+			<scope>test</scope>
+			<version>1.1.8.Final</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.shrinkwrap.resolver</groupId>
+			<artifactId>shrinkwrap-resolver-impl-maven</artifactId>
+			<version>2.2.0-beta-2</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.wildfly.arquillian</groupId>
+			<artifactId>wildfly-arquillian-container-remote</artifactId>
+			<version>1.0.0.Alpha5</version>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>sun.jdk</groupId>
+					<artifactId>jconsole</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.arquillian.extension</groupId>
+			<artifactId>arquillian-rest-warp-impl-resteasy</artifactId>
+			<version>1.0.0.Alpha3</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.arquillian.extension</groupId>
+			<artifactId>arquillian-rest-client-api</artifactId>
+			<version>1.0.0.Alpha3</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.arquillian.extension</groupId>
+			<artifactId>arquillian-rest-client-impl-3x</artifactId>
+			<version>1.0.0.Alpha3</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.arquillian.extension</groupId>
+			<artifactId>arquillian-transaction-impl-base</artifactId>
+			<version>1.0.1.Final</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-jackson-provider</artifactId>
+			<scope>test</scope>
+			<version>3.0.10.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-jaxrs</artifactId>
+			<version>3.0.11.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-jaxb-provider</artifactId>
+			<version>3.0.11.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>jaxrs-api</artifactId>
+			<scope>test</scope>
+			<version>3.0.11.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-client</artifactId>
+			<scope>test</scope>
+			<version>3.0.11.Final</version>
+		</dependency>
+
+		<!--FIXME
+			This dependency needs to be removed and to use either REST or JMS calls instead.
+			Be aware that USM services could be running on a different physical machine from the module that is dependent on usm4uvms.
+		-->
+		<dependency>
+			<groupId>eu.europa.ec.mare.usm</groupId>
+			<artifactId>Information-Service</artifactId>
+			<version>${information.service.version}</version>
+		</dependency>
 
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
@@ -49,17 +190,33 @@
             <version>${jjwt.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-api</artifactId>
-            <scope>provided</scope>
-            <version>${javaee.version}</version>
-        </dependency>
+		<dependency>
+			<groupId>javax</groupId>
+			<artifactId>javaee-api</artifactId>
+			<scope>provided</scope>
+			<version>${javaee.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.4</version>
+		</dependency>
+
 
     </dependencies>
 	
     <build>
         <plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>**/*ITest.java</exclude><!--execute this test manually for the time being-->
+					</excludes>
+				</configuration>
+			</plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
