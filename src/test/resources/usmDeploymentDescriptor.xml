@@ -34,7 +34,7 @@
         <description>some test user preferences</description>
         <dataType>TEXT</dataType>
         <defaultValue>SYSTEM_DEFAULT_VALUE</defaultValue>
-        <group>group_name</group>
+        <group>TEST_APP</group>
     </option>
     <feature>
         <name>APP1_TEST_FEATURE</name>
