@@ -7,8 +7,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.ejb.Singleton;
-import javax.ejb.Startup;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -24,9 +22,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-@Singleton
-@Startup
-public class ModuleInitializerBean {
+
+public abstract class AbstractModuleInitializerBean {
 
     public static final String PROP_MODULE_NAME = "module.name";
     public static final String PROP_USM_REST_SERVER = "usm.rest.server";
@@ -34,14 +31,11 @@ public class ModuleInitializerBean {
     public static final String PROP_USM_ADMIN_REST_USERNAME = "usm.admin.rest.username";
 
     public static final String USM_REST_DESCRIPTOR_URI = "/usm-administration/rest/deployments/";
-    public static final String USM_REST_AUTHENTICATE_URI = "/usm-administration/rest/authenticate";
-    public static final String CONFIG_USM_DEPLOYMENT_DESCRIPTOR_XML = "usmDeploymentDescriptor.xml";
-    public static final String PROP_FILE_NAME = "config.properties";
     public static final String TRUE = "true";
 
     public static final String AUTHORIZATION_HEADER = "authorization";
 
-    private static final Logger LOG = LoggerFactory.getLogger(ModuleInitializerBean.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractModuleInitializerBean.class);
 
     @PostConstruct
     public void onStartup() throws IOException {
@@ -103,32 +97,23 @@ public class ModuleInitializerBean {
         return response.getStatus() == HttpServletResponse.SC_OK;
     }
 
-    private Properties retrieveModuleConfigs() throws IOException {
-        Properties prop = new Properties();
-        InputStream properties = getClass().getClassLoader().getResourceAsStream(PROP_FILE_NAME);
-        if (properties != null) {
-            prop.load(properties);
-            return prop;
-        } else {
-            throw new FileNotFoundException("Property file '" + PROP_FILE_NAME + "' not found in the classpath");
-        }
-    }
+    protected abstract Properties retrieveModuleConfigs() throws IOException;
 
     private USMDeploymentDescriptor retrieveDescriptor() throws JAXBException, FileNotFoundException {
         JAXBContext context = JAXBContext.newInstance(USMDeploymentDescriptor.class);
         Unmarshaller un = context.createUnmarshaller();
 
-        InputStream descriptorXML = getClass().getClassLoader().getResourceAsStream(CONFIG_USM_DEPLOYMENT_DESCRIPTOR_XML);
+        InputStream descriptorXML = getDeploymentDescriptor();
         if (descriptorXML == null) {
-            throw new FileNotFoundException("Descriptor template file '" + CONFIG_USM_DEPLOYMENT_DESCRIPTOR_XML + "' not found in the classpath");
+            throw new FileNotFoundException("Descriptor template file not found in the classpath");
         }
         return (USMDeploymentDescriptor) un.unmarshal(descriptorXML);
     }
 
     private String retrieveDescriptorAsString() throws JAXBException, IOException {
-        InputStream descriptorXML = getClass().getClassLoader().getResourceAsStream(CONFIG_USM_DEPLOYMENT_DESCRIPTOR_XML);
+        InputStream descriptorXML = getDeploymentDescriptor();
         if (descriptorXML == null) {
-            throw new FileNotFoundException("Descriptor template file '" + CONFIG_USM_DEPLOYMENT_DESCRIPTOR_XML + "' not found in the classpath");
+            throw new FileNotFoundException("Descriptor template file not found in the classpath");
         }
         return IOUtils.toString(descriptorXML, "UTF-8");
     }
@@ -141,5 +126,7 @@ public class ModuleInitializerBean {
             throw new RuntimeException("Unable to " + logPrefix + "deploy application descriptor into USM. Response code: " + response.getStatus() + ". Response body: " + response.toString());
         }
     }
+
+    protected abstract InputStream getDeploymentDescriptor();
 
 }

@@ -25,8 +25,8 @@ public class ArquillianTest {
               //  .addAsWebInfResource(new File("src/test/webapp/WEB-INF/beans.xml"));
 
 
-        //File[] libs = new ConfigurableMavenResolverSystemImpl().fromFile(new File("src/test/resources/settings.xml")).loadPomFromFile("pom.xml").importDependencies(ScopeType.COMPILE, ScopeType.RUNTIME, ScopeType.TEST).resolve().withTransitivity().asFile();
-        File[] libs = Maven.configureResolver().fromFile(new File("src/test/resources/settings.xml")).loadPomFromFile("pom.xml").importDependencies(ScopeType.COMPILE, ScopeType.RUNTIME, ScopeType.TEST).resolve().withTransitivity().asFile();
+        File[] libs = Maven.configureResolver().loadPomFromFile("pom.xml").importDependencies(ScopeType.COMPILE, ScopeType.RUNTIME, ScopeType.TEST).resolve().withTransitivity().asFile();
+//        File[] libs = Maven.configureResolver().fromFile(new File("src/test/resources/settings.xml")).loadPomFromFile("pom.xml").importDependencies(ScopeType.COMPILE, ScopeType.RUNTIME, ScopeType.TEST).resolve().withTransitivity().asFile();
         war = war.addAsLibraries(libs);
 
         System.out.println(war.toString(true)); 
