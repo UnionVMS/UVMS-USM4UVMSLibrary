@@ -202,9 +202,15 @@
 			<artifactId>commons-io</artifactId>
 			<version>2.4</version>
 		</dependency>
+		<dependency>
+			<groupId>com.github.tomakehurst</groupId>
+			<artifactId>wiremock</artifactId>
+			<version>1.56</version>
+			<scope>test</scope>
+		</dependency>
 
 
-    </dependencies>
+	</dependencies>
 	
     <build>
         <plugins>

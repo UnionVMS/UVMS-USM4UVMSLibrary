@@ -12,7 +12,7 @@ import java.util.Properties;
  */
 @Singleton
 @Startup
-public class TestModuleInitializerBean extends AbstractModuleInitializerBean {
+public class ModuleInitializerBean extends AbstractModuleInitializerBean {
 
     public static final String CONFIG_USM_DEPLOYMENT_DESCRIPTOR_XML = "usmDeploymentDescriptor.xml";
     public static final String PROP_FILE_NAME = "config.properties";
