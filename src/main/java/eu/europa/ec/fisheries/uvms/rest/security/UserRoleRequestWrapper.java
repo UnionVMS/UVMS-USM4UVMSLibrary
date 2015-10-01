@@ -2,6 +2,7 @@ package eu.europa.ec.fisheries.uvms.rest.security;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
@@ -22,7 +23,7 @@ public class UserRoleRequestWrapper extends HttpServletRequestWrapper {
     private String currentScopeName;
     private String currentRoleName;
 
-    private List<String> roles = null;
+    private Set<String> roles = null;
     private HttpServletRequest realRequest;
 
     /**
@@ -31,7 +32,7 @@ public class UserRoleRequestWrapper extends HttpServletRequestWrapper {
      * @param roles
      * @param request
      */
-    public UserRoleRequestWrapper(String user, List<String> roles, HttpServletRequest request) {
+    public UserRoleRequestWrapper(String user, Set<String> roles, HttpServletRequest request) {
         super(request);
         this.user = user;
         this.setRoles(roles);
@@ -87,11 +88,11 @@ public class UserRoleRequestWrapper extends HttpServletRequestWrapper {
         };
     }
 
-    public List<String> getRoles() {
+    public Set<String> getRoles() {
         return roles;
     }
 
-    public void setRoles(List<String> roles) {
+    public void setRoles(Set<String> roles) {
         this.roles = roles;
     }
 

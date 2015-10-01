@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -36,7 +37,7 @@ public class AuthorizationFilter extends AbstractUSMHandler implements Filter{
         LOGGER.debug("AuthorizationFilter.doFilter(...) START");
 
         if (request instanceof UserRoleRequestWrapper) {
-            List<String> featuresStr = null;
+            Set<String> featuresStr = null;
             UserRoleRequestWrapper requestWrapper = (UserRoleRequestWrapper) request;
             UserContext userContext = getUserContext(requestWrapper.getRemoteUser(), getApplicationName(request.getServletContext()));
 
@@ -55,7 +56,7 @@ public class AuthorizationFilter extends AbstractUSMHandler implements Filter{
 
                     if (usmCtx.getRole().getRoleName().equalsIgnoreCase(currentRole) && usmCtx.getScope().getScopeName().equalsIgnoreCase(currentScope)) {
                         Set<Feature> features = usmCtx.getRole().getFeatures();
-                        featuresStr = new ArrayList<>(features.size());
+                        featuresStr = new HashSet<>(features.size());
                         String appName = getApplicationName(request.getServletContext());
 
                         //extract only the features that the particular application is interested in
@@ -78,7 +79,7 @@ public class AuthorizationFilter extends AbstractUSMHandler implements Filter{
                     LOGGER.warn("Unauthorized attempt to access resource with scope '{}' and role '{}', which don't exist for the current user.", currentScope, currentRole);
                 }
             } else {
-                featuresStr = (List<String>) session.getAttribute(HTTP_SESSION_ATTR_ROLES_NAME);
+                featuresStr = (Set<String>) session.getAttribute(HTTP_SESSION_ATTR_ROLES_NAME);
             }
 
             if (featuresStr != null) {
