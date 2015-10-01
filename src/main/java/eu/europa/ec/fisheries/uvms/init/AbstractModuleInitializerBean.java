@@ -58,7 +58,6 @@ public abstract class AbstractModuleInitializerBean {
             String descriptor = retrieveDescriptorAsString();
 
             if (!isDescriptorAlreadyRegistered(response)) {
-                response.close();
                 LOG.info("USM doesn't recognize the current module. Deploying module deployment descriptor...");
                 response = target.request(MediaType.APPLICATION_XML_TYPE).header(AUTHORIZATION_HEADER, authToken).post(Entity.xml(descriptor));
                 checkResult(response, "");
@@ -94,7 +93,9 @@ public abstract class AbstractModuleInitializerBean {
     }
 
     private boolean isDescriptorAlreadyRegistered(Response response) {
-        return response.getStatus() == HttpServletResponse.SC_OK;
+        boolean isRegistered = response.getStatus() == HttpServletResponse.SC_OK;
+        response.close();
+        return isRegistered;
     }
 
     protected abstract Properties retrieveModuleConfigs() throws IOException;
