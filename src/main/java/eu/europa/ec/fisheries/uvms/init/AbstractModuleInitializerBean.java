@@ -1,5 +1,6 @@
 package eu.europa.ec.fisheries.uvms.init;
 
+import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
 import eu.europa.ec.fisheries.uvms.rest.security.JwtTokenHandler;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -33,8 +34,6 @@ public abstract class AbstractModuleInitializerBean {
     public static final String USM_REST_DESCRIPTOR_URI = "/usm-administration/rest/deployments/";
     public static final String TRUE = "true";
 
-    public static final String AUTHORIZATION_HEADER = "authorization";
-
     private static final Logger LOG = LoggerFactory.getLogger(AbstractModuleInitializerBean.class);
 
     @PostConstruct
@@ -52,21 +51,21 @@ public abstract class AbstractModuleInitializerBean {
         WebTarget target = client.target(moduleConfigs.getProperty(PROP_USM_REST_SERVER)).path(USM_REST_DESCRIPTOR_URI);
 
         LOG.info("Verifying that Reporting module is deployed into USM...");
-        Response response = target.path(moduleConfigs.getProperty(PROP_MODULE_NAME)).request(MediaType.APPLICATION_XML_TYPE).header(AUTHORIZATION_HEADER, authToken).get();
+        Response response = target.path(moduleConfigs.getProperty(PROP_MODULE_NAME)).request(MediaType.APPLICATION_XML_TYPE).header(AuthConstants.HTTP_HEADER_AUTHORIZATION, authToken).get();
 
         try {
             String descriptor = retrieveDescriptorAsString();
 
             if (!isDescriptorAlreadyRegistered(response)) {
                 LOG.info("USM doesn't recognize the current module. Deploying module deployment descriptor...");
-                response = target.request(MediaType.APPLICATION_XML_TYPE).header(AUTHORIZATION_HEADER, authToken).post(Entity.xml(descriptor));
+                response = target.request(MediaType.APPLICATION_XML_TYPE).header(AuthConstants.HTTP_HEADER_AUTHORIZATION, authToken).post(Entity.xml(descriptor));
                 checkResult(response, "");
             } else {
                 LOG.info("Module deployment descriptor has already been deployed at USM.");
 
                 if (isForceUpdate(moduleConfigs)) {
                     LOG.info("Updating the existing module deployment descriptor into USM.");
-                    response = target.request(MediaType.APPLICATION_XML_TYPE).header(AUTHORIZATION_HEADER, authToken).put(Entity.xml(descriptor));
+                    response = target.request(MediaType.APPLICATION_XML_TYPE).header(AuthConstants.HTTP_HEADER_AUTHORIZATION, authToken).put(Entity.xml(descriptor));
                     checkResult(response, "re");
                 }
             }

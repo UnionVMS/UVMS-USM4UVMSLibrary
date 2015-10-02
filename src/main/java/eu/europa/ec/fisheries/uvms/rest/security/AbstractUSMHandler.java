@@ -1,14 +1,12 @@
 package eu.europa.ec.fisheries.uvms.rest.security;
 
+import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
 import eu.europa.ec.mare.usm.information.domain.UserContext;
 import eu.europa.ec.mare.usm.information.domain.UserContextQuery;
 import eu.europa.ec.mare.usm.information.service.InformationService;
 
 import javax.ejb.EJB;
 import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.Context;
 
 /**
  * Created by georgige on 9/22/2015.
@@ -17,13 +15,9 @@ public abstract class AbstractUSMHandler {
 
     private static String UNION_VMS_APPLICATION = "Union-VMS";
 
-    public static String HTTP_HEADER_ROLE_NAME = "roleName";
+    public static String HTTP_SESSION_ATTR_ROLE_NAME = AuthConstants.HTTP_HEADER_ROLE_NAME;
 
-    public static String HTTP_HEADER_SCOPE_NAME = "scopeName";
-
-    public static String HTTP_SESSION_ATTR_ROLE_NAME = HTTP_HEADER_ROLE_NAME;
-
-    public static String HTTP_SESSION_ATTR_SCOPE_NAME = HTTP_HEADER_SCOPE_NAME;
+    public static String HTTP_SESSION_ATTR_SCOPE_NAME = AuthConstants.HTTP_HEADER_SCOPE_NAME;
 
     public static String HTTP_SESSION_ATTR_ROLES_NAME = "listOfFeatures";
 

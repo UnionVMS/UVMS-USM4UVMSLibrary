@@ -2,7 +2,6 @@ package eu.europa.ec.fisheries.uvms.rest.security;
 
 import java.io.IOException;
 
-import javax.inject.Inject;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -11,8 +10,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.HttpHeaders;
 
+import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +29,6 @@ public class AuthenticationFilter implements Filter {
   private static final String CHALLENGEAUTH = "/challengeauth";
   private static final String AUTHENTICATE = "/authenticate";
   private static final String PING = "/ping";
-  public static final String JWTCALLBACK = "jwtcallback";
 
   /**
    * Creates a new instance
@@ -69,7 +67,7 @@ public class AuthenticationFilter implements Filter {
 
     Boolean tokenIsUsed = false;
     String remoteUser = httpRequest.getRemoteUser();
-    String jwtToken = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
+    String jwtToken = httpRequest.getHeader(AuthConstants.HTTP_HEADER_AUTHORIZATION);
 
     LOGGER.info("httpRequest.getRemoteUser(): " + remoteUser);
     if (remoteUser == null) {
@@ -90,7 +88,7 @@ public class AuthenticationFilter implements Filter {
         // we have a remote user but no token was provided
         refreshedToken = tokenHandler.createToken(remoteUser);
       }
-      httpResponse.addHeader(HttpHeaders.AUTHORIZATION, refreshedToken);
+      httpResponse.addHeader(AuthConstants.HTTP_HEADER_AUTHORIZATION, refreshedToken);
      
       if(PING.equals(httpRequest.getPathInfo())){
         //if(httpRequest.getUserPrincipal().getClass().equals(eu.cec.digit.ecas.client.j2ee.weblogic.EcasUser.class)) {
@@ -99,7 +97,7 @@ public class AuthenticationFilter implements Filter {
           //EcasUser ecasUser = (EcasUser) httpRequest.getUserPrincipal();
           //LOGGER.info("getEmail "+ecasUser.getEmail());
           //LOGGER.info("getUid "+ecasUser.getUid());
-          String callback = httpRequest.getParameter(JWTCALLBACK);
+          String callback = httpRequest.getParameter(AuthConstants.JWTCALLBACK);
           if(callback!=null){
             LOGGER.info("Redirecting to add jwt");
             String redir = callback+"?jwt="+refreshedToken;

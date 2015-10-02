@@ -2,7 +2,7 @@ package eu.europa.ec.fisheries.uvms.security.rest.resources;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import eu.europa.ec.fisheries.uvms.rest.security.AuthorizationFilter;
+import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
 import eu.europa.ec.fisheries.uvms.rest.security.JwtTokenHandler;
 import eu.europa.ec.fisheries.uvms.security.rest.util.ArquillianTest;
 import eu.europa.ec.mare.usm.information.domain.*;
@@ -20,7 +20,6 @@ import org.junit.runner.RunWith;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -87,7 +86,7 @@ public class RestResourceITest extends ArquillianTest {
 
 		ResteasyWebTarget usmWebTarget = new ResteasyClientBuilder().build().target("http://localhost:8080/usm-information/rest");
 		Response response = usmWebTarget.path("/userContext").request(MediaType.APPLICATION_JSON_TYPE)
-				.header(HttpHeaders.AUTHORIZATION, new JwtTokenHandler().createToken("TEST_USER")).put(Entity.json(newUserCtx));
+				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new JwtTokenHandler().createToken("TEST_USER")).put(Entity.json(newUserCtx));
 
 		assert response.getStatus() == HttpServletResponse.SC_OK;
 	}
@@ -103,9 +102,9 @@ public class RestResourceITest extends ArquillianTest {
 		
 		//check if we have the prerequisite - a report in the DB with ID = 1
 		Response response = webTarget.path("/list" ).request()
-				.header(HttpHeaders.AUTHORIZATION, new JwtTokenHandler().createToken("TEST_USER"))
-				.header(AuthorizationFilter.HTTP_HEADER_ROLE_NAME, "TEST_ROLE")
-				.header(AuthorizationFilter.HTTP_HEADER_SCOPE_NAME, "TEST_SCOPE")
+				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new JwtTokenHandler().createToken("TEST_USER"))
+				.header(AuthConstants.HTTP_HEADER_ROLE_NAME, "TEST_ROLE")
+				.header(AuthConstants.HTTP_HEADER_SCOPE_NAME, "TEST_SCOPE")
 				.get();
 		assertEquals(HttpServletResponse.SC_OK, response.getStatus());
 		response.close();
@@ -118,9 +117,9 @@ public class RestResourceITest extends ArquillianTest {
 
 		//check if we have the prerequisite - a report in the DB with ID = 1
 		Response response = webTarget.path("/get" ).request()
-				.header(HttpHeaders.AUTHORIZATION, new JwtTokenHandler().createToken("TEST_USER"))
-				.header(AuthorizationFilter.HTTP_HEADER_ROLE_NAME, "TEST_ROLE")
-				.header(AuthorizationFilter.HTTP_HEADER_SCOPE_NAME, "TEST_SCOPE")
+				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new JwtTokenHandler().createToken("TEST_USER"))
+				.header(AuthConstants.HTTP_HEADER_ROLE_NAME, "TEST_ROLE")
+				.header(AuthConstants.HTTP_HEADER_SCOPE_NAME, "TEST_SCOPE")
 				.get();
 		assertEquals(HttpServletResponse.SC_FORBIDDEN, response.getStatus());
 		response.close();

@@ -1,5 +1,6 @@
 package eu.europa.ec.fisheries.uvms.rest.security;
 
+import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
 import eu.europa.ec.mare.usm.information.domain.Context;
 import eu.europa.ec.mare.usm.information.domain.Feature;
 import eu.europa.ec.mare.usm.information.domain.UserContext;
@@ -41,8 +42,8 @@ public class AuthorizationFilter extends AbstractUSMHandler implements Filter{
             UserRoleRequestWrapper requestWrapper = (UserRoleRequestWrapper) request;
             UserContext userContext = getUserContext(requestWrapper.getRemoteUser(), getApplicationName(request.getServletContext()));
 
-            String currentScope = requestWrapper.getHeader(HTTP_HEADER_SCOPE_NAME); //get it from the header
-            String currentRole = requestWrapper.getHeader(HTTP_HEADER_ROLE_NAME); //get it from the header
+            String currentScope = requestWrapper.getHeader(AuthConstants.HTTP_HEADER_SCOPE_NAME); //get it from the header
+            String currentRole = requestWrapper.getHeader(AuthConstants.HTTP_HEADER_ROLE_NAME); //get it from the header
 
             LOGGER.debug("Current requests is with scope '{}', and role '{}'", currentScope, currentRole);
 

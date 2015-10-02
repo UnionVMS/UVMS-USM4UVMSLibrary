@@ -3,6 +3,7 @@ package eu.europa.ec.fisheries.uvms.init;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
+import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -73,7 +74,7 @@ public class ModuleInitializerBeanTest {
                         .withHeader("Accept", WireMock.matching(APPLICATION_XML))
                         .withHeader("Host", WireMock.matching(LOCALHOST))
                         .withHeader("Connection", WireMock.matching(KEEP_ALIVE))
-                        .withHeader(ModuleInitializerBean.AUTHORIZATION_HEADER, WireMock.matching(JWTOKEN))
+                        .withHeader(AuthConstants.HTTP_HEADER_AUTHORIZATION, WireMock.matching(JWTOKEN))
                         .withoutHeader(CONTENT_TYPE)
         );
 
@@ -81,7 +82,7 @@ public class ModuleInitializerBeanTest {
                         .withHeader("Accept", WireMock.matching(APPLICATION_XML))
                         .withHeader("Host", WireMock.matching(LOCALHOST))
                         .withHeader("Connection", WireMock.matching(KEEP_ALIVE))
-                        .withHeader(ModuleInitializerBean.AUTHORIZATION_HEADER, WireMock.matching(JWTOKEN))
+                        .withHeader(AuthConstants.HTTP_HEADER_AUTHORIZATION, WireMock.matching(JWTOKEN))
                         .withRequestBody(WireMock.matching(".*<name>reporting</name>.*"))
         );
     }
@@ -125,7 +126,7 @@ public class ModuleInitializerBeanTest {
                         .withHeader("Accept", WireMock.matching("application/xml"))
                         .withHeader("Host", WireMock.matching(LOCALHOST))
                         .withHeader("Connection", WireMock.matching(KEEP_ALIVE))
-                        .withHeader(ModuleInitializerBean.AUTHORIZATION_HEADER, WireMock.matching(JWTOKEN))
+                        .withHeader(AuthConstants.HTTP_HEADER_AUTHORIZATION, WireMock.matching(JWTOKEN))
                         .withoutHeader(CONTENT_TYPE)
         );
 
@@ -135,7 +136,7 @@ public class ModuleInitializerBeanTest {
                         .withHeader("Host", WireMock.matching(LOCALHOST))
                         .withHeader("Connection", WireMock.matching(KEEP_ALIVE))
                         .withHeader("Content-Length", WireMock.matching("866"))
-                        .withHeader(ModuleInitializerBean.AUTHORIZATION_HEADER, WireMock.matching(JWTOKEN))
+                        .withHeader(AuthConstants.HTTP_HEADER_AUTHORIZATION, WireMock.matching(JWTOKEN))
                         .withRequestBody(WireMock.matching(".*<name>reporting</name>.*"))
         );
 
