@@ -12,4 +12,6 @@ public interface AuthConstants {
 
     public static final String HTTP_HEADER_AUTHORIZATION = HttpHeaders.AUTHORIZATION;
     public static final String JWTCALLBACK = "jwtcallback";
+
+    public static final String HTTP_SERVLET_CONTEXT_ATTR_FEATURES = "servletContextUserFeatures";
 }

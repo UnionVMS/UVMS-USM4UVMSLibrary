@@ -1,5 +1,7 @@
 package eu.europa.ec.fisheries.uvms.rest.security;
 
+import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
+
 import java.security.Principal;
 import java.util.List;
 import java.util.Set;
@@ -36,6 +38,7 @@ public class UserRoleRequestWrapper extends HttpServletRequestWrapper {
         super(request);
         this.user = user;
         this.setRoles(roles);
+        request.getServletContext().setAttribute(AuthConstants.HTTP_SERVLET_CONTEXT_ATTR_FEATURES, roles); //this is needed, because RESTEasy creates proxy objects and in a rest method, I cannot cast to this wrapper and call wrapper.getRoles();
         this.realRequest = request;
     }
 
