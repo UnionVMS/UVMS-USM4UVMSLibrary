@@ -3,15 +3,17 @@
     <groupId>eu.europa.ec.mare.usm</groupId>
     <artifactId>usm4uvms</artifactId>
     <packaging>jar</packaging>
-    <version>0.0.9-SNAPSHOT</version>
+    <version>0.0.11-SNAPSHOT</version>
     <name>usm4uvms</name>
     <description>USM integration for UnionVMS.</description>
 
     <properties>
         <release.branch.name>salome</release.branch.name>
-        <information.service.version>1.6.0</information.service.version>
+        <user.service.version>1.1.0-SNAPSHOT</user.service.version>
+		<information.service.version>1.6.0</information.service.version>
         <javaee.version>7.0</javaee.version>
         <jjwt.version>0.4</jjwt.version>
+		<uvms.commons.version>1.4-SNAPSHOT</uvms.commons.version>
     </properties>
 
     <distributionManagement>
@@ -179,6 +181,13 @@
 			Be aware that USM services could be running on a different physical machine from the module that is dependent on usm4uvms.
 		-->
 		<dependency>
+			<groupId>eu.europa.ec.fisheries.uvms.user</groupId>
+			<artifactId>user-model</artifactId>
+			<version>${user.service.version}</version>
+		</dependency>
+
+		<!-- to be removed since we will use user-model instead-->
+		<dependency>
 			<groupId>eu.europa.ec.mare.usm</groupId>
 			<artifactId>Information-Service</artifactId>
 			<version>${information.service.version}</version>
@@ -203,12 +212,16 @@
 			<version>2.4</version>
 		</dependency>
 		<dependency>
-			<groupId>com.github.tomakehurst</groupId>
-			<artifactId>wiremock</artifactId>
-			<version>1.56</version>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.10.19</version>
 			<scope>test</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>eu.europa.ec.fisheries.uvms</groupId>
+			<artifactId>uvms-commons</artifactId>
+			<version>${uvms.commons.version}</version>
+		</dependency>
 
 	</dependencies>
 	

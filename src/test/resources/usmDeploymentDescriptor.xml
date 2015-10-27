@@ -1,44 +1,45 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:application xmlns:ns2="deployment.domain.administration.usm.mare.ec.europa.eu">
-    <name>TEST_APP</name>
-    <description>Deployment descriptor of module TEST_APP.</description>
-    <parent>Union VMS</parent>
-    <!--
-    <name>app_name</name>
-<description>app_desc</description>
-<parent>parent_name</parent>
-<dataset>
-    <name>dataset_name</name>
-    <description>dataset_desc</description>
-    <category>dataset_cat</category>
-    <discriminator>dataset_disc</discriminator>
-</dataset>
-...
-<option>
-    <name>option_name</name>
-    <description>option_desc</description>
-    <dataType>TEXT</dataType>
-    <defaultValue>default value</defaultValue>
-    <group>group_name</group>
-</option>
-...
-<feature>
-    <name>feature_name</name>
-    <description>feature_desc</description>
-    <group>group_name</group>
-</feature>
-...
-    ......-->
+<ns2:deployApplicationRequest  xmlns:ns2="module.user.wsdl.fisheries.ec.europa.eu">
+    <method>DEPLOY_APPLICATION</method>
+    <application>
+        <name>TEST_APP</name>
+        <description>Deployment descriptor of module TEST_APP.</description>
+        <parent>Union VMS</parent>
+        <!--
+        <name>app_name</name>
+    <description>app_desc</description>
+    <parent>parent_name</parent>
+    <dataset>
+        <name>dataset_name</name>
+        <description>dataset_desc</description>
+        <category>dataset_cat</category>
+        <discriminator>dataset_disc</discriminator>
+    </dataset>
+    ...
     <option>
-        <name>TEST_USER_PREFERENCE</name>
-        <description>some test user preferences</description>
+        <name>option_name</name>
+        <description>option_desc</description>
         <dataType>TEXT</dataType>
-        <defaultValue>SYSTEM_DEFAULT_VALUE</defaultValue>
-        <group>TEST_APP</group>
+        <defaultValue>default value</defaultValue>
+        <group>group_name</group>
     </option>
+    ...
     <feature>
-        <name>APP1_TEST_FEATURE</name>
-        <description>some test feature</description>
-        <group>modified_group_name</group>
+        <name>feature_name</name>
+        <description>feature_desc</description>
+        <group>group_name</group>
     </feature>
-</ns2:application>
+    ...
+        ......-->
+        <option>
+            <name>TEST_USER_PREFERENCE</name>
+            <description>some test user preferences</description>
+            <dataType>TEXT</dataType>
+          </option>
+        <feature>
+            <name>APP1_TEST_FEATURE</name>
+            <description>some test feature</description>
+            <group>modified_group_name</group>
+        </feature>
+    </application>
+</ns2:deployApplicationRequest>

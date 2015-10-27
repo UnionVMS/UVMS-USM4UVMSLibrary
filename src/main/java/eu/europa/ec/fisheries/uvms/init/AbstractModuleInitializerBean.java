@@ -1,78 +1,104 @@
 package eu.europa.ec.fisheries.uvms.init;
 
-import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
-import eu.europa.ec.fisheries.uvms.rest.security.JwtTokenHandler;
+import eu.europa.ec.fisheries.uvms.exception.ServiceException;
+import eu.europa.ec.fisheries.uvms.jms.USMMessageConsumer;
+import eu.europa.ec.fisheries.uvms.jms.USMMessageProducer;
+import eu.europa.ec.fisheries.uvms.message.AbstractJAXBMarshaller;
+import eu.europa.ec.fisheries.uvms.message.MessageConsumer;
+import eu.europa.ec.fisheries.uvms.message.MessageException;
+import eu.europa.ec.fisheries.uvms.user.model.exception.ModelMarshallException;
+import eu.europa.ec.fisheries.wsdl.user.module.*;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.ejb.EJB;
+import javax.jms.*;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Properties;
+import java.io.StringReader;
 
 
-public abstract class AbstractModuleInitializerBean {
-
-    public static final String PROP_MODULE_NAME = "module.name";
-    public static final String PROP_USM_REST_SERVER = "usm.rest.server";
-    public static final String PROP_USM_DESCRIPTOR_FORCE_UPDATE = "usm.deployment.descriptor.force-update";
-    public static final String PROP_USM_ADMIN_REST_USERNAME = "usm.admin.rest.username";
-
-    public static final String USM_REST_DESCRIPTOR_URI = "/usm-administration/rest/deployments/";
-    public static final String TRUE = "true";
+public abstract class AbstractModuleInitializerBean extends AbstractJAXBMarshaller {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractModuleInitializerBean.class);
 
+    @EJB
+    protected USMMessageProducer messageProducer;
+
+    @EJB
+    protected USMMessageConsumer messageConsumer;
+
     @PostConstruct
-    public void onStartup() throws IOException {
+    public void onStartup() throws IOException, JAXBException, ModelMarshallException, JMSException, ServiceException, MessageException {
         // do something on application startup
-        Properties moduleConfigs = retrieveModuleConfigs();
+        InputStream deploymentDescInStream = getDeploymentDescriptorRequest();
 
-        Client client = ClientBuilder.newClient();
+        if (deploymentDescInStream != null) {
+            String deploymentDescriptor = IOUtils.toString(deploymentDescInStream, "UTF-8");
+            if (!isAppDeployed(deploymentDescriptor)) {
+                deployApp(deploymentDescriptor);
+            }
+        } else {
+            LOG.error("USM deployment descriptor is not provided, therefore, the JMS deployment message cannot be sent.");
+        }
+    }
 
-        JwtTokenHandler tokenHandler = new JwtTokenHandler();
+    private boolean isAppDeployed(String deploymentDescriptor) throws JAXBException, JMSException, ServiceException, MessageException {
+        JAXBContext jaxBcontext = JAXBContext.newInstance(DeployApplicationRequest.class);
+        javax.xml.bind.Unmarshaller um = jaxBcontext.createUnmarshaller();
 
-        LOG.info("Successfully authenticated into USM.");
-        String authToken = tokenHandler.createToken(moduleConfigs.getProperty(PROP_USM_ADMIN_REST_USERNAME));
+        DeployApplicationRequest deploymentRequest = (DeployApplicationRequest) um.unmarshal(new StringReader(deploymentDescriptor));
 
-        WebTarget target = client.target(moduleConfigs.getProperty(PROP_USM_REST_SERVER)).path(USM_REST_DESCRIPTOR_URI);
-
-        LOG.info("Verifying that Reporting module is deployed into USM...");
-        Response response = target.path(moduleConfigs.getProperty(PROP_MODULE_NAME)).request(MediaType.APPLICATION_XML_TYPE).header(AuthConstants.HTTP_HEADER_AUTHORIZATION, authToken).get();
-
+        GetDeploymentDescriptorRequest getDeploymentDescriptorRequest = new GetDeploymentDescriptorRequest();
+        getDeploymentDescriptorRequest.setMethod(UserModuleMethod.GET_DEPLOYMENT_DESCRIPTOR);
+        getDeploymentDescriptorRequest.setApplicationName(deploymentRequest.getApplication().getName());
         try {
-            String descriptor = retrieveDescriptorAsString();
+            String msgId = messageProducer.sendModuleMessage(marshallJaxBObjectToString(getDeploymentDescriptorRequest), messageConsumer.getDestination());
+            Message response = messageConsumer.getMessage(msgId, GetDeploymentDescriptorResponse.class);
 
-            if (!isDescriptorAlreadyRegistered(response)) {
-                LOG.info("USM doesn't recognize the current module. Deploying module deployment descriptor...");
-                response = target.request(MediaType.APPLICATION_XML_TYPE).header(AuthConstants.HTTP_HEADER_AUTHORIZATION, authToken).post(Entity.xml(descriptor));
-                checkResult(response, "");
+            if (!(response instanceof TextMessage)) {
+                throw new ServiceException("Unable to receive a response from USM.");
             } else {
-                LOG.info("Module deployment descriptor has already been deployed at USM.");
-
-                if (isForceUpdate(moduleConfigs)) {
-                    LOG.info("Updating the existing module deployment descriptor into USM.");
-                    response = target.request(MediaType.APPLICATION_XML_TYPE).header(AuthConstants.HTTP_HEADER_AUTHORIZATION, authToken).put(Entity.xml(descriptor));
-                    checkResult(response, "re");
+                GetDeploymentDescriptorResponse getDeploymentDescriptorResponse =
+                        unmarshallTextMessage(((TextMessage) response), GetDeploymentDescriptorResponse.class);
+                if (getDeploymentDescriptorResponse.getApplication() != null && getDeploymentDescriptorResponse.getApplication().getName().equals(deploymentRequest.getApplication().getName())) {
+                    return true;
                 }
             }
-        } catch (JAXBException e) {
-            throw new RuntimeException("Unable to unmarshal descriptor", e);
-        } finally {
-            closeConnection(response);
+        } catch (MessageException e) {
+            LOG.error("Unable to open JMS producerConnection producerSession.", e);
+            throw e;
+        }
+
+        return false;
+    }
+
+
+    private void deployApp(String deploymentDescriptor) throws ServiceException, JMSException, MessageException, JAXBException {
+        try {
+            String msgId = messageProducer.sendModuleMessage(deploymentDescriptor, messageConsumer.getDestination());
+            Message response = messageConsumer.getMessage(msgId, DeployApplicationResponse.class);
+
+            if (response instanceof TextMessage) {
+                DeployApplicationResponse deployApplicationResponse = unmarshallTextMessage(((TextMessage) response), DeployApplicationResponse.class);
+
+                if ("OK".equalsIgnoreCase(deployApplicationResponse.getResponse())) {
+                    LOG.info("Application successfully registered into USM.");
+                } else {
+                    throw new ServiceException("Unable to register into USM.");
+                }
+            } else {
+                throw new ServiceException("Unrecognized response during USM registration: " + response.toString());
+            }
+
+        } catch (MessageException e) {
+            LOG.error("Unable to open JMS producerConnection producerSession.", e);
+            throw e;
         }
     }
 
@@ -81,52 +107,5 @@ public abstract class AbstractModuleInitializerBean {
         //TODO undeploy app
     }
 
-    private void closeConnection(Response response) {
-        if (response != null) {
-            response.close();
-        }
-    }
-
-    private boolean isForceUpdate(Properties moduleConfigs) {
-        return TRUE.equalsIgnoreCase(moduleConfigs.getProperty(PROP_USM_DESCRIPTOR_FORCE_UPDATE));
-    }
-
-    private boolean isDescriptorAlreadyRegistered(Response response) {
-        boolean isRegistered = response.getStatus() == HttpServletResponse.SC_OK;
-        response.close();
-        return isRegistered;
-    }
-
-    protected abstract Properties retrieveModuleConfigs() throws IOException;
-
-    private USMDeploymentDescriptor retrieveDescriptor() throws JAXBException, FileNotFoundException {
-        JAXBContext context = JAXBContext.newInstance(USMDeploymentDescriptor.class);
-        Unmarshaller un = context.createUnmarshaller();
-
-        InputStream descriptorXML = getDeploymentDescriptor();
-        if (descriptorXML == null) {
-            throw new FileNotFoundException("Descriptor template file not found in the classpath");
-        }
-        return (USMDeploymentDescriptor) un.unmarshal(descriptorXML);
-    }
-
-    private String retrieveDescriptorAsString() throws JAXBException, IOException {
-        InputStream descriptorXML = getDeploymentDescriptor();
-        if (descriptorXML == null) {
-            throw new FileNotFoundException("Descriptor template file not found in the classpath");
-        }
-        return IOUtils.toString(descriptorXML, "UTF-8");
-    }
-
-    private void checkResult(Response response, String logPrefix) {
-        if (response.getStatus() == HttpServletResponse.SC_OK) {
-            LOG.info("Application " + logPrefix + "deployment descriptor successfully " + logPrefix + "deployed into USM.");
-        } else {
-            closeConnection(response);
-            throw new RuntimeException("Unable to " + logPrefix + "deploy application descriptor into USM. Response code: " + response.getStatus() + ". Response body: " + response.toString());
-        }
-    }
-
-    protected abstract InputStream getDeploymentDescriptor();
-
+    protected abstract InputStream getDeploymentDescriptorRequest();
 }

@@ -2,6 +2,7 @@ package eu.europa.ec.fisheries.uvms.rest.security;
 
 import java.io.IOException;
 
+import javax.jms.JMSException;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -12,9 +13,12 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
+import javax.xml.bind.JAXBException;
 
-import eu.europa.ec.mare.usm.information.domain.Feature;
-import eu.europa.ec.mare.usm.information.domain.UserContext;
+import eu.europa.ec.fisheries.uvms.exception.ServiceException;
+import eu.europa.ec.fisheries.uvms.message.MessageException;
+import eu.europa.ec.fisheries.wsdl.user.types.Feature;
+import eu.europa.ec.fisheries.wsdl.user.types.UserContext;
 
 @Provider
 public class UnionVMSFeatureFilter extends AbstractUSMHandler implements ContainerRequestFilter {
@@ -41,15 +45,30 @@ public class UnionVMSFeatureFilter extends AbstractUSMHandler implements Contain
             return;
         }
 
-        if (!hasFeature(feature, null, null)) {
-            requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
-                    .header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
-                    .entity("User cannot access the resource.")
-                    .build());
+        try {
+            UserContext ctx = getUserContext(servletRequest.getRemoteUser(), getApplicationName(servletContext));
+
+            if (ctx != null && ctx.getContextSet() != null) {
+                if (!hasFeature(ctx, feature, null, null)) {
+                    sendAccessForbidden(requestContext);
+                }
+            } else {
+                sendAccessForbidden(requestContext);
+            }
+        } catch (JAXBException|MessageException|ServiceException|JMSException e) {
+            sendAccessForbidden(requestContext);
         }
+
     }
 
-    private boolean filterRole(eu.europa.ec.mare.usm.information.domain.Context ctx, String role) {
+    private void sendAccessForbidden(ContainerRequestContext requestContext) {
+        requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+                .entity("User cannot access the resource.")
+                .build());
+    }
+
+    private boolean filterRole(eu.europa.ec.fisheries.wsdl.user.types.Context ctx, String role) {
         if (ctx.getRole() == null) {
             return false;
         }
@@ -57,29 +76,22 @@ public class UnionVMSFeatureFilter extends AbstractUSMHandler implements Contain
         return role == null || role.equals(ctx.getRole().getRoleName()); 
     }
 
-    private boolean filterScope(eu.europa.ec.mare.usm.information.domain.Context ctx, String scope) {
+    private boolean filterScope(eu.europa.ec.fisheries.wsdl.user.types.Context ctx, String scope) {
         return ctx.getScope() == null || ctx.getScope().getScopeName().equals(scope);
     }
 
-    private boolean hasFeature(UnionVMSFeature feature, String roleName, String scopeName) {
+    private boolean hasFeature(UserContext userContext, UnionVMSFeature feature, String roleName, String scopeName) {
         if (servletRequest.getRemoteUser() == null) {
             return false;
         }
 
-		String applicationName = getApplicationName(servletContext);
-
-        UserContext ctx = getUserContext(servletRequest.getRemoteUser(), getApplicationName(servletContext));
-        if (ctx == null || ctx.getContextSet() == null) {
-            return false;
-        }
-
-        for (eu.europa.ec.mare.usm.information.domain.Context c : ctx.getContextSet().getContexts()) {
+        for (eu.europa.ec.fisheries.wsdl.user.types.Context c : userContext.getContextSet().getContext()) {
             if (!filterRole(c, roleName) || !filterScope(c, scopeName)) {
                 continue;
             }
 
-            for (Feature f : c.getRole().getFeatures()) {
-                if (applicationName.equals(f.getApplicationName()) && feature.name().equals(f.getFeatureName())) {
+            for (Feature f : c.getRole().getFeature()) {
+                if (feature.name().equals(f.getName())) {
                     return true;
                 }
             }

@@ -1,145 +1,99 @@
 package eu.europa.ec.fisheries.uvms.init;
 
-import com.github.tomakehurst.wiremock.client.WireMock;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
-import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
+import eu.europa.ec.fisheries.uvms.exception.ServiceException;
+import eu.europa.ec.fisheries.uvms.user.model.exception.ModelMarshallException;
+import eu.europa.ec.fisheries.wsdl.user.module.DeployApplicationRequest;
+import eu.europa.ec.fisheries.wsdl.user.module.UserModuleMethod;
+import eu.europa.ec.fisheries.wsdl.user.types.Application;
+import eu.europa.ec.fisheries.wsdl.user.types.Dataset;
 import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Matchers;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
+import org.mockito.internal.util.reflection.Whitebox;
+import org.mockito.runners.MockitoJUnitRunner;
 
+import javax.jms.*;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.MediaType;
+import javax.transaction.HeuristicMixedException;
+import javax.transaction.HeuristicRollbackException;
+import javax.transaction.RollbackException;
+import javax.transaction.SystemException;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import java.io.IOException;
 
 import static java.lang.Integer.valueOf;
-//FIXME
-@Ignore
+import static org.mockito.Mockito.*;
+@RunWith(MockitoJUnitRunner.class)
 public class ModuleInitializerBeanTest {
 
-    public static final int PORT = 8089;
-    public static final String LOCALHOST = "localhost:" + valueOf(PORT);
-    public static final String KEEP_ALIVE = "Keep-Alive";
-    public static final String APPLICATION_XML = "application/xml";
-    public static final String CONTENT_TYPE = "Content-Type";
-    public static final int NOT_PRESENT = HttpServletResponse.SC_NO_CONTENT;
-    public static final int PRESENT = HttpServletResponse.SC_OK;
-    public static final int SUCCESS = HttpServletResponse.SC_OK;
-
-    private static final String JWTOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJ1c20vYXV0aGVudGljYXRpb24iLCJpc3MiOiJ1c20iLCJzdWIiOiJhdXRoZW50aWNhdGlvbiIsImlhdCI6MTQzNzY1NDMxNSwiZXhwIjoxNDM3NjU2MTE1LCJ1c2VyTmFtZSI6InVzbV9hZG1pbiJ9.TqR4eRZnToXPCswFgUzzw8hBXBO7fRdi1oDyLTRjpaA";
-
-    @Rule
-    public WireMockRule wireMockRule = new WireMockRule(PORT);
-
+    @Spy
     private ModuleInitializerBean initializerBean;
+
+    @Mock
+    protected ConnectionFactory connectionFactory;
+
+    @Mock
+    protected Queue usmRequestQueue;
+
+    @Mock
+    private MessageProducer jmsProducer;
+
+    @Mock
+    private Session session;
+
+    @Mock
+    private Connection connection;
 
     @Before
     public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
         initializerBean = new ModuleInitializerBean();
+        Whitebox.setInternalState(initializerBean, "connectionFactory", connectionFactory);
+        Whitebox.setInternalState(initializerBean, "usmRequestQueue", usmRequestQueue);
+        Whitebox.setInternalState(initializerBean, "session", session);
+        Whitebox.setInternalState(initializerBean, "connection", connection);
+
+    }
+
+
+
+    @Test
+    @Ignore
+    public void okDeployDescriptor() throws Exception {
+
+        when(session.createProducer(usmRequestQueue)).thenReturn(jmsProducer);
+        when(connectionFactory.createConnection()).thenReturn(connection);
+        when(connection.createSession(false, Session.AUTO_ACKNOWLEDGE)).thenReturn(session);
+        when(session.createTextMessage(anyString())).thenReturn(mock(TextMessage.class));
+
+        initializerBean.onStartup();
+
+        verify(jmsProducer, times(1)).send(Matchers.any(TextMessage.class));
+        verify(session, times(1)).createProducer(Matchers.eq(usmRequestQueue));
+        reset(session, connection, connectionFactory, jmsProducer, usmRequestQueue);
+    }
+
+    @Test (expected = JAXBException.class)
+    @Ignore
+    public void badDescriptor() throws Exception {
+        initializerBean.onStartup();
+
+        reset(session, connection, connectionFactory, jmsProducer, usmRequestQueue);
     }
 
     @Test
-    public void shouldDeployDescriptor() throws Exception {
-        // given
-        WireMock.stubFor(WireMock.post(WireMock.urlEqualTo("/usm-administration/rest/authenticate"))
-                .willReturn(WireMock.aResponse()
-                        .withStatus(SUCCESS)
-                        .withHeader(CONTENT_TYPE, String.valueOf(MediaType.APPLICATION_JSON_TYPE))
-                        .withBody("{" +
-                                " \"jwtoken\": \"" + JWTOKEN + "\"," +
-                                " \"authenticated\": true,\n" +
-                                " \"statusCode\": 0\n" +
-                                "}")));
-        WireMock.stubFor(WireMock.get(WireMock.urlEqualTo("/usm-administration/rest/deployments/reportingModule"))
-                .willReturn(WireMock.aResponse()
-                        .withStatus(NOT_PRESENT)));
+    @Ignore
+    public void noDescriptor() throws Exception{
+        initializerBean.onStartup();
+        verify(session, times(0)).createProducer(Matchers.eq(usmRequestQueue));
 
-        WireMock.stubFor(WireMock.post(WireMock.urlEqualTo("/usm-administration/rest/deployments/"))
-                .willReturn(WireMock.aResponse()
-                        .withStatus(SUCCESS)
-                        .withHeader(CONTENT_TYPE, APPLICATION_XML)
-                        .withBody("<response>OK</response>")));
-
-        // when
-       // initializerBean.startup();
-
-        // then
-        WireMock.verify(1, WireMock.postRequestedFor(WireMock.urlEqualTo("/usm-administration/rest/authenticate"))
-                        .withHeader(CONTENT_TYPE, WireMock.matching(String.valueOf(MediaType.APPLICATION_JSON_TYPE)))
-                        .withHeader("Host", WireMock.matching(LOCALHOST))
-                        .withRequestBody(WireMock.equalToJson( "{\"userName\":\"usm_bootstrap\",\"password\":\"password\"}"))
-        );
-
-        WireMock.verify(1, WireMock.getRequestedFor(WireMock.urlEqualTo("/usm-administration/rest/deployments/reportingModule"))
-                        .withHeader("Accept", WireMock.matching(APPLICATION_XML))
-                        .withHeader("Host", WireMock.matching(LOCALHOST))
-                        .withHeader("Connection", WireMock.matching(KEEP_ALIVE))
-                        .withHeader(AuthConstants.HTTP_HEADER_AUTHORIZATION, WireMock.matching(JWTOKEN))
-                        .withoutHeader(CONTENT_TYPE)
-        );
-
-        WireMock.verify(1, WireMock.postRequestedFor(WireMock.urlEqualTo("/usm-administration/rest/deployments/"))
-                        .withHeader("Accept", WireMock.matching(APPLICATION_XML))
-                        .withHeader("Host", WireMock.matching(LOCALHOST))
-                        .withHeader("Connection", WireMock.matching(KEEP_ALIVE))
-                        .withHeader(AuthConstants.HTTP_HEADER_AUTHORIZATION, WireMock.matching(JWTOKEN))
-                        .withRequestBody(WireMock.matching(".*<name>reporting</name>.*"))
-        );
+        reset(session, connection, connectionFactory, jmsProducer, usmRequestQueue);
     }
-
-    @Test
-    public void shouldUpdateDescriptor() throws Exception {
-        // given
-        WireMock.stubFor(WireMock.post(WireMock.urlEqualTo("/usm-administration/rest/authenticate"))
-                .willReturn(WireMock.aResponse()
-                        .withStatus(SUCCESS)
-                        .withHeader(CONTENT_TYPE, String.valueOf(MediaType.APPLICATION_JSON_TYPE))
-                        .withBody("{" +
-                                " \"jwtoken\": \"" + JWTOKEN + "\"," +
-                                " \"authenticated\": true,\n" +
-                                " \"statusCode\": 0\n" +
-                                "}")));
-
-        WireMock.stubFor(WireMock.get(WireMock.urlEqualTo("/usm-administration/rest/deployments/reportingModule"))
-                .willReturn(WireMock.aResponse()
-                        .withStatus(PRESENT)
-                        .withHeader(CONTENT_TYPE, APPLICATION_XML)
-                        .withBody("<response>OK</response>")));
-
-        WireMock.stubFor(WireMock.put(WireMock.urlEqualTo("/usm-administration/rest/deployments/"))
-                .willReturn(WireMock.aResponse()
-                        .withStatus(SUCCESS)
-                        .withHeader(CONTENT_TYPE, APPLICATION_XML)
-                        .withBody("<response>OK</response>")));
-
-        // when
-        //initializerBean.startup();
-
-        // then
-        WireMock.verify(1, WireMock.postRequestedFor(WireMock.urlEqualTo("/usm-administration/rest/authenticate"))
-                        .withHeader(CONTENT_TYPE, WireMock.matching(String.valueOf(MediaType.APPLICATION_JSON_TYPE)))
-                        .withHeader("Host", WireMock.matching(LOCALHOST))
-                        .withRequestBody(WireMock.equalToJson( "{\"userName\":\"usm_bootstrap\",\"password\":\"password\"}"))
-        );
-
-        WireMock.verify(1, WireMock.getRequestedFor(WireMock.urlEqualTo("/usm-administration/rest/deployments/reportingModule"))
-                        .withHeader("Accept", WireMock.matching("application/xml"))
-                        .withHeader("Host", WireMock.matching(LOCALHOST))
-                        .withHeader("Connection", WireMock.matching(KEEP_ALIVE))
-                        .withHeader(AuthConstants.HTTP_HEADER_AUTHORIZATION, WireMock.matching(JWTOKEN))
-                        .withoutHeader(CONTENT_TYPE)
-        );
-
-        WireMock.verify(1, WireMock.putRequestedFor(WireMock.urlEqualTo("/usm-administration/rest/deployments/"))
-                        .withHeader("Accept", WireMock.matching(APPLICATION_XML))
-                        .withHeader("Content-Type", WireMock.matching(APPLICATION_XML))
-                        .withHeader("Host", WireMock.matching(LOCALHOST))
-                        .withHeader("Connection", WireMock.matching(KEEP_ALIVE))
-                        .withHeader("Content-Length", WireMock.matching("866"))
-                        .withHeader(AuthConstants.HTTP_HEADER_AUTHORIZATION, WireMock.matching(JWTOKEN))
-                        .withRequestBody(WireMock.matching(".*<name>reporting</name>.*"))
-        );
-
-    }
-
 }
