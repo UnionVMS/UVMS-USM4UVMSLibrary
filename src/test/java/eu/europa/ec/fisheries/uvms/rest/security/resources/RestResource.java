@@ -1,4 +1,4 @@
-package eu.europa.ec.fisheries.uvms.security.rest.resources;
+package eu.europa.ec.fisheries.uvms.rest.security.resources;
 
 
 import org.slf4j.Logger;

@@ -1,6 +1,6 @@
-package eu.europa.ec.fisheries.uvms.security.rest;
+package eu.europa.ec.fisheries.uvms.rest.security;
 
-import eu.europa.ec.fisheries.uvms.security.rest.resources.RestResource;
+import eu.europa.ec.fisheries.uvms.rest.security.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

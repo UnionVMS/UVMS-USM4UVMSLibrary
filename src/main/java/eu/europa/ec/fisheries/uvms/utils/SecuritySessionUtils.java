@@ -32,10 +32,23 @@ public class SecuritySessionUtils {
         //we may have to transform this class into EJB  since we have to use the JMS producer and consumer
     }
 
-    public List<String> getCachedDatasetsPerCategory(String category, HttpSession session) {
-        //TODO something simillar as getCachedUserPreference but with Datasets instead
-        //Use the discriminator or name as an unique field to define scope area restrictions (Area Type/Area ID)
-        return null;
+    /**
+     *
+     * @param category (can be null for non-categorized datasets)
+     * @param session
+     * @return
+     */
+    public List<Dataset> getCachedDatasetsPerCategory(String category, HttpSession session) {
+        List<Dataset> datasets = null;
+
+        if (session != null) {
+            Object datasetsObj = session.getAttribute(category);
+
+            if (datasetsObj != null) {
+                datasets = (List<Dataset>) datasetsObj;
+            }
+        }
+        return datasets;
     }
 
     public static Set<String> getCachedUserFeatures(HttpSession session) {

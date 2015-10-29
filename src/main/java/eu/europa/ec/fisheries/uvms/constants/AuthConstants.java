@@ -21,5 +21,7 @@ public interface AuthConstants {
 
     public static String HTTP_SESSION_ATTR_ROLES_NAME = HTTP_SERVLET_CONTEXT_ATTR_FEATURES;
 
+    public static String HTTP_SESSION_ATTR_DATASETS = "scopeCategorizedDatasets";
+
     public static String HTTP_SESSION_ATTR_USER_PREFERENCES = "userPreferencesMap";
 }

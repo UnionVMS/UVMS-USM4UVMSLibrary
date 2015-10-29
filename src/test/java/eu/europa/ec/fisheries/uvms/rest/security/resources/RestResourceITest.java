@@ -1,11 +1,11 @@
-package eu.europa.ec.fisheries.uvms.security.rest.resources;
+package eu.europa.ec.fisheries.uvms.rest.security.resources;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
 import eu.europa.ec.fisheries.uvms.rest.security.JwtTokenHandler;
-import eu.europa.ec.fisheries.uvms.security.rest.util.ArquillianTest;
-import eu.europa.ec.mare.usm.information.domain.*;
+import eu.europa.ec.fisheries.uvms.rest.security.util.ArquillianTest;
+//import eu.europa.ec.mare.usm.information.domain.*;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.extension.rest.client.ArquillianResteasyResource;
 import org.jboss.arquillian.extension.rest.client.Header;
@@ -39,7 +39,7 @@ public class RestResourceITest extends ArquillianTest {
 
 	@Before
 	public void setUp() throws Exception {
-		UserContext newUserCtx = new UserContext();
+		/*UserContext newUserCtx = new UserContext();
 
 		Feature newFeature = new Feature();
 		newFeature.setApplicationName("TEST_APP");
@@ -88,7 +88,7 @@ public class RestResourceITest extends ArquillianTest {
 		Response response = usmWebTarget.path("/userContext").request(MediaType.APPLICATION_JSON_TYPE)
 				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new JwtTokenHandler().createToken("TEST_USER")).put(Entity.json(newUserCtx));
 
-		assert response.getStatus() == HttpServletResponse.SC_OK;
+		assert response.getStatus() == HttpServletResponse.SC_OK;*/
 	}
 
 	@After

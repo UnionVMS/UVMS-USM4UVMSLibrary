@@ -1,4 +1,4 @@
-package eu.europa.ec.fisheries.uvms.security.rest.util;
+package eu.europa.ec.fisheries.uvms.rest.security.util;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.ShrinkWrap;

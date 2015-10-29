@@ -187,11 +187,11 @@
 		</dependency>
 
 		<!-- to be removed since we will use user-model instead-->
-		<dependency>
+		<!--<dependency>
 			<groupId>eu.europa.ec.mare.usm</groupId>
 			<artifactId>Information-Service</artifactId>
 			<version>${information.service.version}</version>
-		</dependency>
+		</dependency>-->
 
         <dependency>
             <groupId>io.jsonwebtoken</groupId>

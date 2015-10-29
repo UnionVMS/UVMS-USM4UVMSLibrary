@@ -3,16 +3,12 @@ package eu.europa.ec.fisheries.uvms.rest.security;
 import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
 import eu.europa.ec.fisheries.uvms.exception.ServiceException;
 import eu.europa.ec.fisheries.uvms.message.MessageException;
-import eu.europa.ec.fisheries.wsdl.user.types.Context;
-import eu.europa.ec.fisheries.wsdl.user.types.Feature;
-import eu.europa.ec.fisheries.wsdl.user.types.Preference;
-import eu.europa.ec.fisheries.wsdl.user.types.UserContext;
+import eu.europa.ec.fisheries.wsdl.user.types.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.jms.JMSException;
 import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
@@ -43,6 +39,7 @@ public class AuthorizationFilter extends AbstractUSMHandler implements Filter, A
 
             Set<String> featuresStr = null;
             Map<String, String> userPreferences = null;
+            Map<String, List<Dataset>> userDatasets = null;
 
             String currentScope = requestWrapper.getHeader(HTTP_HEADER_SCOPE_NAME); //get it from the header
             String currentRole = requestWrapper.getHeader(HTTP_HEADER_ROLE_NAME); //get it from the header
@@ -64,12 +61,14 @@ public class AuthorizationFilter extends AbstractUSMHandler implements Filter, A
                         if (usmCtx.getRole().getRoleName().equalsIgnoreCase(currentRole) && usmCtx.getScope().getScopeName().equalsIgnoreCase(currentScope)) {
                             featuresStr = getFeaturesAsString(usmCtx, applicationName);
                             userPreferences = getUserPreferences(usmCtx, applicationName);
+                            userDatasets = getCategorizedDatasets(usmCtx);
 
                             //caching the roles and scope
                             session.setAttribute(HTTP_SESSION_ATTR_ROLES_NAME, featuresStr);
                             session.setAttribute(HTTP_SESSION_ATTR_ROLE_NAME, currentRole);
                             session.setAttribute(HTTP_SESSION_ATTR_SCOPE_NAME, currentScope);
                             session.setAttribute(HTTP_SESSION_ATTR_USER_PREFERENCES, userPreferences);
+                            session.setAttribute(HTTP_SESSION_ATTR_DATASETS, userDatasets);
                         }
 
                         break;
@@ -93,6 +92,28 @@ public class AuthorizationFilter extends AbstractUSMHandler implements Filter, A
 
         LOGGER.debug("AuthorizationFilter.doFilter(...) END");
         chain.doFilter(request,response);
+    }
+
+    protected Map<String, List<Dataset>> getCategorizedDatasets(Context usmCtx) {
+        Map<String, List<Dataset>> datasets = new LinkedHashMap<>();
+
+        if (usmCtx != null && usmCtx.getScope() != null) {
+            List<Dataset> datasetList = usmCtx.getScope().getDataset();
+
+            for(Dataset dataset: datasetList) {
+                List<Dataset> categoryDatasets = datasets.get(dataset.getCategory());
+
+                if (categoryDatasets != null) {
+                } else {
+                    categoryDatasets = new LinkedList<>();
+                }
+
+                categoryDatasets.add(dataset);
+                datasets.put(dataset.getCategory(), categoryDatasets);
+            }
+
+        }
+        return datasets;
     }
 
     private Map<String, String> getUserPreferences(Context usmCtx, String applicationName) {
