@@ -71,7 +71,7 @@ public abstract class AbstractModuleInitializerBean extends AbstractJAXBMarshall
                 }
             }
         } catch (MessageException e) {
-            LOG.error("Unable to open JMS producerConnection producerSession.", e);
+            LOG.error("Unable to open JMS producerConnection producerSession.");
             throw e;
         }
 

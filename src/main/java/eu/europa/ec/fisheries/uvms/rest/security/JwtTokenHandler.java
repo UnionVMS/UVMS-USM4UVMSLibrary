@@ -175,11 +175,11 @@ public class JwtTokenHandler {
                    setSigningKey(getSecretKey()).
                    parseClaimsJws(token).getBody();
       } catch (ExpiredJwtException e) {
-        LOGGER.error("Token expired", e);
+        LOGGER.error("Token expired");
       } catch (UnsupportedJwtException |
               MalformedJwtException | SignatureException |
               IllegalArgumentException e) {
-        LOGGER.error("Failed to parse token", e);
+        LOGGER.error("Failed to parse token");
       }
     }
 
