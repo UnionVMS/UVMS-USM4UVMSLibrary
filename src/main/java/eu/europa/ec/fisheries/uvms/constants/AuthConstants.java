@@ -24,4 +24,6 @@ public interface AuthConstants {
     public static String HTTP_SESSION_ATTR_DATASETS = "scopeCategorizedDatasets";
 
     public static String HTTP_SESSION_ATTR_USER_PREFERENCES = "userPreferencesMap";
+
+    public static String HTTP_SESSION_ATTR_USERNAME = "HTTP_SESSION_ATTR_USERNAME";
 }

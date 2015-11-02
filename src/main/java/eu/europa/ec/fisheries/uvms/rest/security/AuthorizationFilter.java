@@ -44,34 +44,44 @@ public class AuthorizationFilter extends AbstractUSMHandler implements Filter, A
             String currentScope = requestWrapper.getHeader(HTTP_HEADER_SCOPE_NAME); //get it from the header
             String currentRole = requestWrapper.getHeader(HTTP_HEADER_ROLE_NAME); //get it from the header
 
+
             LOGGER.debug("Current requests is with scope '{}', and role '{}'", currentScope, currentRole);
 
             //we will use the session to cache the features/roles for the current scope/role selection
             HttpSession session = requestWrapper.getSession(true);
 
+            //due to the fact the session object stays alive, no matter if the front-end jwtoken is invalidated/changed,
+            // we need to check if the request is still coming from the same user!
+            if (!session.isNew() && isSessionInvalid(session, requestWrapper.getRemoteUser(), currentRole, currentScope)) {
+                session.invalidate();
+                session = requestWrapper.getSession(true);
+            }
+
             //check if current scope and role have been changed in the meanwhile
-            if (!isEqualToSessionAttr(session, HTTP_SESSION_ATTR_ROLE_NAME, currentRole) || !isEqualToSessionAttr(session, HTTP_SESSION_ATTR_SCOPE_NAME, currentScope) ) {
+            if (session.isNew()) {
                 try {
                     UserContext userContext = getUserContext(requestWrapper.getRemoteUser(), getApplicationName(request.getServletContext()));
 
+                    if (userContext != null) {
+                        //then try to get the new selection and set the features as user roles (for the particular Application only)
+                        for (Context usmCtx : userContext.getContextSet().getContext()) {
 
-                    //then try to get the new selection and set the features as user roles (for the particular Application only)
-                    for (Context usmCtx: userContext.getContextSet().getContext()) {
+                            if (usmCtx.getRole().getRoleName().equalsIgnoreCase(currentRole) && usmCtx.getScope().getScopeName().equalsIgnoreCase(currentScope)) {
+                                featuresStr = getFeaturesAsString(usmCtx, applicationName);
+                                userPreferences = getUserPreferences(usmCtx, applicationName);
+                                userDatasets = getCategorizedDatasets(usmCtx);
 
-                        if (usmCtx.getRole().getRoleName().equalsIgnoreCase(currentRole) && usmCtx.getScope().getScopeName().equalsIgnoreCase(currentScope)) {
-                            featuresStr = getFeaturesAsString(usmCtx, applicationName);
-                            userPreferences = getUserPreferences(usmCtx, applicationName);
-                            userDatasets = getCategorizedDatasets(usmCtx);
+                                //caching the username, roles, scope, features, preferences and datasets
+                                session.setAttribute(HTTP_SESSION_ATTR_ROLES_NAME, featuresStr);
+                                session.setAttribute(HTTP_SESSION_ATTR_ROLE_NAME, currentRole);
+                                session.setAttribute(HTTP_SESSION_ATTR_SCOPE_NAME, currentScope);
+                                session.setAttribute(HTTP_SESSION_ATTR_USER_PREFERENCES, userPreferences);
+                                session.setAttribute(HTTP_SESSION_ATTR_DATASETS, userDatasets);
+                                session.setAttribute(HTTP_SESSION_ATTR_USERNAME, requestWrapper.getRemoteUser());
+                            }
 
-                            //caching the roles and scope
-                            session.setAttribute(HTTP_SESSION_ATTR_ROLES_NAME, featuresStr);
-                            session.setAttribute(HTTP_SESSION_ATTR_ROLE_NAME, currentRole);
-                            session.setAttribute(HTTP_SESSION_ATTR_SCOPE_NAME, currentScope);
-                            session.setAttribute(HTTP_SESSION_ATTR_USER_PREFERENCES, userPreferences);
-                            session.setAttribute(HTTP_SESSION_ATTR_DATASETS, userDatasets);
+                            break;
                         }
-
-                        break;
                     }
 
                 } catch (JAXBException|MessageException|ServiceException|JMSException e) {
@@ -92,6 +102,15 @@ public class AuthorizationFilter extends AbstractUSMHandler implements Filter, A
 
         LOGGER.debug("AuthorizationFilter.doFilter(...) END");
         chain.doFilter(request,response);
+    }
+
+    private boolean isSessionInvalid(HttpSession session, String username, String currentRole, String currentScope) {
+        if (!isEqualToSessionAttr(session, HTTP_SESSION_ATTR_ROLE_NAME, currentRole)
+            || !isEqualToSessionAttr(session, HTTP_SESSION_ATTR_SCOPE_NAME, currentScope)
+            || !isEqualToSessionAttr(session, HTTP_SESSION_ATTR_USERNAME, username)) {
+            return true;
+        }
+        return false;
     }
 
     protected Map<String, List<Dataset>> getCategorizedDatasets(Context usmCtx) {
