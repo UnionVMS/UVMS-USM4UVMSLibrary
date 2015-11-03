@@ -1,12 +1,17 @@
 package eu.europa.ec.fisheries.uvms.rest.security;
 
-import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
+import javax.ejb.EJB;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.TextMessage;
+import javax.servlet.ServletContext;
+import javax.xml.bind.JAXBException;
+
 import eu.europa.ec.fisheries.uvms.exception.ServiceException;
 import eu.europa.ec.fisheries.uvms.jms.USMMessageConsumer;
 import eu.europa.ec.fisheries.uvms.jms.USMMessageProducer;
 import eu.europa.ec.fisheries.uvms.message.AbstractJAXBMarshaller;
 import eu.europa.ec.fisheries.uvms.message.MessageException;
-import eu.europa.ec.fisheries.wsdl.user.module.GetDeploymentDescriptorResponse;
 import eu.europa.ec.fisheries.wsdl.user.module.GetUserContextRequest;
 import eu.europa.ec.fisheries.wsdl.user.module.GetUserContextResponse;
 import eu.europa.ec.fisheries.wsdl.user.module.UserModuleMethod;
@@ -17,13 +22,6 @@ import eu.europa.ec.mare.usm.information.domain.UserContext;
 import eu.europa.ec.mare.usm.information.domain.UserContextQuery;
 import eu.europa.ec.mare.usm.information.service.InformationService;
 */
-
-import javax.ejb.EJB;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.TextMessage;
-import javax.servlet.*;
-import javax.xml.bind.JAXBException;
 
 /**
  * Created by georgige on 9/22/2015.
@@ -63,7 +61,7 @@ public abstract class AbstractUSMHandler extends AbstractJAXBMarshaller {
         contextId.setUserName(username);
 
         GetUserContextRequest userContextRequest = new GetUserContextRequest();
-        userContextRequest.setMethod(UserModuleMethod.GET_USER_PREFERENCES);
+        userContextRequest.setMethod(UserModuleMethod.GET_USER_CONTEXT);
         userContextRequest.setContextId(contextId);
         String messageID = messageProducer.sendModuleMessage(marshallJaxBObjectToString(userContextRequest) , messageConsumer.getDestination());
         Message response = messageConsumer.getMessage(messageID, GetUserContextResponse.class);

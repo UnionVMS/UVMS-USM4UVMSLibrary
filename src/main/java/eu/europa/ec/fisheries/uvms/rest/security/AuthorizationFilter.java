@@ -64,7 +64,7 @@ public class AuthorizationFilter extends AbstractUSMHandler implements Filter, A
 
                     if (userContext != null) {
                         //then try to get the new selection and set the features as user roles (for the particular Application only)
-                        for (Context usmCtx : userContext.getContextSet().getContext()) {
+                        for (Context usmCtx : userContext.getContextSet().getContexts()) {
 
                             if (usmCtx.getRole().getRoleName().equalsIgnoreCase(currentRole) && usmCtx.getScope().getScopeName().equalsIgnoreCase(currentScope)) {
                                 featuresStr = getFeaturesAsString(usmCtx, applicationName);

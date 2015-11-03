@@ -9,7 +9,7 @@
 
     <properties>
         <release.branch.name>salome</release.branch.name>
-        <user.service.version>1.0.1</user.service.version>
+        <user.service.version>1.1.0-SNAPSHOT</user.service.version>
 		<information.service.version>1.6.0</information.service.version>
         <javaee.version>7.0</javaee.version>
         <jjwt.version>0.4</jjwt.version>

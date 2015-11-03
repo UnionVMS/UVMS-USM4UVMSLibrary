@@ -85,7 +85,7 @@ public class UnionVMSFeatureFilter extends AbstractUSMHandler implements Contain
             return false;
         }
 
-        for (eu.europa.ec.fisheries.wsdl.user.types.Context c : userContext.getContextSet().getContext()) {
+        for (eu.europa.ec.fisheries.wsdl.user.types.Context c : userContext.getContextSet().getContexts()) {
             if (!filterRole(c, roleName) || !filterScope(c, scopeName)) {
                 continue;
             }
