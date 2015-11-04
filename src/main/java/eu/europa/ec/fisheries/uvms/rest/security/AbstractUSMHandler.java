@@ -18,10 +18,10 @@ import eu.europa.ec.fisheries.wsdl.user.module.UserModuleMethod;
 import eu.europa.ec.fisheries.wsdl.user.types.UserContext;
 import eu.europa.ec.fisheries.wsdl.user.types.UserContextId;
 /*
-import eu.europa.ec.mare.usm.information.domain.UserContext;
-import eu.europa.ec.mare.usm.information.domain.UserContextQuery;
-import eu.europa.ec.mare.usm.information.service.InformationService;
-*/
+ import eu.europa.ec.mare.usm.information.domain.UserContext;
+ import eu.europa.ec.mare.usm.information.domain.UserContextQuery;
+ import eu.europa.ec.mare.usm.information.service.InformationService;
+ */
 
 /**
  * Created by georgige on 9/22/2015.
@@ -29,7 +29,7 @@ import eu.europa.ec.mare.usm.information.service.InformationService;
 public abstract class AbstractUSMHandler extends AbstractJAXBMarshaller {
 
     private static String UNION_VMS_APPLICATION = "Union-VMS";
-
+    private static final Long UVMS_USM_TIMEOUT = 10000L;
 
     @EJB
     protected USMMessageProducer messageProducer;
@@ -37,19 +37,17 @@ public abstract class AbstractUSMHandler extends AbstractJAXBMarshaller {
     @EJB
     protected USMMessageConsumer messageConsumer;
 
-
     protected String getApplicationName(ServletContext servletContext) {
         String cfgName = servletContext.getInitParameter("usmApplication");
         if (cfgName == null) {
             cfgName = UNION_VMS_APPLICATION;
         }
 
-       /*   see my comments in UnionVMSModule Enum
-       UnionVMSModule application = UnionVMSModule.valueOf(cfgName);
-        if (application == null) {
-            return UNION_VMS_APPLICATION;
-        }*/
-
+        /*   see my comments in UnionVMSModule Enum
+         UnionVMSModule application = UnionVMSModule.valueOf(cfgName);
+         if (application == null) {
+         return UNION_VMS_APPLICATION;
+         }*/
         return cfgName;
     }
 
@@ -63,29 +61,28 @@ public abstract class AbstractUSMHandler extends AbstractJAXBMarshaller {
         GetUserContextRequest userContextRequest = new GetUserContextRequest();
         userContextRequest.setMethod(UserModuleMethod.GET_USER_CONTEXT);
         userContextRequest.setContextId(contextId);
-        String messageID = messageProducer.sendModuleMessage(marshallJaxBObjectToString(userContextRequest) , messageConsumer.getDestination());
-        Message response = messageConsumer.getMessage(messageID, GetUserContextResponse.class);
+        String messageID = messageProducer.sendModuleMessage(marshallJaxBObjectToString(userContextRequest), messageConsumer.getDestination());
+        Message response = messageConsumer.getMessage(messageID, GetUserContextResponse.class, UVMS_USM_TIMEOUT);
 
         if (!(response instanceof TextMessage)) {
             throw new ServiceException("Unable to receive a response from USM.");
         } else {
-            GetUserContextResponse getUserContextResponse =
-                    unmarshallTextMessage(((TextMessage) response), GetUserContextResponse.class);
+            GetUserContextResponse getUserContextResponse
+                    = unmarshallTextMessage(((TextMessage) response), GetUserContextResponse.class);
             userContext = getUserContextResponse.getContext();
         }
         return userContext;
     }
 
-/*
+    /*
 
-    public InformationService getInfoService() {
-        return infoService;
-    }
+     public InformationService getInfoService() {
+     return infoService;
+     }
 
-    public void setInfoService(InformationService infoService) {
-        this.infoService = infoService;
-    }
+     public void setInfoService(InformationService infoService) {
+     this.infoService = infoService;
+     }
 
-*/
-
+     */
 }

@@ -22,10 +22,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 
-
 public abstract class AbstractModuleInitializerBean extends AbstractJAXBMarshaller {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractModuleInitializerBean.class);
+
+    private static final Long UVMS_USM_TIMEOUT = 10000L;
 
     @EJB
     protected USMMessageProducer messageProducer;
@@ -59,13 +60,13 @@ public abstract class AbstractModuleInitializerBean extends AbstractJAXBMarshall
         getDeploymentDescriptorRequest.setApplicationName(deploymentRequest.getApplication().getName());
         try {
             String msgId = messageProducer.sendModuleMessage(marshallJaxBObjectToString(getDeploymentDescriptorRequest), messageConsumer.getDestination());
-            Message response = messageConsumer.getMessage(msgId, GetDeploymentDescriptorResponse.class);
+            Message response = messageConsumer.getMessage(msgId, GetDeploymentDescriptorResponse.class, UVMS_USM_TIMEOUT);
 
             if (!(response instanceof TextMessage)) {
                 throw new ServiceException("Unable to receive a response from USM.");
             } else {
-                GetDeploymentDescriptorResponse getDeploymentDescriptorResponse =
-                        unmarshallTextMessage(((TextMessage) response), GetDeploymentDescriptorResponse.class);
+                GetDeploymentDescriptorResponse getDeploymentDescriptorResponse
+                        = unmarshallTextMessage(((TextMessage) response), GetDeploymentDescriptorResponse.class);
                 if (getDeploymentDescriptorResponse.getApplication() != null && getDeploymentDescriptorResponse.getApplication().getName().equals(deploymentRequest.getApplication().getName())) {
                     return true;
                 }
@@ -78,11 +79,10 @@ public abstract class AbstractModuleInitializerBean extends AbstractJAXBMarshall
         return false;
     }
 
-
     private void deployApp(String deploymentDescriptor) throws ServiceException, JMSException, MessageException, JAXBException {
         try {
             String msgId = messageProducer.sendModuleMessage(deploymentDescriptor, messageConsumer.getDestination());
-            Message response = messageConsumer.getMessage(msgId, DeployApplicationResponse.class);
+            Message response = messageConsumer.getMessage(msgId, DeployApplicationResponse.class, UVMS_USM_TIMEOUT);
 
             if (response instanceof TextMessage) {
                 DeployApplicationResponse deployApplicationResponse = unmarshallTextMessage(((TextMessage) response), DeployApplicationResponse.class);

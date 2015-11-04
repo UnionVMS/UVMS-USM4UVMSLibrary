@@ -1,7 +1,6 @@
 package eu.europa.ec.fisheries.uvms.jms;
 
 import eu.europa.ec.fisheries.uvms.message.AbstractConsumer;
-import eu.europa.ec.fisheries.uvms.message.AbstractProducer;
 import eu.europa.ec.fisheries.uvms.message.MessageConstants;
 
 import javax.annotation.Resource;
