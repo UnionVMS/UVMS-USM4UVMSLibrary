@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.jms.JMSException;
 import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
@@ -65,6 +67,8 @@ public class AuthorizationFilter extends AbstractUSMHandler implements Filter, A
 
                     if (userContext != null) {
                         //then try to get the new selection and set the features as user roles (for the particular Application only)
+                        boolean isContextFound = false;
+
                         for (Context usmCtx : userContext.getContextSet().getContexts()) {
 
                             if (isContextMatch(usmCtx, currentRole, currentScope)) {
@@ -79,10 +83,19 @@ public class AuthorizationFilter extends AbstractUSMHandler implements Filter, A
                                 session.setAttribute(HTTP_SESSION_ATTR_USER_PREFERENCES, userPreferences);
                                 session.setAttribute(HTTP_SESSION_ATTR_DATASETS, userDatasets);
                                 session.setAttribute(HTTP_SESSION_ATTR_USERNAME, requestWrapper.getRemoteUser());
-                            }
 
-                            break;
+                                isContextFound = true;
+                                break;
+                            }
                         }
+
+                        if (!isContextFound) {
+                            //  Send 403 error
+                            ((HttpServletResponse)response).sendError(HttpServletResponse.SC_FORBIDDEN);
+                        }
+                    } else {
+                        //  Send 403 error
+                        ((HttpServletResponse)response).sendError(HttpServletResponse.SC_FORBIDDEN);
                     }
 
                 } catch (JAXBException|MessageException|ServiceException|JMSException e) {
