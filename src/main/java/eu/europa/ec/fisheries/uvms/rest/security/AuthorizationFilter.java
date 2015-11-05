@@ -13,6 +13,7 @@ import javax.servlet.http.HttpSession;
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.util.*;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Created by georgige on 9/22/2015.
@@ -66,7 +67,7 @@ public class AuthorizationFilter extends AbstractUSMHandler implements Filter, A
                         //then try to get the new selection and set the features as user roles (for the particular Application only)
                         for (Context usmCtx : userContext.getContextSet().getContexts()) {
 
-                            if (usmCtx.getRole().getRoleName().equalsIgnoreCase(currentRole) && usmCtx.getScope().getScopeName().equalsIgnoreCase(currentScope)) {
+                            if (isContextMatch(usmCtx, currentRole, currentScope)) {
                                 featuresStr = getFeaturesAsString(usmCtx, applicationName);
                                 userPreferences = getUserPreferences(usmCtx, applicationName);
                                 userDatasets = getCategorizedDatasets(usmCtx);
@@ -102,6 +103,21 @@ public class AuthorizationFilter extends AbstractUSMHandler implements Filter, A
 
         LOGGER.debug("AuthorizationFilter.doFilter(...) END");
         chain.doFilter(request,response);
+    }
+
+    private boolean isContextMatch(Context usmCtx, String currentRole, String currentScope) {
+        boolean isContextMatch = false;
+        if (usmCtx.getRole().getRoleName().equalsIgnoreCase(currentRole)) {
+            isContextMatch = true;
+        }
+
+        //check if our user has a scope (it is possible to have a context without a scope)
+        if ( StringUtils.isNotBlank(currentScope) ) {
+            if (usmCtx.getScope() == null || !usmCtx.getScope().getScopeName().equalsIgnoreCase(currentScope)) {
+                isContextMatch = false;
+            }
+        }
+        return isContextMatch;
     }
 
     private boolean isSessionInvalid(HttpSession session, String username, String currentRole, String currentScope) {
