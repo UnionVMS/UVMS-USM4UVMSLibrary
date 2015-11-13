@@ -95,7 +95,7 @@ public class AuthorizationFilter extends AbstractUSMHandler implements Filter, A
                         }
                     } else {
                         //  Send 403 error
-                        ((HttpServletResponse)response).sendError(HttpServletResponse.SC_FORBIDDEN);
+                      //  ((HttpServletResponse)response).sendError(HttpServletResponse.SC_FORBIDDEN); temporary disabling this due to a problem with USM
                     }
 
                 } catch (JAXBException|MessageException|ServiceException|JMSException e) {
