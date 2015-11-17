@@ -68,28 +68,12 @@ public class UnionVMSFeatureFilter extends AbstractUSMHandler implements Contain
                 .build());
     }
 
-    private boolean filterRole(eu.europa.ec.fisheries.wsdl.user.types.Context ctx, String role) {
-        if (ctx.getRole() == null) {
-            return false;
-        }
-
-        return role == null || role.equals(ctx.getRole().getRoleName()); 
-    }
-
-    private boolean filterScope(eu.europa.ec.fisheries.wsdl.user.types.Context ctx, String scope) {
-        return ctx.getScope() == null || ctx.getScope().getScopeName().equals(scope);
-    }
-
     private boolean hasFeature(UserContext userContext, UnionVMSFeature feature, String roleName, String scopeName) {
         if (servletRequest.getRemoteUser() == null) {
             return false;
         }
 
         for (eu.europa.ec.fisheries.wsdl.user.types.Context c : userContext.getContextSet().getContexts()) {
-            if (!filterRole(c, roleName) || !filterScope(c, scopeName)) {
-                continue;
-            }
-
             for (Feature f : c.getRole().getFeature()) {
                 if (feature.name().equals(f.getName())) {
                     return true;
