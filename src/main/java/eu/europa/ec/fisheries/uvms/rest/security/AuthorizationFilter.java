@@ -6,7 +6,6 @@ import eu.europa.ec.fisheries.uvms.message.MessageException;
 import eu.europa.ec.fisheries.uvms.rest.security.bean.USMService;
 import eu.europa.ec.fisheries.uvms.rest.security.bean.USMServiceBean;
 import eu.europa.ec.fisheries.uvms.user.model.exception.ModelMarshallException;
-import eu.europa.ec.fisheries.uvms.utils.SecuritySessionUtils;
 import eu.europa.ec.fisheries.wsdl.user.types.*;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
