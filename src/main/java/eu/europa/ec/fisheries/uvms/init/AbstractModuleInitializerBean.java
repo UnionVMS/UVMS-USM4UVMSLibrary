@@ -6,8 +6,11 @@ import eu.europa.ec.fisheries.uvms.jms.USMMessageProducer;
 import eu.europa.ec.fisheries.uvms.message.AbstractJAXBMarshaller;
 import eu.europa.ec.fisheries.uvms.message.MessageConsumer;
 import eu.europa.ec.fisheries.uvms.message.MessageException;
+import eu.europa.ec.fisheries.uvms.rest.security.bean.USMService;
 import eu.europa.ec.fisheries.uvms.user.model.exception.ModelMarshallException;
+import eu.europa.ec.fisheries.uvms.user.model.mapper.UserModuleRequestMapper;
 import eu.europa.ec.fisheries.wsdl.user.module.*;
+import eu.europa.ec.fisheries.wsdl.user.types.Application;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,10 +32,7 @@ public abstract class AbstractModuleInitializerBean extends AbstractJAXBMarshall
     private static final Long UVMS_USM_TIMEOUT = 10000L;
 
     @EJB
-    protected USMMessageProducer messageProducer;
-
-    @EJB
-    protected USMMessageConsumer messageConsumer;
+    protected USMService usmService;
 
     @PostConstruct
     public void onStartup() throws IOException, JAXBException, ModelMarshallException, JMSException, ServiceException, MessageException {
@@ -42,7 +42,7 @@ public abstract class AbstractModuleInitializerBean extends AbstractJAXBMarshall
         if (deploymentDescInStream != null) {
             String deploymentDescriptor = IOUtils.toString(deploymentDescInStream, "UTF-8");
             if (!isAppDeployed(deploymentDescriptor)) {
-                deployApp(deploymentDescriptor);
+                usmService.deployApplicationDescriptor(deploymentDescriptor);
             }
         } else {
             LOG.error("USM deployment descriptor is not provided, therefore, the JMS deployment message cannot be sent.");
@@ -50,56 +50,19 @@ public abstract class AbstractModuleInitializerBean extends AbstractJAXBMarshall
     }
 
     private boolean isAppDeployed(String deploymentDescriptor) throws JAXBException, JMSException, ServiceException, MessageException {
-        JAXBContext jaxBcontext = JAXBContext.newInstance(DeployApplicationRequest.class);
+        boolean isAppDeployed = false;
+        JAXBContext jaxBcontext = JAXBContext.newInstance(Application.class);
         javax.xml.bind.Unmarshaller um = jaxBcontext.createUnmarshaller();
 
-        DeployApplicationRequest deploymentRequest = (DeployApplicationRequest) um.unmarshal(new StringReader(deploymentDescriptor));
+        Application applicationDefinition = (Application) um.unmarshal(new StringReader(deploymentDescriptor));
 
-        GetDeploymentDescriptorRequest getDeploymentDescriptorRequest = new GetDeploymentDescriptorRequest();
-        getDeploymentDescriptorRequest.setMethod(UserModuleMethod.GET_DEPLOYMENT_DESCRIPTOR);
-        getDeploymentDescriptorRequest.setApplicationName(deploymentRequest.getApplication().getName());
-        try {
-            String msgId = messageProducer.sendModuleMessage(marshallJaxBObjectToString(getDeploymentDescriptorRequest), messageConsumer.getDestination());
-            Message response = messageConsumer.getMessage(msgId, GetDeploymentDescriptorResponse.class, UVMS_USM_TIMEOUT);
+        Application application = usmService.getApplicationDefinition(applicationDefinition.getName());
 
-            if (!(response instanceof TextMessage)) {
-                throw new ServiceException("Unable to receive a response from USM.");
-            } else {
-                GetDeploymentDescriptorResponse getDeploymentDescriptorResponse
-                        = unmarshallTextMessage(((TextMessage) response), GetDeploymentDescriptorResponse.class);
-                if (getDeploymentDescriptorResponse.getApplication() != null && getDeploymentDescriptorResponse.getApplication().getName().equals(deploymentRequest.getApplication().getName())) {
-                    return true;
-                }
-            }
-        } catch (MessageException e) {
-            LOG.error("Unable to open JMS producerConnection producerSession.");
-            throw e;
+        if (application != null) {
+            isAppDeployed = true;
         }
 
-        return false;
-    }
-
-    private void deployApp(String deploymentDescriptor) throws ServiceException, JMSException, MessageException, JAXBException {
-        try {
-            String msgId = messageProducer.sendModuleMessage(deploymentDescriptor, messageConsumer.getDestination());
-            Message response = messageConsumer.getMessage(msgId, DeployApplicationResponse.class, UVMS_USM_TIMEOUT);
-
-            if (response instanceof TextMessage) {
-                DeployApplicationResponse deployApplicationResponse = unmarshallTextMessage(((TextMessage) response), DeployApplicationResponse.class);
-
-                if ("OK".equalsIgnoreCase(deployApplicationResponse.getResponse())) {
-                    LOG.info("Application successfully registered into USM.");
-                } else {
-                    throw new ServiceException("Unable to register into USM.");
-                }
-            } else {
-                throw new ServiceException("Unrecognized response during USM registration: " + response.toString());
-            }
-
-        } catch (MessageException e) {
-            LOG.error("Unable to open JMS producerConnection producerSession.", e);
-            throw e;
-        }
+        return isAppDeployed;
     }
 
     @PreDestroy

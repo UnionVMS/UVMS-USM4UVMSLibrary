@@ -8,22 +8,15 @@ import javax.ws.rs.core.HttpHeaders;
 public interface AuthConstants {
     public static final String HTTP_HEADER_ROLE_NAME = "roleName";
 
-    public static final String HTTP_HEADER_SCOPE_NAME = "scopeName";
+    String HTTP_HEADER_SCOPE_NAME = "scopeName";
 
-    public static final String HTTP_HEADER_AUTHORIZATION = HttpHeaders.AUTHORIZATION;
-    public static final String JWTCALLBACK = "jwtcallback";
+    String HTTP_HEADER_AUTHORIZATION = HttpHeaders.AUTHORIZATION;
+    String JWTCALLBACK = "jwtcallback";
 
-    public static final String HTTP_SERVLET_CONTEXT_ATTR_FEATURES = "servletContextUserFeatures";
+    String HTTP_SERVLET_CONTEXT_ATTR_FEATURES = "servletContextUserFeatures";
 
-    public static String HTTP_SESSION_ATTR_ROLE_NAME = HTTP_HEADER_ROLE_NAME;
+    String HTTP_SESSION_ATTR_ROLES_NAME = HTTP_SERVLET_CONTEXT_ATTR_FEATURES;
 
-    public static String HTTP_SESSION_ATTR_SCOPE_NAME = HTTP_HEADER_SCOPE_NAME;
-
-    public static String HTTP_SESSION_ATTR_ROLES_NAME = HTTP_SERVLET_CONTEXT_ATTR_FEATURES;
-
-    public static String HTTP_SESSION_ATTR_DATASETS = "scopeCategorizedDatasets";
-
-    public static String HTTP_SESSION_ATTR_USER_PREFERENCES = "userPreferencesMap";
-
-    public static String HTTP_SESSION_ATTR_USERNAME = "HTTP_SESSION_ATTR_USERNAME";
+    String CACHE_NAME_USER_SESSION = "userSessionCache";
+    String CACHE_NAME_APP_MODULE = "appModuleCache";
 }

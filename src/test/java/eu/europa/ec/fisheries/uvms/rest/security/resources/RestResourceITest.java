@@ -3,9 +3,12 @@ package eu.europa.ec.fisheries.uvms.rest.security.resources;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
+import eu.europa.ec.fisheries.uvms.exception.ServiceException;
 import eu.europa.ec.fisheries.uvms.rest.security.JwtTokenHandler;
+import eu.europa.ec.fisheries.uvms.rest.security.bean.USMService;
 import eu.europa.ec.fisheries.uvms.rest.security.util.ArquillianTest;
 //import eu.europa.ec.mare.usm.information.domain.*;
+import eu.europa.ec.fisheries.wsdl.user.types.Application;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.extension.rest.client.ArquillianResteasyResource;
 import org.jboss.arquillian.extension.rest.client.Header;
@@ -18,6 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import javax.ejb.EJB;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
@@ -36,6 +40,9 @@ public class RestResourceITest extends ArquillianTest {
 	
     @ArquillianResource
     private URL contextPath;
+
+	@EJB
+	private USMService usmService;
 
 	@Before
 	public void setUp() throws Exception {
@@ -125,39 +132,90 @@ public class RestResourceITest extends ArquillianTest {
 		response.close();
 	}
 
-/*
-//TODO not implemented yet since USM guys will implement new REST methods, dedicated to user preferences
 	@Test
 	@Header(name="connection", value = "Keep-Alive")
-	public void testUserPreferencesDefaultValue(@ArquillianResteasyResource("test/rest") ResteasyWebTarget webTarget) throws JsonParseException, JsonMappingException, IOException {
+	public void testApplicationDescriptor(@ArquillianResteasyResource("test/rest/applicationDescriptor") ResteasyWebTarget webTarget) throws IOException, ServiceException {
 
-		//check if we have the prerequisite - a report in the DB with ID = 1
-		Response response = webTarget.path("/get" ).request()
-				.header(HttpHeaders.AUTHORIZATION, new JwtTokenHandler().createToken("TEST_USER"))
-				.header(AuthorizationFilter.HTTP_HEADER_ROLE_NAME, "TEST_ROLE")
-				.header(AuthorizationFilter.HTTP_HEADER_SCOPE_NAME, "TEST_SCOPE")
+		Response response = webTarget.request()
+				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new JwtTokenHandler().createToken("TEST_USER"))
+				.header(AuthConstants.HTTP_HEADER_ROLE_NAME, "TEST_ROLE")
+				.header(AuthConstants.HTTP_HEADER_SCOPE_NAME, "TEST_SCOPE")
 				.get();
-		assertEquals(HttpServletResponse.SC_FORBIDDEN, response.getStatus());
+		assertEquals(HttpServletResponse.SC_OK, response.getStatus());
 		response.close();
+
+//		RestResource res = new RestResource();
+//		res.applicationDescriptor();
+//		res.datasets();
+//		res.features();
+//		res.options();
+//		res.preferences();
 	}
 
 	@Test
 	@Header(name="connection", value = "Keep-Alive")
-	public void testUserPreferencesCustomValue(@ArquillianResteasyResource("usm-information/rest") ResteasyWebTarget usmWebTarget, @ArquillianResteasyResource("test/rest") ResteasyWebTarget webTarget) throws JsonParseException, JsonMappingException, IOException {
-		//TODO add new preference
-		usmWebTarget.path("/userContext").request(MediaType.APPLICATION_JSON_TYPE)
-				.header(HttpHeaders.AUTHORIZATION, new JwtTokenHandler().createToken("TEST_USER"))
-				.put(Entity.json(new UserContext().))
+	public void testDatasets(@ArquillianResteasyResource("test/rest/datasets") ResteasyWebTarget webTarget) throws IOException, ServiceException {
 
-		//TODO call your test rest which returns the value of the preference
-		Response response = webTarget.path("/get" ).request()
-				.header(HttpHeaders.AUTHORIZATION, new JwtTokenHandler().createToken("TEST_USER"))
-				.header(AuthorizationFilter.HTTP_HEADER_ROLE_NAME, "TEST_ROLE")
-				.header(AuthorizationFilter.HTTP_HEADER_SCOPE_NAME, "TEST_SCOPE")
+		Response response = webTarget.request()
+				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new JwtTokenHandler().createToken("TEST_USER"))
+				.header(AuthConstants.HTTP_HEADER_ROLE_NAME, "TEST_ROLE")
+				.header(AuthConstants.HTTP_HEADER_SCOPE_NAME, "TEST_SCOPE")
 				.get();
-		assertEquals(HttpServletResponse.SC_FORBIDDEN, response.getStatus());
+		assertEquals(HttpServletResponse.SC_OK, response.getStatus());
 		response.close();
-	}
-*/
 
+//		RestResource res = new RestResource();
+//		res.features();
+//		res.options();
+//		res.preferences();
+	}
+
+	@Test
+	@Header(name="connection", value = "Keep-Alive")
+	public void testFeatures(@ArquillianResteasyResource("test/rest/features") ResteasyWebTarget webTarget) throws IOException, ServiceException {
+
+		Response response = webTarget.request()
+				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new JwtTokenHandler().createToken("TEST_USER"))
+				.header(AuthConstants.HTTP_HEADER_ROLE_NAME, "TEST_ROLE")
+				.header(AuthConstants.HTTP_HEADER_SCOPE_NAME, "TEST_SCOPE")
+				.get();
+		assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+		response.close();
+
+//		RestResource res = new RestResource();
+//		res.options();
+//		res.preferences();
+	}
+
+	@Test
+	@Header(name="connection", value = "Keep-Alive")
+	public void testOptions(@ArquillianResteasyResource("test/rest/options") ResteasyWebTarget webTarget) throws IOException, ServiceException {
+
+		Response response = webTarget.request()
+				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new JwtTokenHandler().createToken("TEST_USER"))
+				.header(AuthConstants.HTTP_HEADER_ROLE_NAME, "TEST_ROLE")
+				.header(AuthConstants.HTTP_HEADER_SCOPE_NAME, "TEST_SCOPE")
+				.get();
+		assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+		response.close();
+
+//		RestResource res = new RestResource();
+//		res.preferences();
+	}
+
+	@Test
+	@Header(name="connection", value = "Keep-Alive")
+	public void testPreferences(@ArquillianResteasyResource("test/rest/preferences") ResteasyWebTarget webTarget) throws IOException, ServiceException {
+
+		Response response = webTarget.request()
+				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new JwtTokenHandler().createToken("TEST_USER"))
+				.header(AuthConstants.HTTP_HEADER_ROLE_NAME, "TEST_ROLE")
+				.header(AuthConstants.HTTP_HEADER_SCOPE_NAME, "TEST_SCOPE")
+				.get();
+		assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+		response.close();
+
+//		RestResource res = new RestResource();
+//		res.preferences();
+	}
 }

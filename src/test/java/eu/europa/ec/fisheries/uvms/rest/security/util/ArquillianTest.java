@@ -13,7 +13,12 @@ public class ArquillianTest {
 
     @Deployment(testable = false)
     public static WebArchive createDeployment() {
-    	WebArchive war = ShrinkWrap.create(WebArchive.class,"usm4uvms.war").addPackages(true, "eu.europa.ec.fisheries.uvms.security.rest", "eu.europa.ec.fisheries.uvms.rest.security","eu.europa.ec.fisheries.uvms.init")
+    	WebArchive war = ShrinkWrap.create(WebArchive.class,"usm4uvms.war").addPackages(true,
+                "eu.europa.ec.fisheries.uvms.rest.security",
+                "eu.europa.ec.fisheries.uvms.init",
+                "eu.europa.ec.fisheries.uvms.jms",
+                "eu.europa.ec.fisheries.uvms.utils",
+                "eu.europa.ec.fisheries.uvms.constants")
                 //.addAsResource("META-INF/test-persistence.xml", "META-INF/persistence.xml")
                 .addAsWebInfResource(new File("src/test/webapp/WEB-INF/web.xml"))
                .addAsWebResource("jwt.properties")
@@ -21,6 +26,7 @@ public class ArquillianTest {
                 .addAsResource("config.properties")
                 .addAsResource("usmDeploymentDescriptor.xml")
                 .addAsResource("logback.xml")
+                .addAsResource("ehcache.xml")
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
               //  .addAsWebInfResource(new File("src/test/webapp/WEB-INF/beans.xml"));
 

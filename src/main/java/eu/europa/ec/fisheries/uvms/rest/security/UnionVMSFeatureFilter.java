@@ -46,7 +46,7 @@ public class UnionVMSFeatureFilter extends AbstractUSMHandler implements Contain
         }
 
         try {
-            UserContext ctx = getUserContext(servletRequest.getRemoteUser(), getApplicationName(servletContext));
+            UserContext ctx = usmService.getFullUserContext(servletRequest.getRemoteUser(), getApplicationName(servletContext));
 
             if (ctx != null && ctx.getContextSet() != null) {
                 if (!hasFeature(ctx, feature, null, null)) {
@@ -55,7 +55,7 @@ public class UnionVMSFeatureFilter extends AbstractUSMHandler implements Contain
             } else {
                 sendAccessForbidden(requestContext);
             }
-        } catch (JAXBException|MessageException|ServiceException|JMSException e) {
+        } catch (ServiceException e) {
             sendAccessForbidden(requestContext);
         }
 
