@@ -103,9 +103,6 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
                 }
             }
 
-
-            cachedContext = new Element(cacheKey, context);
-            userSessionCache.put(cachedContext);
             LOG.debug("the received userContext is cached with a key: {}", cacheKey);
         } else {
             context = (Context) cachedContext.getObjectValue();
