@@ -70,7 +70,7 @@ public interface USMService {
 
     Application getApplicationDefinition(String applicationName) throws ServiceException;
 
-    void deployApplicationDescriptor(String descriptor) throws ServiceException;
+    void deployApplicationDescriptor(Application descriptor) throws ServiceException;
 
     Set<String> getUserFeatures(String username, String applicationName, String currentRole, String currentScope, String cacheKey) throws ServiceException;
 
@@ -91,4 +91,6 @@ public interface USMService {
      * @return
      */
     UserContext getFullUserContext(String remoteUser, String applicationName) throws ServiceException;
+
+    void redeployApplicationDescriptor(Application deploymentDescriptor) throws ServiceException;
 }

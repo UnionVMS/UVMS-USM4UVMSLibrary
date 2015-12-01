@@ -2,26 +2,14 @@ package eu.europa.ec.fisheries.uvms.rest.security;
 
 import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
 import eu.europa.ec.fisheries.uvms.exception.ServiceException;
-import eu.europa.ec.fisheries.uvms.message.MessageException;
-import eu.europa.ec.fisheries.uvms.rest.security.bean.USMService;
-import eu.europa.ec.fisheries.uvms.rest.security.bean.USMServiceBean;
-import eu.europa.ec.fisheries.uvms.user.model.exception.ModelMarshallException;
-import eu.europa.ec.fisheries.wsdl.user.types.*;
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
+import eu.europa.ec.fisheries.wsdl.user.types.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.jms.JMSException;
 import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.xml.bind.JAXBException;
 import java.io.IOException;
-import java.util.*;
-import org.apache.commons.lang3.StringUtils;
+import java.util.Set;
 
 /**
  * Created by georgige on 9/22/2015.
@@ -62,10 +50,8 @@ public class AuthorizationFilter extends AbstractUSMHandler implements Filter, A
                 } else {
                     featuresStr = usmService.getUserFeatures(requestWrapper.getRemoteUser(), userContext);
                 }
-            } catch (ServiceException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (ServiceException|IOException e) {
+                throw new ServletException("Unable to get user context and/or user features.", e);
             }
 
             if (featuresStr == null) {

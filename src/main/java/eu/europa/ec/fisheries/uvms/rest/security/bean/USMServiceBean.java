@@ -223,15 +223,11 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
 
     @Override
     @Transactional
-    public void deployApplicationDescriptor(String descriptor) throws ServiceException {
+    public void deployApplicationDescriptor(Application descriptor) throws ServiceException {
         LOG.debug("START deployApplicationDescriptor({})", descriptor);
 
         try {
-            JAXBContext jaxBcontext = JAXBContext.newInstance(Application.class);
-            javax.xml.bind.Unmarshaller um = jaxBcontext.createUnmarshaller();
-            Application applicationDefinition = (Application) um.unmarshal(new StringReader(descriptor));
-
-            String descriptorString = UserModuleRequestMapper.mapToDeployApplicationRequest(applicationDefinition);
+            String descriptorString = UserModuleRequestMapper.mapToDeployApplicationRequest(descriptor);
             String msgId = messageProducer.sendModuleMessage(descriptorString, messageConsumer.getDestination());
             Message response = messageConsumer.getMessage(msgId, DeployApplicationResponse.class, UVMS_USM_TIMEOUT);
 
@@ -258,6 +254,40 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
         }
 
         LOG.debug("END deployApplicationDescriptor()");
+    }
+
+    @Override
+    public void redeployApplicationDescriptor(Application deploymentDescriptor) throws ServiceException {
+        LOG.debug("START redeployApplicationDescriptor({})", deploymentDescriptor);
+
+        try {
+            String descriptorString = UserModuleRequestMapper.mapToRedeployApplicationRequest(deploymentDescriptor);
+            String msgId = messageProducer.sendModuleMessage(descriptorString, messageConsumer.getDestination());
+            Message response = messageConsumer.getMessage(msgId, DeployApplicationResponse.class, UVMS_USM_TIMEOUT);
+
+            if (response != null && !isUserFault((TextMessage) response)) {
+                RedeployApplicationResponse redeployApplicationResponse = unmarshallTextMessage((TextMessage) response, RedeployApplicationResponse.class);
+                LOG.debug("Response concerning message with ID: {} is received.", msgId);
+                if ("OK".equalsIgnoreCase(redeployApplicationResponse.getResponse())) {
+                    LOG.info("Application successfully registered into USM.");
+                } else {
+                    throw new ServiceException("Unable to register into USM.");
+                }
+            } else {
+                LOG.error("Error occurred while receiving JMS response for message ID: {}", msgId);
+
+                if(response!= null) {
+                    UserFault error = unmarshallTextMessage((TextMessage) response, UserFault.class);
+                    LOG.error("Error Code: {}, Message: {}", error.getCode(), error.getFault());
+                    throw new ServiceException("Unable to register into USM.");
+                }
+            }
+
+        } catch (MessageException|JMSException|JAXBException|ModelMarshallException e) {
+            throw new ServiceException("Unable to deploy Application descriptor",e);
+        }
+
+        LOG.debug("END redeployApplicationDescriptor()");
     }
 
     @Override

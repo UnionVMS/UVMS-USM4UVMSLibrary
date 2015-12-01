@@ -28,5 +28,10 @@ public class ModuleInitializerBean extends AbstractModuleInitializerBean {
         return  getClass().getClassLoader().getResourceAsStream(CONFIG_USM_DEPLOYMENT_DESCRIPTOR_XML);
     }
 
+    @Override
+    protected boolean mustRedeploy() {
+        return true;
+    }
+
 
 }

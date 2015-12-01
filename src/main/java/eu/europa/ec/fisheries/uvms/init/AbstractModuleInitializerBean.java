@@ -39,24 +39,28 @@ public abstract class AbstractModuleInitializerBean extends AbstractJAXBMarshall
         // do something on application startup
         InputStream deploymentDescInStream = getDeploymentDescriptorRequest();
 
+
+
         if (deploymentDescInStream != null) {
-            String deploymentDescriptor = IOUtils.toString(deploymentDescInStream, "UTF-8");
-            if (!isAppDeployed(deploymentDescriptor)) {
-                usmService.deployApplicationDescriptor(deploymentDescriptor);
+            JAXBContext jaxBcontext = JAXBContext.newInstance(DeployApplicationRequest.class);
+            javax.xml.bind.Unmarshaller um = jaxBcontext.createUnmarshaller();
+
+            DeployApplicationRequest applicationDefinition = (DeployApplicationRequest) um.unmarshal(deploymentDescInStream);
+
+            if (!isAppDeployed(applicationDefinition.getApplication())) {
+                usmService.deployApplicationDescriptor(applicationDefinition.getApplication());
+            } else if(mustRedeploy()) {
+                usmService.redeployApplicationDescriptor(applicationDefinition.getApplication());
             }
         } else {
             LOG.error("USM deployment descriptor is not provided, therefore, the JMS deployment message cannot be sent.");
         }
     }
 
-    private boolean isAppDeployed(String deploymentDescriptor) throws JAXBException, JMSException, ServiceException, MessageException {
+    private boolean isAppDeployed(Application deploymentDescriptor) throws JAXBException, JMSException, ServiceException, MessageException {
         boolean isAppDeployed = false;
-        JAXBContext jaxBcontext = JAXBContext.newInstance(Application.class);
-        javax.xml.bind.Unmarshaller um = jaxBcontext.createUnmarshaller();
 
-        Application applicationDefinition = (Application) um.unmarshal(new StringReader(deploymentDescriptor));
-
-        Application application = usmService.getApplicationDefinition(applicationDefinition.getName());
+        Application application = usmService.getApplicationDefinition(deploymentDescriptor.getName());
 
         if (application != null) {
             isAppDeployed = true;
@@ -70,5 +74,15 @@ public abstract class AbstractModuleInitializerBean extends AbstractJAXBMarshall
         //TODO undeploy app
     }
 
+    /**
+     *
+     * @return InputStream with the String representation of Application descriptor
+     */
     protected abstract InputStream getDeploymentDescriptorRequest();
+
+    /**
+     *
+     * @return true if the application descriptor must be redeployed
+     */
+    protected abstract boolean mustRedeploy();
 }
