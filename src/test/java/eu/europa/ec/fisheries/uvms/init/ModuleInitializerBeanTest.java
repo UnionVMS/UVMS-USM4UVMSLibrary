@@ -84,6 +84,7 @@ public class ModuleInitializerBeanTest {
         reset(session, connection, connectionFactory, jmsProducer, usmRequestQueue);*/
     }
 
+    @Ignore
     @Test (expected = JAXBException.class)
     public void badDescriptor() throws Exception {
 //        initializerBean.onStartup();
