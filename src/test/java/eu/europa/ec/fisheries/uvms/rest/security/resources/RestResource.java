@@ -5,6 +5,8 @@ import eu.europa.ec.fisheries.uvms.exception.ServiceException;
 import eu.europa.ec.fisheries.uvms.rest.security.bean.USMService;
 import eu.europa.ec.fisheries.wsdl.user.types.Application;
 import eu.europa.ec.fisheries.wsdl.user.types.Dataset;
+import eu.europa.ec.fisheries.wsdl.user.types.DatasetExtension;
+import org.junit.Ignore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +31,7 @@ public class RestResource {
     private static final String TEST_USER_PREFERENCE = "TEST_USER_PREFERENCE";
     public static final String SOME_TEST_OPTION = "someTestOption";
     public static final String DATASET_CATEGORY = "restrictionAreas";
+    private static final String APP_NAME = "Reporting";
 
     @Context
 	private UriInfo context;
@@ -78,14 +81,14 @@ public class RestResource {
 
 
 
-        Dataset dataset = new Dataset();
+        DatasetExtension dataset = new DatasetExtension();
         dataset.setCategory(datasetCategory);
         dataset.setName(datasetName);
         dataset.setDiscriminator(datasetName);
-
+        dataset.setApplicationName(APP_NAME);
         /// let's test the setter method
         try {
-            usmService.setDataset("Reporting", dataset, cacheKey);
+            usmService.createDataset(APP_NAME, dataset);
         } catch (ServiceException e) {
             return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
         }
@@ -93,7 +96,7 @@ public class RestResource {
 
         eu.europa.ec.fisheries.wsdl.user.types.Context ctxt = null;
         try {
-            ctxt = usmService.getUserContext("rep_power", "Reporting", "rep_power_role", "EC", "someCacheKey");
+            ctxt = usmService.getUserContext("rep_power", APP_NAME, "rep_power_role", "EC", "someCacheKey");
         } catch (ServiceException e) {
             return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
         }
@@ -126,6 +129,27 @@ public class RestResource {
             return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
         }
 
+        try {
+            datasetDiscriminator = "Discriminator" + new Date().getTime();
+            dataset.setDiscriminator(datasetDiscriminator);
+            usmService.updateDataset(APP_NAME, dataset);
+
+            ctxt = usmService.getUserContext("rep_power", APP_NAME, "rep_power_role", "EC", "someCacheKey");
+
+            List<Dataset> datasets = usmService.getDatasetsPerCategory(datasetCategory, ctxt);
+
+            if (datasets == null
+                    || datasets.size() != 1
+                    || !datasetDiscriminator.equals(datasets.get(0).getDiscriminator())
+                    || !datasetName.equals(datasets.get(0).getDiscriminator())
+                    || !datasetCategory.equals(datasets.get(0).getCategory())) {
+                return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
+            }
+
+        } catch (ServiceException e) {
+            return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
+        }
+
         return Response.status(HttpServletResponse.SC_OK).build();
 
     }
@@ -139,7 +163,7 @@ public class RestResource {
 
         Application application = null;
         try {
-            application = usmService.getApplicationDefinition("Reporting");
+            application = usmService.getApplicationDefinition(APP_NAME);
         } catch (ServiceException e) {
             return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
         }
@@ -154,7 +178,7 @@ public class RestResource {
 
         long timeDiff2 = new Date().getTime();
         try {
-            application = usmService.getApplicationDefinition("Reporting");
+            application = usmService.getApplicationDefinition(APP_NAME);
         } catch (ServiceException e) {
             return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
         }
@@ -178,7 +202,7 @@ public class RestResource {
         String newDefaultValue = "newValue"+ new Date().getTime();
 
         try {
-            usmService.setOptionDefaultValue(TEST_USER_PREFERENCE, newDefaultValue, "DEPLOY_APPLICATION");
+            usmService.setOptionDefaultValue(TEST_USER_PREFERENCE, newDefaultValue, APP_NAME);
         } catch (ServiceException e) {
             return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
         }
@@ -187,7 +211,7 @@ public class RestResource {
         String optionDefaultValue;
         long timeDiff = new Date().getTime();
         try {
-            optionDefaultValue = usmService.getOptionDefaultValue(TEST_USER_PREFERENCE, "DEPLOY_APPLICATION");
+            optionDefaultValue = usmService.getOptionDefaultValue(TEST_USER_PREFERENCE, APP_NAME);
         } catch (ServiceException e) {
             return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
         }
@@ -202,7 +226,7 @@ public class RestResource {
 
         long timeDiff2 = new Date().getTime();
         try {
-            optionDefaultValue = usmService.getOptionDefaultValue(TEST_USER_PREFERENCE, "DEPLOY_APPLICATION");
+            optionDefaultValue = usmService.getOptionDefaultValue(TEST_USER_PREFERENCE, APP_NAME);
         } catch (ServiceException e) {
             return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
         }
@@ -217,14 +241,14 @@ public class RestResource {
         return Response.status(HttpServletResponse.SC_OK).build();
     }
 
-    @GET
+   /* @GET
     @Path("/features")
     @Produces(MediaType.APPLICATION_JSON)
     public Response features(@Context HttpServletRequest request,
                               @Context HttpServletResponse response)  {
         eu.europa.ec.fisheries.wsdl.user.types.Context ctxt = null;
         try {
-            ctxt = usmService.getUserContext("rep_power", "Reporting", "rep_power_role", "EC", "someCacheKey");
+            ctxt = usmService.getUserContext("rep_power", APP_NAME, "rep_power_role", "EC", "someCacheKey");
         } catch (ServiceException e) {
             return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
         }
@@ -232,7 +256,7 @@ public class RestResource {
         Set<String> features;
 
         try {
-            features = usmService.getUserFeatures("rep_power", ctxt);
+            features = usmService.updateUserPreference("rep_power", ctxt);
         } catch (ServiceException e) {
             return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
         }
@@ -254,7 +278,7 @@ public class RestResource {
         }
 
         return Response.status(HttpServletResponse.SC_OK).build();
-    }
+    }*/
 
     @GET
     @Path("/preferences")
@@ -265,14 +289,14 @@ public class RestResource {
         String newValue = "valueeeee" + new Date().getTime();
 
         try {
-            usmService.updateUserPreference(TEST_USER_PREFERENCE, newValue,  "TEST_APP", "EC", "rep_power", "someCacheKeyrefga wqerf qwerdfqwre23");
+            usmService.putUserPreference(TEST_USER_PREFERENCE, newValue,  APP_NAME, "EC", "rep_power_role", "rep_power", "someCacheKeyrefga wqerf qwerdfqwre23");
         } catch (ServiceException e) {
             return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
         }
 
         eu.europa.ec.fisheries.wsdl.user.types.Context ctxt = null;
         try {
-            ctxt = usmService.getUserContext("rep_power", "Reporting", "rep_power_role", "EC", "someCacheKeydratgv asdf aert34sdfgds");
+            ctxt = usmService.getUserContext("rep_power", APP_NAME, "rep_power_role", "EC", "someCacheKeydratgv asdf aert34sdfgds");
         } catch (ServiceException e) {
             return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
         }

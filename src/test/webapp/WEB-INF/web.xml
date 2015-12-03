@@ -21,6 +21,6 @@
 
 	<context-param>
 		<param-name>usmApplication</param-name>
-		<param-value>TEST_APP</param-value>
+		<param-value>Reporting</param-value>
 	</context-param>
 </web-app>

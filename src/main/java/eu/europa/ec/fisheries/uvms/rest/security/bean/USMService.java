@@ -1,11 +1,9 @@
 package eu.europa.ec.fisheries.uvms.rest.security.bean;
 
 import eu.europa.ec.fisheries.uvms.exception.ServiceException;
-import eu.europa.ec.fisheries.wsdl.user.types.Application;
-import eu.europa.ec.fisheries.wsdl.user.types.Context;
-import eu.europa.ec.fisheries.wsdl.user.types.Dataset;
-import eu.europa.ec.fisheries.wsdl.user.types.UserContext;
+import eu.europa.ec.fisheries.wsdl.user.types.*;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Set;
 
@@ -36,29 +34,13 @@ public interface USMService {
     void setOptionDefaultValue(String keyOption, String defaultValue, String applicationName) throws ServiceException;
 
 
-    /**
-     *
-     * @param keyOption
-     * @param userDefinedValue
-     * @param applicationName
-     * @param scopeName
-     * @param username
-     * @param cacheKey needed to clear the users session cache in order to refresh the user preferences
-     * @throws ServiceException
-     */
-    void updateUserPreference(String keyOption,
-                              String userDefinedValue,
-                              String applicationName,
-                              String scopeName,
-                              String username,
-                              String cacheKey) throws ServiceException;
 
     String getUserPreference(String preferenceName,
                              String username,
                              String applicationName,
                              String currentRole,
                              String currentScope,
-                             String cacheKey) throws ServiceException;
+                             String jwToken) throws ServiceException;
 
     String getUserPreference(String preferenceName, Context userContext) throws ServiceException;
 
@@ -66,22 +48,28 @@ public interface USMService {
                            String applicationName,
                            String currentRole,
                            String currentScope,
-                           String cacheKey) throws ServiceException;
+                           String jwToken) throws ServiceException;
 
     Application getApplicationDefinition(String applicationName) throws ServiceException;
 
     void deployApplicationDescriptor(Application descriptor) throws ServiceException;
 
-    Set<String> getUserFeatures(String username, String applicationName, String currentRole, String currentScope, String cacheKey) throws ServiceException;
+    Set<String> getUserFeatures(String username, String applicationName, String currentRole, String currentScope, String jwToken) throws ServiceException;
 
     Set<String> getUserFeatures(String username, Context userContext) throws ServiceException;
 
-    List<Dataset> getDatasetsPerCategory(String category, String username, String applicationName, String currentRole, String currentScope, String cacheKey) throws ServiceException;
+
+    @Transactional
+    void putUserPreference(String keyOption, String userDefinedValue, String applicationName, String scopeName, String roleName, String username, String jwToken) throws ServiceException;
+
+    List<Dataset> getDatasetsPerCategory(String category, String username, String applicationName, String currentRole, String currentScope, String jwToken) throws ServiceException;
 
     List<Dataset> getDatasetsPerCategory(String category, Context userContext) throws ServiceException;
 
 
-    void setDataset(String applicationName, Dataset dataset, String cacheKey) throws ServiceException;
+    void createDataset(String applicationName, DatasetExtension dataset) throws ServiceException;
+
+    void updateDataset(String applicationName, DatasetExtension dataset) throws ServiceException;
 
     /**
      * This contains all user contexts available in USM for the given user.
