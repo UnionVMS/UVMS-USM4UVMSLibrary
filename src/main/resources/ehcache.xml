@@ -93,7 +93,7 @@ Here is an example of CacheManager level resource tuning, which will use up to 4
     Subdirectories can be specified below the property e.g. java.io.tmpdir/one
 
     -->
-    <diskStore path="java.io.tmpdir"/>
+   <!-- <diskStore path="java.io.tmpdir"/>-->
 
     <!--
     TransactionManagerLookup configuration
@@ -744,7 +744,7 @@ Here is an example of CacheManager level resource tuning, which will use up to 4
            maxEntriesLocalHeap="1000"
            eternal="false"
            memoryStoreEvictionPolicy="LRU"
-           overflowToDisk="true"
+           overflowToDisk="false"
            timeToIdleSeconds="3000"
            timeToLiveSeconds="3000"/>
 
@@ -753,7 +753,7 @@ Here is an example of CacheManager level resource tuning, which will use up to 4
            maxEntriesLocalHeap="20"
            eternal="true"
            memoryStoreEvictionPolicy="LRU"
-           overflowToDisk="true"/>
+           overflowToDisk="false"/>
     <!--
     Sample cache named sampleCache3. This cache overflows to disk. The disk store is
     persistent between cache and VM restarts. The disk expiry thread interval is set to 10
