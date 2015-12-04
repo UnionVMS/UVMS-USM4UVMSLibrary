@@ -42,5 +42,8 @@ public enum UnionVMSFeature {
     manageAlarmsOpenTickets,
     
     /** Viewing audit */
-    viewAudit
+    viewAudit,
+
+    /** Configuration page */
+    viewConfiguration
 }
