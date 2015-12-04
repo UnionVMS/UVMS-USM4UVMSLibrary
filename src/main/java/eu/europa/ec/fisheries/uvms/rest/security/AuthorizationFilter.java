@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.HttpHeaders;
 import java.io.IOException;
 import java.util.Set;
 
@@ -35,7 +36,6 @@ public class AuthorizationFilter extends AbstractUSMHandler implements Filter, A
             UserRoleRequestWrapper requestWrapper = (UserRoleRequestWrapper) request;
             Set<String> featuresStr = null;
 
-            String cacheKey = generateCacheKey(requestWrapper);
             String applicationName = getApplicationName(request.getServletContext());
             String currentScope = requestWrapper.getHeader(HTTP_HEADER_SCOPE_NAME); //get it from the header
             String currentRole = requestWrapper.getHeader(HTTP_HEADER_ROLE_NAME); //get it from the header
@@ -43,7 +43,7 @@ public class AuthorizationFilter extends AbstractUSMHandler implements Filter, A
             LOGGER.debug("Current requests is with scope '{}', and role '{}'", currentScope, currentRole);
 
             try {
-                Context userContext = usmService.getUserContext(requestWrapper.getRemoteUser(), applicationName, currentRole, currentScope,cacheKey);
+                Context userContext = usmService.getUserContext(requestWrapper.getRemoteUser(), applicationName, currentRole, currentScope);
 
                 if (userContext == null) {
                     ((HttpServletResponse)response).sendError(HttpServletResponse.SC_FORBIDDEN);

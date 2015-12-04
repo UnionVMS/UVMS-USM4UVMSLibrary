@@ -74,11 +74,15 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
         return defaultOptionValue;
     }
 
+    private String getCacheKey(String userName, String currentRole, String currentScope) {
+        return new StringBuilder(userName).append('_').append(currentRole).append('_').append(currentScope).toString();
+    }
+
     @Override
-    public Context getUserContext(String username, String applicationName, String currentRole, String currentScope, String jwToken) throws ServiceException {
-        LOG.debug("START getUserContext({}, {}, {}, {}, {})", username, applicationName, currentRole, currentScope, jwToken);
+    public Context getUserContext(String username, String applicationName, String currentRole, String currentScope) throws ServiceException {
+        LOG.debug("START getUserContext({}, {}, {}, {})", username, applicationName, currentRole, currentScope);
         Context context = null;
-        String cacheKey = applicationName+jwToken;
+        String cacheKey = getCacheKey(username, currentRole, currentScope);
 
         Element cachedContext = userSessionCache.get(cacheKey);
 
@@ -115,8 +119,8 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
     }
 
     @Override
-    public String getUserPreference(String preferenceName, String username, String applicationName, String currentRole, String currentScope, String jwToken) throws ServiceException {
-        LOG.debug("START getUserPreference({}, {}, {}, {}, {}, {})", preferenceName, username, applicationName, currentRole, currentScope, jwToken);
+    public String getUserPreference(String preferenceName, String username, String applicationName, String currentRole, String currentScope) throws ServiceException {
+        LOG.debug("START getUserPreference({}, {}, {}, {}, {})", preferenceName, username, applicationName, currentRole, currentScope);
         String userPrefValue = null;
 
 //        try {
@@ -142,21 +146,11 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
 //            throw new ServiceException("Unable to get Application Definition", e);
 //        }
 
-        Context userContext = getUserContext(username, applicationName, currentRole, currentScope, jwToken);
+        Context userContext = getUserContext(username, applicationName, currentRole, currentScope);
 
    //     Map<String, String> userPreferences = new HashMap<>();
 
-        if (userContext.getPreferences() != null) {
-            List<Preference> listPrefs = userContext.getPreferences().getPreference();
-            //lets filter out all other preferences which comes from the other apps
-
-            for (Preference pref : listPrefs) {
-                if (pref.getOptionName().equals(preferenceName)) {
-                    userPrefValue = pref.getOptionValue();
-                    break;
-                }
-            }
-        }
+        userPrefValue = getUserPreference(preferenceName, userContext);
 
         LOG.debug("END getUserPreference(), returning: {}", userPrefValue);
         return userPrefValue;
@@ -339,17 +333,10 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
 
     @Override
     @Transactional
-    public void putUserPreference(String keyOption, String userDefinedValue, String applicationName, String scopeName, String roleName, String username, String jwToken) throws ServiceException {
-        LOG.debug("START putUserPreference({} , {}, {}, {}, {}, {}, {})", keyOption, userDefinedValue, applicationName, scopeName, roleName, username, jwToken);
+    public void putUserPreference(String keyOption, String userDefinedValue, String applicationName, String scopeName, String roleName, String username) throws ServiceException {
+        LOG.debug("START putUserPreference({} , {}, {}, {}, {}, {})", keyOption, userDefinedValue, applicationName, scopeName, roleName, username);
 
-        String cacheKey = applicationName+jwToken;
-        String userPref = null;
-
-        try {
-            userPref = getUserPreference(keyOption, username, applicationName, roleName, scopeName, jwToken);
-        } catch (ServiceException e) {
-            LOG.debug("unable to get user preference from USM.");
-        }
+        String cacheKey = getCacheKey(username, roleName, scopeName);
 
         if (userSessionCache.remove(cacheKey)) {
             LOG.debug("clearing {} application definition from the cache.", applicationName);
@@ -364,20 +351,12 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
         userPreference.setRoleName(roleName);
 
 
-        if (userPref == null) {
-            //create user preference
-            try {
-                createUserPreference(userPreference);
-            } catch (Exception anyException) {      //this is ugly, dirty workaround until USM implements better API
-                updateUserPreference(userPreference);
-            }
-        } else {
-            //update
-            try {
-                updateUserPreference(userPreference);
-            } catch (Exception anyExc) {//this is ugly, dirty workaround until USM implements better API
-                createUserPreference(userPreference);
-            }
+        //FIXME once we have better APIs from USM
+        //update
+        try {
+            updateUserPreference(userPreference);
+        } catch (Exception anyExc) {//this is ugly, dirty workaround until USM implements better API
+            createUserPreference(userPreference);
         }
 
 
@@ -450,9 +429,9 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
 
 
     @Override
-    public List<Dataset> getDatasetsPerCategory(String category, String username, String applicationName, String currentRole, String currentScope, String jwToken) throws ServiceException {
+    public List<Dataset> getDatasetsPerCategory(String category, String username, String applicationName, String currentRole, String currentScope) throws ServiceException {
 
-        Context ctxt = getUserContext(username, applicationName, currentRole, currentScope, jwToken);
+        Context ctxt = getUserContext(username, applicationName, currentRole, currentScope);
 
         return getDatasetsPerCategory(category, ctxt);
     }
@@ -589,13 +568,6 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
     }
 
     @Override
-    public Set<String> getUserFeatures(String username, String applicationName, String currentRole, String currentScope, String jwToken) throws ServiceException {
-
-        Context ctxt = getUserContext(username, applicationName, currentRole, currentScope, jwToken);
-        return getUserFeatures(username, ctxt);
-    }
-
-    @Override
     public Set<String> getUserFeatures(String username, Context userContext) throws ServiceException {
         LOG.debug("START getUserFeatures({} ,{})", username, userContext);
 
@@ -613,6 +585,13 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
 
         LOG.debug("END getUserFeatures(...), returns {} ", featuresStr);
         return featuresStr;
+    }
+
+    @Override
+    public Set<String> getUserFeatures(String username, String applicationName, String currentRole, String currentScope) throws ServiceException {
+
+        Context ctxt = getUserContext(username, applicationName, currentRole, currentScope);
+        return getUserFeatures(username, ctxt);
     }
 
     private boolean isUserFault(TextMessage message) {

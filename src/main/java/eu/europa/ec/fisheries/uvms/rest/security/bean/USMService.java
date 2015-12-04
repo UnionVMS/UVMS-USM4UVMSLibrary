@@ -39,30 +39,28 @@ public interface USMService {
                              String username,
                              String applicationName,
                              String currentRole,
-                             String currentScope,
-                             String jwToken) throws ServiceException;
+                             String currentScope) throws ServiceException;
 
     String getUserPreference(String preferenceName, Context userContext) throws ServiceException;
 
     Context getUserContext(String username,
                            String applicationName,
                            String currentRole,
-                           String currentScope,
-                           String jwToken) throws ServiceException;
+                           String currentScope) throws ServiceException;
 
     Application getApplicationDefinition(String applicationName) throws ServiceException;
 
     void deployApplicationDescriptor(Application descriptor) throws ServiceException;
 
-    Set<String> getUserFeatures(String username, String applicationName, String currentRole, String currentScope, String jwToken) throws ServiceException;
+    Set<String> getUserFeatures(String username, String applicationName, String currentRole, String currentScope) throws ServiceException;
 
     Set<String> getUserFeatures(String username, Context userContext) throws ServiceException;
 
 
     @Transactional
-    void putUserPreference(String keyOption, String userDefinedValue, String applicationName, String scopeName, String roleName, String username, String jwToken) throws ServiceException;
+    void putUserPreference(String keyOption, String userDefinedValue, String applicationName, String scopeName, String roleName, String username) throws ServiceException;
 
-    List<Dataset> getDatasetsPerCategory(String category, String username, String applicationName, String currentRole, String currentScope, String jwToken) throws ServiceException;
+    List<Dataset> getDatasetsPerCategory(String category, String username, String applicationName, String currentRole, String currentScope) throws ServiceException;
 
     List<Dataset> getDatasetsPerCategory(String category, Context userContext) throws ServiceException;
 

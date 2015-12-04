@@ -96,7 +96,7 @@ public class RestResource {
 
         eu.europa.ec.fisheries.wsdl.user.types.Context ctxt = null;
         try {
-            ctxt = usmService.getUserContext("rep_power", APP_NAME, "rep_power_role", "EC", cacheKey);
+            ctxt = usmService.getUserContext("rep_power", APP_NAME, "rep_power_role", "EC");
         } catch (ServiceException e) {
             return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
         }
@@ -134,7 +134,7 @@ public class RestResource {
             dataset.setDiscriminator(datasetDiscriminator);
             usmService.updateDataset(APP_NAME, dataset);
 
-            ctxt = usmService.getUserContext("rep_power", APP_NAME, "rep_power_role", "EC", cacheKey);
+            ctxt = usmService.getUserContext("rep_power", APP_NAME, "rep_power_role", "EC");
 
             List<Dataset> datasets = usmService.getDatasetsPerCategory(datasetCategory, ctxt);
 
@@ -287,14 +287,14 @@ public class RestResource {
         String cacheKey= "someCacheKeydratgv asdf aert34sdfgds";
 
         try {
-            usmService.putUserPreference(TEST_USER_PREFERENCE, newValue, APP_NAME, "EC", "rep_power_role", "rep_power", cacheKey);
+            usmService.putUserPreference(TEST_USER_PREFERENCE, newValue, APP_NAME, "EC", "rep_power_role", "rep_power");
         } catch (ServiceException e) {
             return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
         }
 
         eu.europa.ec.fisheries.wsdl.user.types.Context ctxt = null;
         try {
-            ctxt = usmService.getUserContext("rep_power", APP_NAME, "rep_power_role", "EC", cacheKey);
+            ctxt = usmService.getUserContext("rep_power", APP_NAME, "rep_power_role", "EC");
         } catch (ServiceException e) {
             return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
         }

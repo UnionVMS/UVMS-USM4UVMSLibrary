@@ -51,8 +51,5 @@ public abstract class AbstractUSMHandler  {
         return cfgName;
     }
 
-    protected String generateCacheKey(HttpServletRequest request) {
-        return request.getHeader(HttpHeaders.AUTHORIZATION) + getApplicationName(request.getServletContext());
-    }
 
 }
