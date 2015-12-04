@@ -100,14 +100,13 @@ public class RestResourceITest extends ArquillianTest {
 	
 	@Test
 	@Header(name="connection", value = "Keep-Alive")
-	@Ignore
 	public void testAuthorizationPositive(@ArquillianResteasyResource("test/rest") ResteasyWebTarget webTarget) throws JsonParseException, JsonMappingException, IOException {
 		
 		//check if we have the prerequisite - a report in the DB with ID = 1
 		Response response = webTarget.path("/list" ).request()
-				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new JwtTokenHandler().createToken("TEST_USER"))
-				.header(AuthConstants.HTTP_HEADER_ROLE_NAME, "TEST_ROLE")
-				.header(AuthConstants.HTTP_HEADER_SCOPE_NAME, "TEST_SCOPE")
+				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new JwtTokenHandler().createToken("rep_power"))
+				.header(AuthConstants.HTTP_HEADER_ROLE_NAME, "rep_power_role")
+				.header(AuthConstants.HTTP_HEADER_SCOPE_NAME, "EC")
 				.get();
 		assertEquals(HttpServletResponse.SC_OK, response.getStatus());
 		response.close();
@@ -116,12 +115,11 @@ public class RestResourceITest extends ArquillianTest {
 
 	@Test
 	@Header(name="connection", value = "Keep-Alive")
-	@Ignore
 	public void testAuthorizationNegative(@ArquillianResteasyResource("test/rest") ResteasyWebTarget webTarget) throws JsonParseException, JsonMappingException, IOException {
 
 		//check if we have the prerequisite - a report in the DB with ID = 1
 		Response response = webTarget.path("/get" ).request()
-				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new JwtTokenHandler().createToken("TEST_USER"))
+				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new JwtTokenHandler().createToken("Some Fake User"))
 				.header(AuthConstants.HTTP_HEADER_ROLE_NAME, "TEST_ROLE")
 				.header(AuthConstants.HTTP_HEADER_SCOPE_NAME, "TEST_SCOPE")
 				.get();
@@ -131,13 +129,12 @@ public class RestResourceITest extends ArquillianTest {
 
 	@Test
 	@Header(name="connection", value = "Keep-Alive")
-	@Ignore
 	public void testApplicationDescriptor(@ArquillianResteasyResource("test/rest/applicationDescriptor") ResteasyWebTarget webTarget) throws IOException, ServiceException {
 
 		Response response = webTarget.request()
-				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new JwtTokenHandler().createToken("TEST_USER"))
-				.header(AuthConstants.HTTP_HEADER_ROLE_NAME, "TEST_ROLE")
-				.header(AuthConstants.HTTP_HEADER_SCOPE_NAME, "TEST_SCOPE")
+				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new JwtTokenHandler().createToken("rep_power"))
+				.header(AuthConstants.HTTP_HEADER_ROLE_NAME, "rep_power_role")
+				.header(AuthConstants.HTTP_HEADER_SCOPE_NAME, "EC")
 				.get();
 		assertEquals(HttpServletResponse.SC_OK, response.getStatus());
 		response.close();
@@ -152,7 +149,6 @@ public class RestResourceITest extends ArquillianTest {
 
 	@Test
 	@Header(name="connection", value = "Keep-Alive")
-	@Ignore
 	public void testDatasets(@ArquillianResteasyResource("test/rest/datasets") ResteasyWebTarget webTarget) throws IOException, ServiceException {
 
 		Response response = webTarget.request()

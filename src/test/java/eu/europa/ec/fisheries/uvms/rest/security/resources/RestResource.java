@@ -47,7 +47,7 @@ public class RestResource {
     public Response listReports(@Context HttpServletRequest request,
     				@Context HttpServletResponse response) {
 
-        if (!request.isUserInRole("APP1_TEST_FEATURE")) {
+        if (!request.isUserInRole("LIST_REPORTS")) {
             return Response.status(HttpServletResponse.SC_FORBIDDEN).build();
         }
 
@@ -96,7 +96,7 @@ public class RestResource {
 
         eu.europa.ec.fisheries.wsdl.user.types.Context ctxt = null;
         try {
-            ctxt = usmService.getUserContext("rep_power", APP_NAME, "rep_power_role", "EC", "someCacheKey");
+            ctxt = usmService.getUserContext("rep_power", APP_NAME, "rep_power_role", "EC", cacheKey);
         } catch (ServiceException e) {
             return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
         }
@@ -134,7 +134,7 @@ public class RestResource {
             dataset.setDiscriminator(datasetDiscriminator);
             usmService.updateDataset(APP_NAME, dataset);
 
-            ctxt = usmService.getUserContext("rep_power", APP_NAME, "rep_power_role", "EC", "someCacheKey");
+            ctxt = usmService.getUserContext("rep_power", APP_NAME, "rep_power_role", "EC", cacheKey);
 
             List<Dataset> datasets = usmService.getDatasetsPerCategory(datasetCategory, ctxt);
 
@@ -172,21 +172,18 @@ public class RestResource {
 
 
         if (application== null
-                || !"Reporting".equals(application.getName())) {
+                || !APP_NAME.equals(application.getName())) {
             return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).entity(String.valueOf(timeDiff)).build();
         }
 
-        long timeDiff2 = new Date().getTime();
         try {
             application = usmService.getApplicationDefinition(APP_NAME);
         } catch (ServiceException e) {
             return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
         }
-        timeDiff2 = new Date().getTime()-timeDiff2;
 
         if (application== null
-                || !"Reporting".equals(application.getName())
-                || timeDiff2>= timeDiff) {
+                || !APP_NAME.equals(application.getName())) {
             return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).entity(String.valueOf(timeDiff)).build();
         }
 
@@ -287,23 +284,24 @@ public class RestResource {
                               @Context HttpServletResponse response) {
 
         String newValue = "valueeeee" + new Date().getTime();
+        String cacheKey= "someCacheKeydratgv asdf aert34sdfgds";
 
         try {
-            usmService.putUserPreference(TEST_USER_PREFERENCE, newValue,  APP_NAME, "EC", "rep_power_role", "rep_power", "someCacheKeyrefga wqerf qwerdfqwre23");
+            usmService.putUserPreference(TEST_USER_PREFERENCE, newValue, APP_NAME, "EC", "rep_power_role", "rep_power", cacheKey);
         } catch (ServiceException e) {
             return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
         }
 
         eu.europa.ec.fisheries.wsdl.user.types.Context ctxt = null;
         try {
-            ctxt = usmService.getUserContext("rep_power", APP_NAME, "rep_power_role", "EC", "someCacheKeydratgv asdf aert34sdfgds");
+            ctxt = usmService.getUserContext("rep_power", APP_NAME, "rep_power_role", "EC", cacheKey);
         } catch (ServiceException e) {
             return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
         }
 
         String userPref = null;
         try {
-            userPref = usmService.getUserPreference(SOME_TEST_OPTION, ctxt);
+            userPref = usmService.getUserPreference(TEST_USER_PREFERENCE, ctxt);
         } catch (ServiceException e) {
             return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
         }
@@ -314,7 +312,7 @@ public class RestResource {
 
 
         try {
-            userPref = usmService.getUserPreference(SOME_TEST_OPTION, ctxt);
+            userPref = usmService.getUserPreference(TEST_USER_PREFERENCE, ctxt);
         } catch (ServiceException e) {
             return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
         }

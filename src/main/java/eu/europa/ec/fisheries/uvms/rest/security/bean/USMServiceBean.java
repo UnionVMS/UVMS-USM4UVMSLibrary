@@ -119,18 +119,39 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
         LOG.debug("START getUserPreference({}, {}, {}, {}, {}, {})", preferenceName, username, applicationName, currentRole, currentScope, jwToken);
         String userPrefValue = null;
 
+//        try {
+//            String msgId = messageProducer.sendModuleMessage(marshallJaxBObjectToString(getDeploymentDescriptorRequest), messageConsumer.getDestination());
+//            LOG.debug("JMS message with ID: {} is sent to USM.", msgId);
+//
+//            Message response = messageConsumer.getMessage(msgId, GetDeploymentDescriptorResponse.class, UVMS_USM_TIMEOUT);
+//
+//            if (response != null && !isUserFault((TextMessage) response)) {
+//                GetDeploymentDescriptorResponse getDeploymentDescriptorResponse = unmarshallTextMessage((TextMessage) response, GetDeploymentDescriptorResponse.class);
+//                LOG.debug("Response concerning message with ID: {} is received.", msgId);
+//                application = getDeploymentDescriptorResponse.getApplication();
+//            } else {
+//                LOG.error("Error occurred while receiving JMS response for message ID: {}", msgId);
+//
+//                if (response != null) {
+//                    UserFault error = unmarshallTextMessage((TextMessage) response, UserFault.class);
+//                    LOG.error("Error Code: {}, Message: {}", error.getCode(), error.getFault());
+//                    throw new ServiceException("Unable to receive a response from USM.");
+//                }
+//            }
+//        } catch (MessageException | JMSException | JAXBException e) {
+//            throw new ServiceException("Unable to get Application Definition", e);
+//        }
+
         Context userContext = getUserContext(username, applicationName, currentRole, currentScope, jwToken);
 
-        Map<String, String> userPreferences = new HashMap<>();
+   //     Map<String, String> userPreferences = new HashMap<>();
 
         if (userContext.getPreferences() != null) {
             List<Preference> listPrefs = userContext.getPreferences().getPreference();
             //lets filter out all other preferences which comes from the other apps
-           /* for (Preference pref : listPrefs) {
-                userPreferences.put(pref.getOptionName(), pref.getOptionValue());
-            }*/
+
             for (Preference pref : listPrefs) {
-                if (pref.getOptionName() == preferenceName) {
+                if (pref.getOptionName().equals(preferenceName)) {
                     userPrefValue = pref.getOptionValue();
                     break;
                 }
@@ -147,7 +168,7 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
         String userPrefValue = null;
 
         if (userContext != null) {
-            Map<String, String> userPreferences = new HashMap<>();
+           // Map<String, String> userPreferences = new HashMap<>();
 
             if (userContext.getPreferences() != null) {
                 List<Preference> listPrefs = userContext.getPreferences().getPreference();
@@ -156,7 +177,7 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
                     userPreferences.put(pref.getOptionName(), pref.getOptionValue());
                 }*/
                 for (Preference pref : listPrefs) {
-                    if (pref.getOptionName() == preferenceName) {
+                    if (pref.getOptionName().equals(preferenceName)) {
                         userPrefValue = pref.getOptionValue();
                         break;
                     }
@@ -345,10 +366,18 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
 
         if (userPref == null) {
             //create user preference
-            createUserPreference(userPreference);
+            try {
+                createUserPreference(userPreference);
+            } catch (Exception anyException) {      //this is ugly, dirty workaround until USM implements better API
+                updateUserPreference(userPreference);
+            }
         } else {
             //update
-            updateUserPreference(userPreference);
+            try {
+                updateUserPreference(userPreference);
+            } catch (Exception anyExc) {//this is ugly, dirty workaround until USM implements better API
+                createUserPreference(userPreference);
+            }
         }
 
 
