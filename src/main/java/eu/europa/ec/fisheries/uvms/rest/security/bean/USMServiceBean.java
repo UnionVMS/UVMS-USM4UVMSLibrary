@@ -409,8 +409,8 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
             Message response = messageConsumer.getMessage(messageID, CreatePreferenceRequest.class, UVMS_USM_TIMEOUT);
 
             if (response != null && !isUserFault((TextMessage) response)) {
-                CreatePreferenceRequest createPreferenceRequest = unmarshallTextMessage((TextMessage) response, CreatePreferenceRequest.class);
-                LOG.debug("Response concerning message with ID: {} is received. The response is: {}", messageID, createPreferenceRequest.getUserPreference());
+                CreatePreferenceResponse createPreferenceRequest = unmarshallTextMessage((TextMessage) response, CreatePreferenceResponse.class);
+                LOG.debug("Response concerning message with ID: {} is received. The response is: {}", messageID, createPreferenceRequest.getResponse());
             } else {
                 LOG.error("Error occurred while receiving JMS response for message ID: {}", messageID);
 
