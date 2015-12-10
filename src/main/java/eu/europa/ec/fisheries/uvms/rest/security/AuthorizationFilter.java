@@ -29,7 +29,7 @@ public class AuthorizationFilter extends AbstractUSMHandler implements Filter, A
 
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException, IOException {
         LOGGER.debug("AuthorizationFilter.doFilter(...) START");
 
         if (request instanceof UserRoleRequestWrapper) {
@@ -51,7 +51,8 @@ public class AuthorizationFilter extends AbstractUSMHandler implements Filter, A
                     featuresStr = usmService.getUserFeatures(requestWrapper.getRemoteUser(), userContext);
                 }
             } catch (ServiceException|IOException e) {
-                throw new ServletException("Unable to get user context and/or user features.", e);
+                ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unable to get user context and/or user features.");
+                return;
             }
 
             if (featuresStr == null) {

@@ -22,8 +22,6 @@ public class UserRoleRequestWrapper extends HttpServletRequestWrapper {
 
 
     private String user;
-    private String currentScopeName;
-    private String currentRoleName;
 
     private Set<String> roles = null;
     private HttpServletRequest realRequest;
@@ -99,19 +97,4 @@ public class UserRoleRequestWrapper extends HttpServletRequestWrapper {
         this.roles = roles;
     }
 
-    public String getCurrentRoleName() {
-        return currentRoleName;
-    }
-
-    public void setCurrentRoleName(String currentRoleName) {
-        this.currentRoleName = currentRoleName;
-    }
-
-    public String getCurrentScopeName() {
-        return currentScopeName;
-    }
-
-    public void setCurrentScopeName(String currentScopeName) {
-        this.currentScopeName = currentScopeName;
-    }
 }
