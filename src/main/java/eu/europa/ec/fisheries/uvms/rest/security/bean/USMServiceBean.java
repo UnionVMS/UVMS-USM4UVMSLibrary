@@ -269,9 +269,17 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
     public void redeployApplicationDescriptor(Application deploymentDescriptor) throws ServiceException {
         LOG.debug("START redeployApplicationDescriptor({})", deploymentDescriptor);
 
+        //we must clear the app cache for the given application definition
+        // since it contains all options default values
+        if (appCache.remove(deploymentDescriptor.getName())) {
+            LOG.debug("clearing {} application definition from the cache.", deploymentDescriptor.getName());
+        }
+
         try {
             String descriptorString = UserModuleRequestMapper.mapToRedeployApplicationRequest(deploymentDescriptor);
             String msgId = messageProducer.sendModuleMessage(descriptorString, messageConsumer.getDestination());
+            LOG.debug("JMS message with ID: {} is sent to USM.", msgId);
+
             Message response = messageConsumer.getMessage(msgId, RedeployApplicationResponse.class, UVMS_USM_TIMEOUT);
 
             if (response != null && !isUserFault((TextMessage) response)) {
@@ -298,6 +306,7 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
 
         LOG.debug("END redeployApplicationDescriptor()");
     }
+
 
     @Override
     @Transactional
@@ -623,35 +632,4 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
         return isContextMatch;
     }
 
-    private void redeployApplication(Application application) throws ServiceException {
-        //we must clear the app cache for the given application definition
-        // since it contains all options default values
-        if (appCache.remove(application.getName())) {
-            LOG.debug("clearing {} application definition from the cache.", application.getName());
-        }
-
-        String payload = null;
-        try {
-            payload = UserModuleRequestMapper.mapToRedeployApplicationRequest(application);
-
-            String messageID = messageProducer.sendModuleMessage(payload, messageConsumer.getDestination());
-            LOG.debug("JMS message with ID: {} is sent to USM.", messageID);
-
-            Message response = messageConsumer.getMessage(messageID, GetUserContextResponse.class, UVMS_USM_TIMEOUT);
-
-            if (response != null && !isUserFault((TextMessage) response)) {
-                RedeployApplicationResponse redeployApplicationResponse = unmarshallTextMessage((TextMessage) response, RedeployApplicationResponse.class);
-                LOG.debug("Response concerning message with ID: {} is received. The response is: {}", messageID, redeployApplicationResponse.getResponse());
-            } else {
-                LOG.error("Error occurred while receiving JMS response for message ID: {}", messageID);
-
-                if (response != null) {
-                    UserFault error = unmarshallTextMessage((TextMessage) response, UserFault.class);
-                    LOG.error("Error Code: {}, Message: {}", error.getCode(), error.getFault());
-                }
-            }
-        } catch (ModelMarshallException | MessageException | JMSException | JAXBException e) {
-            throw new ServiceException("Unable to set option default value into USM.", e);
-        }
-    }
 }
