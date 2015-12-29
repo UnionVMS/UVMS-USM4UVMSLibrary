@@ -255,6 +255,8 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
                     UserFault error = unmarshallTextMessage((TextMessage) response, UserFault.class);
                     LOG.error("Error Code: {}, Message: {}", error.getCode(), error.getFault());
                     throw new ServiceException("Unable to register into USM.");
+                } else {
+                    throw new ServiceException("Unable to register into USM.");
                 }
             }
 
@@ -296,6 +298,8 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
                 if (response != null) {
                     UserFault error = unmarshallTextMessage((TextMessage) response, UserFault.class);
                     LOG.error("Error Code: {}, Message: {}", error.getCode(), error.getFault());
+                    throw new ServiceException("Unable to register into USM.");
+                } else {
                     throw new ServiceException("Unable to register into USM.");
                 }
             }
