@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.HttpHeaders;
 import java.io.IOException;
 import java.util.Set;
 
@@ -77,3 +76,4 @@ public class AuthorizationFilter extends AbstractUSMHandler implements Filter, A
     public void destroy() {
     }
 }
+

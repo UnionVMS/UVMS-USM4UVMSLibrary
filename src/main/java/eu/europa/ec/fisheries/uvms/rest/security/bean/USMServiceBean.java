@@ -363,20 +363,44 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
         userPreference.setUserName(username);
         userPreference.setRoleName(roleName);
 
-
-        //FIXME once we have better APIs from USM
-        //update
-        try {
-            updateUserPreference(userPreference);
-        } catch (Exception anyExc) {//this is ugly, dirty workaround until USM implements better API
-            createUserPreference(userPreference);
-        }
+        putUserPreference(userPreference);
 
 
         LOG.debug("END putUserPreference()");
     }
 
-    private void updateUserPreference(UserPreference userPreference) throws ServiceException {
+    private void putUserPreference(UserPreference userPreference) throws ServiceException {
+        LOG.debug("START putUserPreference param: {}", userPreference);
+
+        String payload = null;
+        try {
+            payload = UserModuleRequestMapper.mapToPutUserPreferenceRequest(userPreference);
+
+            String messageID = messageProducer.sendModuleMessage(payload, messageConsumer.getDestination());
+            LOG.debug("JMS message with ID: {} is successfully sent to USM.", messageID);
+
+            Message response = messageConsumer.getMessage(messageID, PutPreferenceResponse.class, UVMS_USM_TIMEOUT);
+
+            if (response != null && !isUserFault((TextMessage) response)) {
+                PutPreferenceResponse putPreferenceResponse = unmarshallTextMessage((TextMessage) response, PutPreferenceResponse.class);
+                LOG.debug("Response concerning message with ID: {} is received. The response is: {}", messageID, putPreferenceResponse.getResponse());
+            } else {
+                LOG.error("Error occurred while receiving JMS response for message ID: {}", messageID);
+
+                if (response != null) {
+                    UserFault error = unmarshallTextMessage((TextMessage) response, UserFault.class);
+                    LOG.error("Error Code: {}, Message: {}", error.getCode(), error.getFault());
+                }
+            }
+
+        } catch (ModelMarshallException | MessageException | JMSException | JAXBException e) {
+            throw new ServiceException("Unable to set user preference into USM.", e);
+        }
+
+        LOG.debug("END putUserPreference");
+    }
+
+   /* private void updateUserPreference(UserPreference userPreference) throws ServiceException {
         LOG.debug("START updateUserPreference");
 
         String payload = null;
@@ -438,7 +462,7 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
         }
 
         LOG.debug("END createUserPreference");
-    }
+    }*/
 
 
     @Override
