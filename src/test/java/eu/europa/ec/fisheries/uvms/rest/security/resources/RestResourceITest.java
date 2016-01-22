@@ -147,9 +147,10 @@ public class RestResourceITest extends ArquillianTest {
 //		res.preferences();
 	}
 
+
 	@Test
 	@Header(name="connection", value = "Keep-Alive")
-	public void testDatasets(@ArquillianResteasyResource("test/rest/datasets") ResteasyWebTarget webTarget) throws IOException, ServiceException {
+	public void testDatasetsMerge(@ArquillianResteasyResource("test/rest/datasets/merge") ResteasyWebTarget webTarget) throws IOException, ServiceException {
 
 		Response response = webTarget.request()
 				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new JwtTokenHandler().createToken("rep_power"))
@@ -159,13 +160,23 @@ public class RestResourceITest extends ArquillianTest {
 		assertEquals(HttpServletResponse.SC_OK, response.getStatus());
 		response.close();
 
-//		RestResource res = new RestResource();
-//		res.features();
-//		res.options();
-//		res.preferences();
 	}
 
-	/*@Test
+	@Test
+	@Header(name="connection", value = "Keep-Alive")
+	public void testDatasetsReset(@ArquillianResteasyResource("test/rest/datasets/reset") ResteasyWebTarget webTarget) throws IOException, ServiceException {
+
+		Response response = webTarget.request()
+				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new JwtTokenHandler().createToken("rep_power"))
+				.header(AuthConstants.HTTP_HEADER_ROLE_NAME, "rep_power_role")
+				.header(AuthConstants.HTTP_HEADER_SCOPE_NAME, "EC")
+				.get();
+		assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+		response.close();
+
+	}
+
+	@Test
 	@Header(name="connection", value = "Keep-Alive")
 	public void testFeatures(@ArquillianResteasyResource("test/rest/features") ResteasyWebTarget webTarget) throws IOException, ServiceException {
 
@@ -180,7 +191,7 @@ public class RestResourceITest extends ArquillianTest {
 //		RestResource res = new RestResource();
 //		res.options();
 //		res.preferences();
-	}*/
+	}
 
 	@Test
 	@Header(name="connection", value = "Keep-Alive")

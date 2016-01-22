@@ -5,6 +5,7 @@
         <name>Reporting</name>
         <description>Deployment descriptor of module "Reporting" version "@application.version@".</description>
         <parent>Union VMS</parent>
+        <datasetRetain>true</datasetRetain>
         <!--<dataset>
             <name>dataset_name</name>
             <description>dataset_desc</description>
@@ -72,5 +73,11 @@
             <description>allows user to delete PUBLIC shared reports, of which he is not the owner</description>
             <group>reporting</group>
         </feature>
+        <dataset>
+            <name>dataset_name</name>
+            <description>dataset_desc</description>
+            <category>dataset_cat</category>
+            <discriminator>dataset_disc</discriminator>
+        </dataset>
     </application>
 </ns2:deployApplicationRequest>

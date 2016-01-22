@@ -3,6 +3,7 @@ package eu.europa.ec.fisheries.uvms.rest.security.resources;
 
 import eu.europa.ec.fisheries.uvms.exception.ServiceException;
 import eu.europa.ec.fisheries.uvms.rest.security.bean.USMService;
+import eu.europa.ec.fisheries.wsdl.user.module.DeployApplicationRequest;
 import eu.europa.ec.fisheries.wsdl.user.types.Application;
 import eu.europa.ec.fisheries.wsdl.user.types.Dataset;
 import eu.europa.ec.fisheries.wsdl.user.types.DatasetExtension;
@@ -20,6 +21,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import java.applet.AppletContext;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -69,23 +74,13 @@ public class RestResource {
 
 
     @GET
-    @Path("/datasets")
+    @Path("/datasets/merge")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response datasets(@Context HttpServletRequest request,
-                              @Context HttpServletResponse response)  {
+    public Response datasetsMerge(@Context HttpServletRequest request,
+                             @Context HttpServletResponse response)  {
 
-        String datasetName = "datasetName" + new Date().getTime();
-        String datasetDiscriminator = "Discriminator" + new Date().getTime();
-        String cacheKey = "adgfasregfdsvdsfgrewtrehjyhsgaswefa";
-        String datasetCategory = DATASET_CATEGORY + new Date().getTime();
-
-
-
-        DatasetExtension dataset = new DatasetExtension();
-        dataset.setCategory(datasetCategory);
-        dataset.setName(datasetName);
-        dataset.setDiscriminator(datasetName);
-        dataset.setApplicationName(APP_NAME);
+        //STEP 1 - create a new dataset
+       DatasetExtension dataset = createDataset(new Date());
         /// let's test the setter method
         try {
             usmService.createDataset(APP_NAME, dataset);
@@ -101,57 +96,80 @@ public class RestResource {
             return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
         }
 
+        //STEP 2 - redeploy application
         try {
-            long timeDiff = new Date().getTime();
-            List<Dataset> datasets = usmService.getDatasetsPerCategory(datasetCategory, ctxt);
-
-            if (datasets == null
-                    || datasets.size() != 1
-                    || !datasetDiscriminator.equals(datasets.get(0).getDiscriminator())
-                    || !datasetName.equals(datasets.get(0).getDiscriminator())
-                    || !datasetCategory.equals(datasets.get(0).getCategory())) {
-                return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
-            }
-
-
-            //now let's check the caching performance
-            timeDiff = new Date().getTime() - timeDiff;
-
-            long timeDiff2 = new Date().getTime();
-            datasets = usmService.getDatasetsPerCategory(datasetCategory, ctxt);
-            timeDiff2 = new Date().getTime() - timeDiff2;
-
-            if (datasets == null || datasets.size() != 1 || timeDiff2>= timeDiff) {
-                return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
-            }
-
-        } catch (ServiceException e) {
-            return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
-        }
-
-        try {
-            datasetDiscriminator = "Discriminator" + new Date().getTime();
-            dataset.setDiscriminator(datasetDiscriminator);
-            usmService.updateDataset(APP_NAME, dataset);
-
+            usmService.redeployApplicationDescriptor(getApplicationDeploymentRequest());
             ctxt = usmService.getUserContext("rep_power", APP_NAME, "rep_power_role", "EC");
-
-            List<Dataset> datasets = usmService.getDatasetsPerCategory(datasetCategory, ctxt);
-
-            if (datasets == null
-                    || datasets.size() != 1
-                    || !datasetDiscriminator.equals(datasets.get(0).getDiscriminator())
-                    || !datasetName.equals(datasets.get(0).getDiscriminator())
-                    || !datasetCategory.equals(datasets.get(0).getCategory())) {
-                return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
-            }
-
-        } catch (ServiceException e) {
+        } catch (Exception e) {
             return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
         }
 
         return Response.status(HttpServletResponse.SC_OK).build();
 
+    }
+
+    @GET
+    @Path("/datasets/reset")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response datasetsReset(@Context HttpServletRequest request,
+                                  @Context HttpServletResponse response)  {
+
+        //STEP 1 - create a new dataset
+        DatasetExtension dataset = createDataset(new Date());
+        /// let's test the setter method
+        try {
+            usmService.createDataset(APP_NAME, dataset);
+        } catch (ServiceException e) {
+            return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
+        }
+
+
+        eu.europa.ec.fisheries.wsdl.user.types.Context ctxt = null;
+        try {
+            ctxt = usmService.getUserContext("rep_power", APP_NAME, "rep_power_role", "EC");
+        } catch (ServiceException e) {
+            return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
+        }
+
+        //STEP 2 - redeploy application
+        try {
+            Application app = getApplicationDeploymentRequest();
+            app.setDatasetRetain(false);
+            usmService.redeployApplicationDescriptor(app);
+            ctxt = usmService.getUserContext("rep_power", APP_NAME, "rep_power_role", "EC");
+        } catch (Exception e) {
+            return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
+        }
+
+        return Response.status(HttpServletResponse.SC_OK).build();
+
+    }
+
+    private Application getApplicationDeploymentRequest() throws JAXBException {
+        // do something on application startup
+        InputStream deploymentDescInStream = getClass().getClassLoader().getResourceAsStream("usmDeploymentDescriptor.xml");
+        JAXBContext jaxBcontext = JAXBContext.newInstance(DeployApplicationRequest.class);
+        javax.xml.bind.Unmarshaller um = jaxBcontext.createUnmarshaller();
+
+        DeployApplicationRequest applicationDefinition = (DeployApplicationRequest) um.unmarshal(deploymentDescInStream);
+
+        return applicationDefinition.getApplication();
+    }
+
+    private DatasetExtension createDataset(Date date) {
+
+        String datasetName = "datasetName" + date.getTime();
+        String datasetDiscriminator = "Discriminator" + date.getTime();
+        String cacheKey = "adgfasregfdsvdsfgrewtrehjyhsgaswefa";
+        String datasetCategory = DATASET_CATEGORY + date.getTime();
+
+
+        DatasetExtension dataset = new DatasetExtension();
+        dataset.setCategory(datasetCategory);
+        dataset.setName(datasetName);
+        dataset.setDiscriminator(datasetName);
+        dataset.setApplicationName(APP_NAME);
+        return dataset;
     }
 
     @GET
