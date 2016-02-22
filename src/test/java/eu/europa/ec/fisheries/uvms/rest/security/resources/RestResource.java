@@ -72,7 +72,7 @@ public class RestResource {
         return Response.status(HttpServletResponse.SC_OK).build();
     }
 
-
+/*
     @GET
     @Path("/datasets/merge")
     @Produces(MediaType.APPLICATION_JSON)
@@ -143,7 +143,7 @@ public class RestResource {
 
         return Response.status(HttpServletResponse.SC_OK).build();
 
-    }
+    }*/
 
     private Application getApplicationDeploymentRequest() throws JAXBException {
         // do something on application startup

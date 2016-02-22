@@ -64,10 +64,11 @@ public interface USMService {
 
     List<Dataset> getDatasetsPerCategory(String category, Context userContext) throws ServiceException;
 
+    @Transactional
+    void createDataset(String applicationName, String datasetName, String discriminator, String category, String description)  throws ServiceException;
 
-    void createDataset(String applicationName, DatasetExtension dataset) throws ServiceException;
-
-    void updateDataset(String applicationName, DatasetExtension dataset) throws ServiceException;
+    @Transactional
+    void deleteDataset(String applicationName, String datasetName) throws ServiceException;
 
     /**
      * This contains all user contexts available in USM for the given user.

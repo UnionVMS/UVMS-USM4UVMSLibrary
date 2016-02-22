@@ -494,15 +494,26 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
     }
 
     @Override
-    public void createDataset(String applicationName, DatasetExtension dataset) throws ServiceException {
+    public void createDataset(String applicationName, String datasetName, String discriminator, String category, String description) throws ServiceException {
 
-        LOG.debug("START createDataset({}, {}", applicationName, dataset);
+        LOG.debug("START createDataset({}, {}, {}, {}, {})", applicationName, datasetName, discriminator, category, description);
+
+        if (StringUtils.isEmpty(applicationName) || StringUtils.isEmpty(datasetName)) {
+            throw new IllegalArgumentException("Application name, nor dataset name cannot be null");
+        }
 
         if (appCache.remove(applicationName)) {
             LOG.debug("clearing {} application definition from the cache.", applicationName);
         }
 
         try {
+            DatasetExtension dataset = new DatasetExtension();
+            dataset.setApplicationName(applicationName);
+            dataset.setDiscriminator(discriminator);
+            dataset.setName(datasetName);
+            dataset.setCategory(category);
+            dataset.setDescription(description);
+
             String payload = UserModuleRequestMapper.mapToCreateDatasetRequest(dataset);
 
 
@@ -530,10 +541,10 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
         LOG.debug("END createDataset(...)");
     }
 
-    @Override
-    public void updateDataset(String applicationName, DatasetExtension dataset) throws ServiceException {
+    /*@Override
+    public void renameDataset(String applicationName, String oldDatasetName, String newDatasetName) throws ServiceException {
 
-        LOG.debug("START updateDataset({}, {}, {}", applicationName, dataset);
+        LOG.debug("START renameDataset({}, old-> {}, new->{}", applicationName, oldDatasetName, newDatasetName);
 
         if (appCache.remove(applicationName)) {
             LOG.debug("clearing {} application definition from the cache.", applicationName);
@@ -564,7 +575,46 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
             throw new ServiceException("Unable to update Dataset.", e);
         }
 
-        LOG.debug("END updateDataset(...)");
+        LOG.debug("END renameDataset(...)");
+    }*/
+
+    @Override
+    public void deleteDataset(String applicationName, String datasetName) throws ServiceException {
+        LOG.debug("START deleteDataset({}, {}", applicationName, datasetName);
+
+        if (appCache.remove(applicationName)) {
+            LOG.debug("clearing {} application definition from the cache.", applicationName);
+        }
+
+        try {
+            DatasetExtension dataset = new DatasetExtension();
+            dataset.setApplicationName(applicationName);
+            dataset.setName(datasetName);
+
+            String payload = UserModuleRequestMapper.mapToDeleteDatasetRequest(dataset);
+
+            String messageID = messageProducer.sendModuleMessage(payload, messageConsumer.getDestination());
+            LOG.debug("JMS message with ID: {} is sent to USM.", messageID);
+
+            Message response = messageConsumer.getMessage(messageID, DeleteDatasetResponse.class, UVMS_USM_TIMEOUT);
+
+            if (response != null && !isUserFault((TextMessage) response)) {
+                DeleteDatasetResponse deleteDatasetResponse = unmarshallTextMessage((TextMessage) response, DeleteDatasetResponse.class);
+                LOG.debug("Response concerning message with ID: {} is received. The response is: {}", messageID, deleteDatasetResponse.getResponse());
+            } else {
+                LOG.error("Error occurred while receiving JMS response for message ID: {}", messageID);
+
+                if (response != null) {
+                    UserFault error = unmarshallTextMessage((TextMessage) response, UserFault.class);
+                    LOG.error("Error Code: {}, Message: {}", error.getCode(), error.getFault());
+                }
+            }
+
+        } catch (ModelMarshallException | MessageException | JMSException | JAXBException e) {
+            throw new ServiceException("Unable to update Dataset.", e);
+        }
+
+        LOG.debug("END deleteDataset(...)");
     }
 
     @Override
