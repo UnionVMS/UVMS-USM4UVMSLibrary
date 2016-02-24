@@ -3,7 +3,7 @@
     <groupId>eu.europa.ec.fisheries.uvms</groupId>
     <artifactId>usm4uvms</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
     <name>usm4uvms</name>
     <description>USM integration for UnionVMS.</description>
 
@@ -48,7 +48,7 @@
     </distributionManagement>
 
     <scm>
-        <connection>scm:svn:https://webgate.ec.europa.eu/CITnet/svn/UNIONVMS/tags/usm4uvms</connection>
+        <connection>scm:svn:https://webgate.ec.europa.eu/CITnet/svn/UNIONVMS/tags/usm4uvms/usm4uvms-1.0.1</connection>
     </scm>
 
     <dependencies>
