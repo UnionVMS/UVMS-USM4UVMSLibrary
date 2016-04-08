@@ -40,6 +40,7 @@ public enum UnionVMSFeature {
     manageAlarmsHoldingTable,
     viewAlarmsOpenTickets,
     manageAlarmsOpenTickets,
+    manageGlobalAlarmsRules,
     
     /** Viewing audit */
     viewAudit,
