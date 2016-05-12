@@ -494,6 +494,7 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
     }
 
     @Override
+    @Transactional
     public void createDataset(String applicationName, String datasetName, String discriminator, String category, String description) throws ServiceException {
 
         LOG.debug("START createDataset({}, {}, {}, {}, {})", applicationName, datasetName, discriminator, category, description);
@@ -616,6 +617,47 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
 
         LOG.debug("END deleteDataset(...)");
     }
+
+
+    @Override
+    public List<DatasetExtension> findDatasetsByDiscriminator(String applicationName, String discriminator) throws ServiceException {
+        LOG.debug("START findDatasetByDiscriminator({}, {}", applicationName, discriminator);
+        List<DatasetExtension> listToReturn = null;
+
+        try {
+            DatasetFilter datasetFilter = new DatasetFilter();
+            datasetFilter.setApplicationName(applicationName);
+            datasetFilter.setDiscriminator(discriminator);
+
+            String payload = UserModuleRequestMapper.mapToFindDatasetRequest(datasetFilter);
+
+            String messageID = messageProducer.sendModuleMessage(payload, messageConsumer.getDestination());
+            LOG.debug("JMS message with ID: {} is sent to USM.", messageID);
+
+            Message response = messageConsumer.getMessage(messageID, DeleteDatasetResponse.class, UVMS_USM_TIMEOUT);
+
+            if (response != null && !isUserFault((TextMessage) response)) {
+                FilterDatasetResponse filterDatasetResponse = unmarshallTextMessage((TextMessage) response, FilterDatasetResponse.class);
+                LOG.debug("Response concerning message with ID: {} is received. The response is: {}", messageID, filterDatasetResponse.getDatasetList().getList());
+                listToReturn = filterDatasetResponse.getDatasetList().getList();
+            } else {
+                LOG.error("Error occurred while receiving JMS response for message ID: {}", messageID);
+
+                if (response != null) {
+                    UserFault error = unmarshallTextMessage((TextMessage) response, UserFault.class);
+                    LOG.error("Error Code: {}, Message: {}", error.getCode(), error.getFault());
+                }
+            }
+
+
+        } catch (ModelMarshallException | MessageException | JMSException | JAXBException e) {
+            throw new ServiceException("Unable to update Dataset.", e);
+        }
+
+        LOG.debug("END findDatasetByDiscriminator(...), returning {}", listToReturn);
+        return listToReturn;
+    }
+
 
     @Override
     public UserContext getFullUserContext(String remoteUser, String applicationName) throws ServiceException {

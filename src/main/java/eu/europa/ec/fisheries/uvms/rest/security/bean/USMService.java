@@ -70,6 +70,9 @@ public interface USMService {
     @Transactional
     void deleteDataset(String applicationName, String datasetName) throws ServiceException;
 
+
+    List<DatasetExtension> findDatasetsByDiscriminator(String applicationName, String discriminator) throws ServiceException;
+
     /**
      * This contains all user contexts available in USM for the given user.
      * Be aware that the UserContext object is not cached and each call does a JMS call to USM
