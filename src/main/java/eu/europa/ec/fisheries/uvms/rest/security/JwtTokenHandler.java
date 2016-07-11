@@ -38,39 +38,21 @@ import org.slf4j.LoggerFactory;
  */
 public class JwtTokenHandler {
   private static final Logger LOGGER = LoggerFactory.getLogger(JwtTokenHandler.class);
-  private static final String PROPERTIES_FILE = "jwt.properties";
-  private static final String PROP_KEY = "secretKey";
-  private static final String PROP_SUBJECT = "subject";
-  private static final String PROP_ISSUER = "issuer";
-  private static final String PROP_ID = "id";
+  private static final String PROP_KEY = "usm4uvms.jwt.secretKey";
+  private static final String PROP_SUBJECT = "usm4uvms.jwt.subject";
+  private static final String PROP_ISSUER = "usm4uvms.jwt.issuer";
+  private static final String PROP_ID = "usm4uvms.jwt.id";
   private static final long DEFAULT_TTL = (30 * 60 * 1000);
-  private static final String DEFAULT_KEY = "";
-  private static final String DEFAULT_ID = "";
-  private static final String DEFAULT_ISSUER = "";
-  private static final String DEFAULT_SUBJECT = "";
 
   private static final String USER_NAME = "userName";
 
   private SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
-  private Properties properties = new Properties();
 
   /**
    * Creates a new instance
    */
   public JwtTokenHandler() 
   {
-    InputStream is = getClass().getClassLoader().getResourceAsStream(PROPERTIES_FILE);
-    if (is != null) {
-      try {
-        properties.load(is);
-      } catch (IOException e) {
-        LOGGER.warn("Failed to load class-path resource:'" + 
-                    PROPERTIES_FILE + "'. Using default values", e);
-      }
-    } else {
-      LOGGER.info("Class-path resource: '" + PROPERTIES_FILE + 
-                  "' does not exist. Using default values");
-    }
   }
 
   /**
@@ -92,9 +74,9 @@ public class JwtTokenHandler {
 
       // Claims
       Claims claims = Jwts.claims();
-      claims.setId(properties.getProperty(PROP_ID, DEFAULT_ID));
-      claims.setIssuer(properties.getProperty(PROP_ISSUER, DEFAULT_ISSUER));
-      claims.setSubject(properties.getProperty(PROP_SUBJECT, DEFAULT_SUBJECT));
+      claims.setId(System.getProperty(PROP_ID));
+      claims.setIssuer(System.getProperty(PROP_ISSUER));
+      claims.setSubject(System.getProperty(PROP_SUBJECT));
       claims.setIssuedAt(new Date(now));
       claims.setExpiration(new Date(now + DEFAULT_TTL));
       claims.put(USER_NAME, userName);
@@ -199,7 +181,7 @@ public class JwtTokenHandler {
 
   private byte[] getSecretKey() 
   {
-    String secretKey = properties.getProperty(PROP_KEY, DEFAULT_KEY);
+    String secretKey = System.getProperty(PROP_KEY);
 
     return DatatypeConverter.parseBase64Binary(secretKey);
   }
