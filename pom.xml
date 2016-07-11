@@ -9,7 +9,7 @@
 
     <properties>
         <release.branch.name>uvms-2.0.6-kili</release.branch.name>
-        <user.service.version>1.2.0</user.service.version>
+        <user.service.version>2.0.0</user.service.version>
         <information.service.version>1.8.0</information.service.version>
         <javaee.version>7.0</javaee.version>
         <jjwt.version>0.4</jjwt.version>
