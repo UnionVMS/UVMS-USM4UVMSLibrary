@@ -13,7 +13,7 @@
         <information.service.version>1.8.0</information.service.version>
         <javaee.version>7.0</javaee.version>
         <jjwt.version>0.4</jjwt.version>
-        <uvms.commons.version>2.0.12</uvms.commons.version>
+        <uvms.commons.version>2.0.13-SNAPSHOT</uvms.commons.version>
         <ehcache.version>2.10.1</ehcache.version>
         <apache.commons.version>3.4</apache.commons.version>
         <jackson.version>2.6.0</jackson.version>
