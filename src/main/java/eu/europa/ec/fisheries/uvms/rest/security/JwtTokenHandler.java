@@ -11,26 +11,17 @@ copy of the GNU General Public License along with the IFDM Suite. If not, see <h
  */
 package eu.europa.ec.fisheries.uvms.rest.security;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Header;
-import io.jsonwebtoken.JwsHeader;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.SignatureException;
-import io.jsonwebtoken.UnsupportedJwtException;
-import java.io.IOException;
-import java.io.InputStream;
+import io.jsonwebtoken.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.crypto.spec.SecretKeySpec;
+import javax.naming.InitialContext;
+import javax.xml.bind.DatatypeConverter;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
-import javax.crypto.spec.SecretKeySpec;
-import javax.xml.bind.DatatypeConverter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Handles the creation, extension (of validity) and verification (parsing) 
@@ -43,9 +34,12 @@ public class JwtTokenHandler {
   private static final String PROP_ISSUER = "usm4uvms.jwt.issuer";
   private static final String PROP_ID = "usm4uvms.jwt.id";
   private static final long DEFAULT_TTL = (30 * 60 * 1000);
-
+  private static final String JNDIkey = "USM/secretKey";
+  private static final String DEFAULT_SUBJECT = "authentication";
+  private static final String DEFAULT_ISSUER = "usm";
+  private static final String DEFAULT_ID = "usm/authentication";
   private static final String USER_NAME = "userName";
-
+  private static InitialContext initialContext = null;
   private SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
   /**
@@ -66,21 +60,17 @@ public class JwtTokenHandler {
   public String createToken(String userName) 
   {
     LOGGER.info("createToken(" +  userName + ") - (ENTER)");
-    
     String ret = null;
-    
     if (userName != null && !userName.trim().isEmpty()) {
       long now = System.currentTimeMillis();
 
-      // Claims
       Claims claims = Jwts.claims();
-      claims.setId(System.getProperty(PROP_ID));
-      claims.setIssuer(System.getProperty(PROP_ISSUER));
-      claims.setSubject(System.getProperty(PROP_SUBJECT));
+      claims.setId(System.getProperty(PROP_ID, DEFAULT_ID));
+      claims.setIssuer(System.getProperty(PROP_ISSUER, DEFAULT_ISSUER));
+      claims.setSubject(System.getProperty(PROP_SUBJECT, DEFAULT_SUBJECT));
       claims.setIssuedAt(new Date(now));
       claims.setExpiration(new Date(now + DEFAULT_TTL));
       claims.put(USER_NAME, userName);
-
       ret = signClaims(claims);
     }
     
@@ -99,15 +89,12 @@ public class JwtTokenHandler {
   public String extendToken(String token) 
   {
     LOGGER.info("extendToken(" + token + ") - (ENTER)");
-    
     String ret = null;
     Claims claims = parseClaims(token);
     if (claims != null) {
-
       long now = System.currentTimeMillis();
       claims.setIssuedAt(new Date(now));
       claims.setExpiration(new Date(now + DEFAULT_TTL));
-
       ret = signClaims(claims);
     }
     
@@ -126,14 +113,11 @@ public class JwtTokenHandler {
   public String parseToken(String token) 
   {
     LOGGER.info("parseToken(" + token + ") - (ENTER)");
-    
     String ret = null;
-
     Claims claims = parseClaims(token);
     if (claims != null) {
       ret = (String) claims.get(USER_NAME);
     }
-
     LOGGER.info("parseToken() - (LEAVE)");
     return ret;
   }
@@ -161,7 +145,6 @@ public class JwtTokenHandler {
   private Claims parseClaims(String token) 
   {
     Claims ret = null;
-
     if (token != null && !token.trim().isEmpty()) {
       try {
         ret = Jwts.parser().
@@ -175,14 +158,35 @@ public class JwtTokenHandler {
         LOGGER.error("Failed to parse token");
       }
     }
-
     return ret;
   }
 
   private byte[] getSecretKey() 
   {
-    String secretKey = System.getProperty(PROP_KEY);
-
+    String secretKey;
+    Object lookupJnid = lookupSecretKey(JNDIkey);
+    if(lookupJnid!=null){
+      secretKey = lookupJnid.toString();
+    }else{
+      secretKey = System.getProperty(PROP_KEY);
+    }
     return DatatypeConverter.parseBase64Binary(secretKey);
+  }
+
+  private Object lookupSecretKey(String JNDIName){
+    Object value = null;
+    try {
+      initialContext = new InitialContext();
+      value = initialContext.lookup(JNDIName);
+      try {
+        initialContext.close();
+      } catch (Exception e) {
+        LOGGER.error("Could not close InitialContext");
+      }
+
+    } catch (Exception e) {
+      LOGGER.error("Could not lookup JNDI with key: " +JNDIName );
+    }
+    return value;
   }
 }
