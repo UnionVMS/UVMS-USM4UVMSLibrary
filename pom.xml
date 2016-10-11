@@ -32,6 +32,7 @@
         <maven.release.plugin.version>2.5.3</maven.release.plugin.version>
         <maven.scm.provider.version>2.1.1</maven.scm.provider.version>
         <maven.deploy.plugin.version>2.8.1</maven.deploy.plugin.version>
+        <usm.JWTokenHandler.version>2.1.1</usm.JWTokenHandler.version>
     </properties>
 
     <distributionManagement>
@@ -221,6 +222,16 @@
             <groupId>eu.europa.ec.fisheries.uvms</groupId>
             <artifactId>uvms-commons</artifactId>
             <version>${uvms.commons.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.mare.usm</groupId>
+            <artifactId>jwt-handler-api</artifactId>
+            <version>${usm.JWTokenHandler.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.mare.usm</groupId>
+            <artifactId>jwt-handler-impl</artifactId>
+            <version>${usm.JWTokenHandler.version}</version>
         </dependency>
     </dependencies>
 

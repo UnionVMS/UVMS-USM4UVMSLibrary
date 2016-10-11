@@ -2,6 +2,8 @@ package eu.europa.ec.fisheries.uvms.rest.security;
 
 import java.io.IOException;
 
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -12,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
+import eu.europa.ec.mare.usm.jwt.DefaultJwtTokenHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +32,8 @@ public class AuthenticationFilter implements Filter {
   private static final String CHALLENGEAUTH = "/challengeauth";
   private static final String AUTHENTICATE = "/authenticate";
   private static final String PING = "/ping";
+
+  private DefaultJwtTokenHandler tokenHandler;
 
   /**
    * Creates a new instance
@@ -56,9 +61,6 @@ public class AuthenticationFilter implements Filter {
                         FilterChain chain)
   throws IOException, ServletException 
   {
-
-
-    JwtTokenHandler tokenHandler = new JwtTokenHandler();
 
     HttpServletRequest httpRequest = (HttpServletRequest) request;
     HttpServletResponse httpResponse = (HttpServletResponse) response;
@@ -125,9 +127,7 @@ public class AuthenticationFilter implements Filter {
   public void init(FilterConfig fc)
   throws ServletException 
   {
-    /*if (tokenHandler == null) {
-      throw new ServletException("JwtTokenHandler is undefined");
-    }*/
+    tokenHandler = new DefaultJwtTokenHandler();
   }
 
   @Override
