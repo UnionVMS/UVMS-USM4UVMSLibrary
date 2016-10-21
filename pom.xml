@@ -8,7 +8,7 @@
     <description>USM integration for UnionVMS.</description>
 
     <properties>
-        <release.branch.name>uvms-2.0.6-kili</release.branch.name>
+        <release.branch.name>uvms-2.1.1-kili</release.branch.name>
         <information.service.version>1.8.0</information.service.version>
         <javaee.version>7.0</javaee.version>
         <jjwt.version>0.4</jjwt.version>
