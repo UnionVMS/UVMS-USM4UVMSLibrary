@@ -30,7 +30,7 @@
         <maven.deploy.plugin.version>2.8.1</maven.deploy.plugin.version>
 
         <user.service.version>2.0.0</user.service.version>
-        <uvms.commons.version>2.0.12</uvms.commons.version>
+        <uvms.commons.version>2.0.13</uvms.commons.version>
 
         <project.scm.id>github</project.scm.id>
     </properties>
