@@ -126,3 +126,4 @@ public abstract class AbstractModuleInitializerBean extends AbstractJAXBMarshall
      */
     protected abstract boolean mustRedeploy();
 }
+

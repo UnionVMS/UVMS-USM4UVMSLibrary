@@ -1,3 +1,4 @@
+
 /*
 ﻿Developed with the contribution of the European Commission - Directorate General for Maritime Affairs and Fisheries
 © European Union, 2015-2016.
@@ -31,11 +32,7 @@ import eu.europa.ec.fisheries.wsdl.user.module.GetUserContextResponse;
 import eu.europa.ec.fisheries.wsdl.user.module.UserModuleMethod;
 import eu.europa.ec.fisheries.wsdl.user.types.UserContext;
 import eu.europa.ec.fisheries.wsdl.user.types.UserContextId;
-/*
- import eu.europa.ec.mare.usm.information.domain.UserContext;
- import eu.europa.ec.mare.usm.information.domain.UserContextQuery;
- import eu.europa.ec.mare.usm.information.service.InformationService;
- */
+
 
 /**
  * Created by georgige on 9/22/2015.
