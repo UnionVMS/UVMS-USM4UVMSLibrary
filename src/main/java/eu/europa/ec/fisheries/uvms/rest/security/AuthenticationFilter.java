@@ -18,8 +18,6 @@ import eu.europa.ec.mare.usm.jwt.DefaultJwtTokenHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-//import eu.cec.digit.ecas.client.j2ee.weblogic.EcasUser;
-//import weblogic.security.spi.WLSUser;
 
 /**
  * Filters incoming requests, converting JWT token to a remote 

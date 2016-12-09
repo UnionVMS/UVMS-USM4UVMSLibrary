@@ -3,19 +3,16 @@
     <groupId>eu.europa.ec.fisheries.uvms</groupId>
     <artifactId>usm4uvms</artifactId>
     <packaging>jar</packaging>
-    <version>2.0.17-SNAPSHOT</version>
+    <version>2.1.3-SNAPSHOT</version>
     <name>usm4uvms</name>
     <description>USM integration for UnionVMS.</description>
 
     <properties>
-        <release.branch.name>uvms-2.0.6-kili</release.branch.name>
-        <user.service.version>1.2.0</user.service.version>
+        <release.branch.name>uvms-2.1.3-morgoth</release.branch.name>
         <information.service.version>1.8.0</information.service.version>
         <javaee.version>7.0</javaee.version>
         <jjwt.version>0.4</jjwt.version>
-        <uvms.commons.version>1.7.1</uvms.commons.version>
         <ehcache.version>2.10.1</ehcache.version>
-
         <apache.commons.version>3.4</apache.commons.version>
         <jackson.version>2.6.0</jackson.version>
         <junit.version>4.11</junit.version>
@@ -33,24 +30,72 @@
         <maven.scm.provider.version>2.1.1</maven.scm.provider.version>
         <maven.deploy.plugin.version>2.8.1</maven.deploy.plugin.version>
         <usm.JWTokenHandler.version>2.1.1</usm.JWTokenHandler.version>
+        <user.service.version>2.0.0</user.service.version>
+        <uvms.commons.version>2.0.13</uvms.commons.version>
+
+        <project.scm.id>github</project.scm.id>
     </properties>
 
-    <distributionManagement>
-        <repository>
-            <id>digit-releases</id>
-            <name>DG DIGIT Repository</name>
-            <url>https://webgate.ec.europa.eu/CITnet/nexus/content/repositories/mare/</url>
-        </repository>
-        <snapshotRepository>
-            <id>digit-snapshots</id>
-            <name>DG DIGIT Snapshot Repository</name>
-            <url>https://webgate.ec.europa.eu/CITnet/nexus/content/repositories/mare-snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
-
     <scm>
-        <developerConnection>scm:svn:https://webgate.ec.europa.eu/CITnet/svn/UNIONVMS/branches/${release.branch.name}/Libraries/usm4uvms</developerConnection>
+        <connection>${scm.connection}</connection>
+        <tag>HEAD</tag>
     </scm>
+
+<profiles>
+    <profile>
+        <id>github</id>
+        <activation>
+            <activeByDefault>true</activeByDefault>
+        </activation>
+        <repositories>
+            <repository>
+                <id>focus-repo</id>
+                <name>Focus nexus repository</name>
+                <url>http://nexus.focus.fish/</url>
+            </repository>
+        </repositories>
+
+        <distributionManagement>
+            <repository>
+                <id>focus-releases</id>
+                <name>UnionVms Repository</name>
+                <url>http://nexus.focus.fish/nexus/content/repositories/releases/</url>
+            </repository>
+            <snapshotRepository>
+                <id>focus-snapshots</id>
+                <name>UnionVms Snapshot Repository</name>
+                <url>http://nexus.focus.fish/nexus/content/repositories/snapshots/</url>
+            </snapshotRepository>
+        </distributionManagement>
+
+        <properties>
+            <scm.connection>scm:git:https://github.com/UnionVMS/UVMS-USM4UVMSLibrary.git</scm.connection>
+        </properties>
+    </profile>
+    <profile>
+        <id>dg-mare</id>
+        <activation>
+            <activeByDefault>false</activeByDefault>
+        </activation>
+		<distributionManagement>
+			<repository>
+				<id>digit-releases</id>
+				<name>DG DIGIT Repository</name>
+				<url>https://webgate.ec.europa.eu/CITnet/nexus/content/repositories/mare/</url>
+			</repository>
+			<snapshotRepository>
+				<id>digit-snapshots</id>
+				<name>DG DIGIT Snapshot Repository</name>
+				<url>https://webgate.ec.europa.eu/CITnet/nexus/content/repositories/mare-snapshots/</url>
+			</snapshotRepository>
+		</distributionManagement>
+
+        <properties>
+            <scm.connection>scm:git:https://emserveje@webgate.ec.europa.eu/CITnet/stash/scm/unionvms/uvms-usm4uvmslibrary.git</scm.connection>
+        </properties>
+    </profile>
+
+</profiles>
 
     <dependencies>
         <dependency>
@@ -235,15 +280,6 @@
         </dependency>
     </dependencies>
 
-    <profiles>
-        <profile>
-            <id>release-dev</id>
-            <properties>
-                <release.branch.name>dev</release.branch.name>
-            </properties>
-        </profile>
-    </profiles>
-
     <build>
         <plugins>
             <plugin>
@@ -286,12 +322,13 @@
                         <artifactId>maven-scm-provider-svnjava</artifactId>
                         <version>${maven.scm.provider.version}</version>
                     </dependency>
+                    <dependency>
+                        <groupId>org.apache.maven.scm</groupId>
+                        <artifactId>maven-scm-provider-gitexe</artifactId>
+                        <version>1.8.1</version>
+                    </dependency>
                 </dependencies>
                 <configuration>
-                    <providerImplementations>
-                        <svn>javasvn</svn>
-                    </providerImplementations>
-                    <tagBase>https://webgate.ec.europa.eu/CITnet/svn/UNIONVMS/tags/usm4uvms</tagBase>
                     <tagNameFormat>@{project.artifactId}-@{project.version}</tagNameFormat>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                 </configuration>
@@ -319,6 +356,24 @@
                         <id>attach-sources</id>
                         <goals>
                             <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>${maven.deploy.plugin.version}</version>
+                <configuration>
+                    <deployAtEnd>true</deployAtEnd>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>default-deploy</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>deploy</goal>
                         </goals>
                     </execution>
                 </executions>
