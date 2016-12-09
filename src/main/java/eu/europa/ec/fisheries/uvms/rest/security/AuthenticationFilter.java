@@ -1,18 +1,9 @@
-/*
-﻿Developed with the contribution of the European Commission - Directorate General for Maritime Affairs and Fisheries
-© European Union, 2015-2016.
-
-This file is part of the Integrated Fisheries Data Management (IFDM) Suite. The IFDM Suite is free software: you can
-redistribute it and/or modify it under the terms of the GNU General Public License as published by the
-Free Software Foundation, either version 3 of the License, or any later version. The IFDM Suite is distributed in
-the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details. You should have received a
-copy of the GNU General Public License along with the IFDM Suite. If not, see <http://www.gnu.org/licenses/>.
- */
 package eu.europa.ec.fisheries.uvms.rest.security;
 
 import java.io.IOException;
 
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -23,11 +14,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
+import eu.europa.ec.mare.usm.jwt.DefaultJwtTokenHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-//import eu.cec.digit.ecas.client.j2ee.weblogic.EcasUser;
-//import weblogic.security.spi.WLSUser;
 
 /**
  * Filters incoming requests, converting JWT token to a remote 
@@ -40,6 +30,8 @@ public class AuthenticationFilter implements Filter {
   private static final String CHALLENGEAUTH = "/challengeauth";
   private static final String AUTHENTICATE = "/authenticate";
   private static final String PING = "/ping";
+
+  private DefaultJwtTokenHandler tokenHandler;
 
   /**
    * Creates a new instance
@@ -67,9 +59,6 @@ public class AuthenticationFilter implements Filter {
                         FilterChain chain)
   throws IOException, ServletException 
   {
-
-
-    JwtTokenHandler tokenHandler = new JwtTokenHandler();
 
     HttpServletRequest httpRequest = (HttpServletRequest) request;
     HttpServletResponse httpResponse = (HttpServletResponse) response;
@@ -136,9 +125,7 @@ public class AuthenticationFilter implements Filter {
   public void init(FilterConfig fc)
   throws ServletException 
   {
-    /*if (tokenHandler == null) {
-      throw new ServletException("JwtTokenHandler is undefined");
-    }*/
+    tokenHandler = new DefaultJwtTokenHandler();
   }
 
   @Override
