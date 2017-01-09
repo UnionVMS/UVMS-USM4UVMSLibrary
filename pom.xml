@@ -245,6 +245,46 @@
                 <release.branch.name>dev</release.branch.name>
             </properties>
         </profile>
+		<profile>
+            <id>weblogic</id>
+				<properties>
+				</properties>				
+            <build>
+                <plugins>
+					
+								  
+				  <plugin>
+                      <groupId>eu.europa.ec.fisheries.uvms.containerconversion</groupId>
+                      <artifactId>uvms-wildfly-weblogic-convertor</artifactId>
+                      <version>${uvms-wildfly-weblogic-convertor}</version>
+                      <executions>
+					  <execution>
+						<phase>process-resources</phase>
+						<goals>
+						  <goal>convertUSM4UVMS</goal>
+						</goals>
+					  </execution>
+					</executions>
+				  </plugin>	
+					
+				 <plugin>
+					<artifactId>maven-jar-plugin</artifactId>
+						   <executions>
+							 <execution>
+							   <phase>package</phase>
+							   <goals>
+								 <goal>jar</goal>
+							   </goals>
+							   <configuration>
+								 <classifier>weblogic</classifier>
+							   </configuration>
+							 </execution>
+						   </executions>
+						 </plugin>					
+                </plugins>
+            </build>
+
+        </profile>			
     </profiles>
 
     <build>
