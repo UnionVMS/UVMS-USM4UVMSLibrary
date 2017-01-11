@@ -13,7 +13,7 @@
         <information.service.version>1.8.0</information.service.version>
         <javaee.version>7.0</javaee.version>
         <jjwt.version>0.4</jjwt.version>
-        <uvms.commons.version>1.7.1</uvms.commons.version>
+        <uvms.commons.version>2.0.14-SNAPSHOT</uvms.commons.version>
         <ehcache.version>2.10.1</ehcache.version>
 
         <apache.commons.version>3.4</apache.commons.version>
@@ -248,7 +248,7 @@
             </properties>
         </profile>
 		<profile>
-            <id>weblogic</id>
+            <id>weblogic-activemq</id>
 				<properties>
 				</properties>				
             <build>
@@ -278,7 +278,7 @@
 								 <goal>jar</goal>
 							   </goals>
 							   <configuration>
-								 <classifier>weblogic</classifier>
+								 <classifier>weblogic-activemq</classifier>
 							   </configuration>
 							 </execution>
 						   </executions>
@@ -294,6 +294,40 @@
 				</dependency>									
 			</dependencies>				
         </profile>			
+		
+		<profile>
+            <id>weblogic-weblogic</id>
+				<properties>
+				</properties>				
+            <build>
+                <plugins>
+					<plugin>
+					<artifactId>maven-jar-plugin</artifactId>
+						   <executions>
+							 <execution>
+							   <phase>package</phase>
+							   <goals>
+								 <goal>jar</goal>
+							   </goals>
+							   <configuration>
+								 <classifier>weblogic-weblogic</classifier>
+							   </configuration>
+							 </execution>
+						   </executions>
+						 </plugin>					
+                </plugins>
+            </build>			
+			<dependencies>				
+				<dependency>
+					<groupId>eu.europa.ec.fisheries.uvms</groupId>
+					<artifactId>uvms-commons</artifactId>
+					<version>${uvms.commons.version}</version>
+					<classifier>weblogic</classifier>
+				</dependency>									
+			</dependencies>				
+        </profile>				
+		
+		
     </profiles>
 
     <build>
