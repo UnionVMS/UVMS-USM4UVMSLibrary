@@ -35,30 +35,28 @@
         <maven.deploy.plugin.version>2.8.1</maven.deploy.plugin.version>
         <usm.JWTokenHandler.version>2.1.1</usm.JWTokenHandler.version>
         <uvms-wildfly-weblogic-convertor>1.7.1</uvms-wildfly-weblogic-convertor>
+
+        <scm.connection>https://github.com/UnionVMS/UVMS-USM4UVMSLibrary.git</scm.connection>
     </properties>
+
+    <scm>
+        <connection>${scm.connection}</connection>
+        <tag>HEAD</tag>
+    </scm>
+
 
     <distributionManagement>
         <repository>
-            <id>digit-releases</id>
-            <name>DG DIGIT Repository</name>
-            <url>https://webgate.ec.europa.eu/CITnet/nexus/content/repositories/mare/</url>
+            <id>focus-releases</id>
+            <name>UnionVms Repository</name>
+            <url>http://nexus.focus.fish/nexus/content/repositories/releases/</url>
         </repository>
         <snapshotRepository>
-            <id>digit-snapshots</id>
-            <name>DG DIGIT Snapshot Repository</name>
-            <url>https://webgate.ec.europa.eu/CITnet/nexus/content/repositories/mare-snapshots/</url>
+            <id>focus-snapshots</id>
+            <name>UnionVms Snapshot Repository</name>
+            <url>http://nexus.focus.fish/nexus/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
-
-    <scm>
-        <connection>scm:git:https://emserveje@webgate.ec.europa.eu/CITnet/stash/scm/unionvms/uvms-usm4uvmslibrary.git
-        </connection>
-        <developerConnection>
-            scm:git:https://emserveje@webgate.ec.europa.eu/CITnet/stash/scm/unionvms/uvms-usm4uvmslibrary.git
-        </developerConnection>
-        <url>https://emserveje@webgate.ec.europa.eu/CITnet/stash/scm/unionvms/</url>
-        <tag>HEAD</tag>
-    </scm>
 
     <dependencies>
         <dependency>
@@ -239,6 +237,25 @@
     </dependencies>
 
     <profiles>
+        <profile>
+            <id>dg-mare</id>
+            <distributionManagement>
+                <repository>
+                    <id>digit-releases</id>
+                    <name>DG DIGIT Repository</name>
+                    <url>https://webgate.ec.europa.eu/CITnet/nexus/content/repositories/mare/</url>
+                </repository>
+                <snapshotRepository>
+                    <id>digit-snapshots</id>
+                    <name>DG DIGIT Snapshot Repository</name>
+                    <url>https://webgate.ec.europa.eu/CITnet/nexus/content/repositories/mare-snapshots/</url>
+                </snapshotRepository>
+            </distributionManagement>
+
+            <properties>
+                <connection>scm:git:https://emserveje@webgate.ec.europa.eu/CITnet/stash/scm/unionvms/uvms-usm4uvmslibrary.git</connection>
+            </properties>
+        </profile>
         <profile>
             <id>release-dev</id>
             <properties>
