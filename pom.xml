@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.europa.ec.fisheries.uvms</groupId>
     <artifactId>usm4uvms</artifactId>
@@ -13,7 +14,7 @@
         <information.service.version>1.8.0</information.service.version>
         <javaee.version>7.0</javaee.version>
         <jjwt.version>0.4</jjwt.version>
-        <uvms.commons.version>1.7.1</uvms.commons.version>
+        <uvms.commons.version>2.0.14-SNAPSHOT</uvms.commons.version>
         <ehcache.version>2.10.1</ehcache.version>
 
         <apache.commons.version>3.4</apache.commons.version>
@@ -33,6 +34,7 @@
         <maven.scm.provider.version>2.1.1</maven.scm.provider.version>
         <maven.deploy.plugin.version>2.8.1</maven.deploy.plugin.version>
         <usm.JWTokenHandler.version>2.1.1</usm.JWTokenHandler.version>
+        <uvms-wildfly-weblogic-convertor>1.7.1</uvms-wildfly-weblogic-convertor>
     </properties>
 
     <distributionManagement>
@@ -49,8 +51,11 @@
     </distributionManagement>
 
     <scm>
-        <connection>scm:git:https://emserveje@webgate.ec.europa.eu/CITnet/stash/scm/unionvms/uvms-usm4uvmslibrary.git</connection>
-        <developerConnection>scm:git:https://emserveje@webgate.ec.europa.eu/CITnet/stash/scm/unionvms/uvms-usm4uvmslibrary.git</developerConnection>
+        <connection>scm:git:https://emserveje@webgate.ec.europa.eu/CITnet/stash/scm/unionvms/uvms-usm4uvmslibrary.git
+        </connection>
+        <developerConnection>
+            scm:git:https://emserveje@webgate.ec.europa.eu/CITnet/stash/scm/unionvms/uvms-usm4uvmslibrary.git
+        </developerConnection>
         <url>https://emserveje@webgate.ec.europa.eu/CITnet/stash/scm/unionvms/</url>
         <tag>HEAD</tag>
     </scm>
@@ -186,23 +191,16 @@
             <scope>test</scope>
             <version>${resteasy.version}</version>
         </dependency>
-
-        
         <dependency>
             <groupId>eu.europa.ec.fisheries.uvms.user</groupId>
             <artifactId>user-model</artifactId>
             <version>${user.service.version}</version>
         </dependency>
-
-        
-        
-
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt</artifactId>
             <version>${jjwt.version}</version>
         </dependency>
-
         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-api</artifactId>
@@ -225,6 +223,7 @@
             <groupId>eu.europa.ec.fisheries.uvms</groupId>
             <artifactId>uvms-commons</artifactId>
             <version>${uvms.commons.version}</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>eu.europa.ec.mare.usm</groupId>
@@ -236,6 +235,7 @@
             <artifactId>jwt-handler-impl</artifactId>
             <version>${usm.JWTokenHandler.version}</version>
         </dependency>
+
     </dependencies>
 
     <profiles>
@@ -245,6 +245,101 @@
                 <release.branch.name>dev</release.branch.name>
             </properties>
         </profile>
+        <profile>
+            <id>weblogic-activemq</id>
+            <properties>
+                <archive.classifier>weblogic-activemq</archive.classifier>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>eu.europa.ec.fisheries.uvms.containerconversion</groupId>
+                        <artifactId>uvms-wildfly-weblogic-convertor</artifactId>
+                        <version>${uvms-wildfly-weblogic-convertor}</version>
+                        <executions>
+                            <execution>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>convertUSM4UVMS</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <classifier>weblogic-activemq</classifier>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencies>
+                <dependency>
+                    <groupId>eu.europa.ec.fisheries.uvms</groupId>
+                    <artifactId>uvms-commons</artifactId>
+                    <version>${uvms.commons.version}</version>
+                    <classifier>weblogic</classifier>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>weblogic-weblogic</id>
+            <properties>
+                <archive.classifier>weblogic-weblogic</archive.classifier>
+            </properties>
+            <build>
+                <plugins>
+
+                    <plugin>
+                        <groupId>eu.europa.ec.fisheries.uvms.containerconversion</groupId>
+                        <artifactId>uvms-wildfly-weblogic-convertor</artifactId>
+                        <version>${uvms-wildfly-weblogic-convertor}</version>
+                        <executions>
+                            <execution>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>convertUSM4UVMS</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <classifier>weblogic-weblogic</classifier>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencies>
+                <dependency>
+                    <groupId>eu.europa.ec.fisheries.uvms</groupId>
+                    <artifactId>uvms-commons</artifactId>
+                    <version>${uvms.commons.version}</version>
+                    <classifier>weblogic</classifier>
+                </dependency>
+            </dependencies>
+        </profile>
+
+
     </profiles>
 
     <build>
@@ -252,6 +347,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.19.1</version>
                 <configuration>
                     <excludes>
                         <exclude>**/*ITest.java</exclude>
@@ -303,6 +399,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.10.3</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -316,6 +413,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
+                <version>2.0.4</version>
                 <executions>
                     <execution>
                         <!-- This id must match the -Prelease-profile id value or else sources will be "uploaded" twice, which causes Nexus to fail -->
