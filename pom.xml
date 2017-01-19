@@ -219,7 +219,7 @@
         </dependency>
         <dependency>
             <groupId>eu.europa.ec.fisheries.uvms</groupId>
-            <artifactId>uvms-commons</artifactId>
+            <artifactId>uvms-commons-wildfly</artifactId>
             <version>${uvms.commons.version}</version>
             <optional>true</optional>
         </dependency>
