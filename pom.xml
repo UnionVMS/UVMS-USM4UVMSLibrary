@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.europa.ec.fisheries.uvms</groupId>
     <artifactId>usm4uvms</artifactId>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
     <version>2.0.17-SNAPSHOT</version>
     <name>usm4uvms</name>
     <description>USM integration for UnionVMS.</description>
@@ -34,7 +34,7 @@
         <maven.scm.provider.version>2.1.1</maven.scm.provider.version>
         <maven.deploy.plugin.version>2.8.1</maven.deploy.plugin.version>
         <usm.JWTokenHandler.version>2.1.1</usm.JWTokenHandler.version>
-        <uvms-wildfly-weblogic-convertor>1.7.1</uvms-wildfly-weblogic-convertor>
+        <uvms-wildfly-weblogic-convertor>1.7.2-SNAPSHOT</uvms-wildfly-weblogic-convertor>
 
         <scm.connection>https://github.com/UnionVMS/UVMS-USM4UVMSLibrary.git</scm.connection>
     </properties>
@@ -219,7 +219,7 @@
         </dependency>
         <dependency>
             <groupId>eu.europa.ec.fisheries.uvms</groupId>
-            <artifactId>uvms-commons</artifactId>
+            <artifactId>uvms-commons-wildfly</artifactId>
             <version>${uvms.commons.version}</version>
             <optional>true</optional>
         </dependency>
@@ -256,107 +256,6 @@
                 <scm.connection>scm:git:https://emserveje@webgate.ec.europa.eu/CITnet/stash/scm/unionvms/uvms-usm4uvmslibrary.git</scm.connection>
             </properties>
         </profile>
-        <profile>
-            <id>release-dev</id>
-            <properties>
-                <release.branch.name>dev</release.branch.name>
-            </properties>
-        </profile>
-        <profile>
-            <id>weblogic-activemq</id>
-            <properties>
-                <archive.classifier>weblogic-activemq</archive.classifier>
-            </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>eu.europa.ec.fisheries.uvms.containerconversion</groupId>
-                        <artifactId>uvms-wildfly-weblogic-convertor</artifactId>
-                        <version>${uvms-wildfly-weblogic-convertor}</version>
-                        <executions>
-                            <execution>
-                                <phase>process-resources</phase>
-                                <goals>
-                                    <goal>convertUSM4UVMS</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-jar-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                                <configuration>
-                                    <classifier>weblogic-activemq</classifier>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-            <dependencies>
-                <dependency>
-                    <groupId>eu.europa.ec.fisheries.uvms</groupId>
-                    <artifactId>uvms-commons</artifactId>
-                    <version>${uvms.commons.version}</version>
-                    <classifier>weblogic</classifier>
-                </dependency>
-            </dependencies>
-        </profile>
-
-        <profile>
-            <id>weblogic-weblogic</id>
-            <properties>
-                <archive.classifier>weblogic-weblogic</archive.classifier>
-            </properties>
-            <build>
-                <plugins>
-
-                    <plugin>
-                        <groupId>eu.europa.ec.fisheries.uvms.containerconversion</groupId>
-                        <artifactId>uvms-wildfly-weblogic-convertor</artifactId>
-                        <version>${uvms-wildfly-weblogic-convertor}</version>
-                        <executions>
-                            <execution>
-                                <phase>process-resources</phase>
-                                <goals>
-                                    <goal>convertUSM4UVMS</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-
-                    <plugin>
-                        <artifactId>maven-jar-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                                <configuration>
-                                    <classifier>weblogic-weblogic</classifier>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-            <dependencies>
-                <dependency>
-                    <groupId>eu.europa.ec.fisheries.uvms</groupId>
-                    <artifactId>uvms-commons</artifactId>
-                    <version>${uvms.commons.version}</version>
-                    <classifier>weblogic</classifier>
-                </dependency>
-            </dependencies>
-        </profile>
-
-
     </profiles>
 
     <build>
@@ -404,10 +303,6 @@
                     </dependency>
                 </dependencies>
                 <configuration>
-                    <providerImplementations>
-                        <svn>javasvn</svn>
-                    </providerImplementations>
-                    <tagBase>https://webgate.ec.europa.eu/CITnet/svn/UNIONVMS/tags/usm4uvms</tagBase>
                     <tagNameFormat>@{project.artifactId}-@{project.version}</tagNameFormat>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                 </configuration>
@@ -443,4 +338,9 @@
             </plugin>
         </plugins>
     </build>
+
+    <modules>
+        <module>wildfly</module>
+        <module>weblogic</module>
+    </modules>
 </project>
