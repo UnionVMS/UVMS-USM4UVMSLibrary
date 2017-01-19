@@ -9,7 +9,7 @@
     <parent>
         <groupId>eu.europa.ec.fisheries.uvms</groupId>
         <artifactId>usm4uvms</artifactId>
-        <version>2.0.17</version>
+        <version>2.0.18-SNAPSHOT</version>
     </parent>
 
     <build>
