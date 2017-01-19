@@ -34,7 +34,7 @@
         <maven.scm.provider.version>2.1.1</maven.scm.provider.version>
         <maven.deploy.plugin.version>2.8.1</maven.deploy.plugin.version>
         <usm.JWTokenHandler.version>2.1.1</usm.JWTokenHandler.version>
-        <uvms-wildfly-weblogic-convertor>1.7.2-SNAPSHOT</uvms-wildfly-weblogic-convertor>
+        <uvms-wildfly-weblogic-convertor>1.7.2</uvms-wildfly-weblogic-convertor>
 
         <scm.connection>https://github.com/UnionVMS/UVMS-USM4UVMSLibrary.git</scm.connection>
     </properties>
