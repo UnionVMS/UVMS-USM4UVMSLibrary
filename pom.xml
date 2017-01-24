@@ -3,7 +3,7 @@
     <groupId>eu.europa.ec.fisheries.uvms</groupId>
     <artifactId>usm4uvms</artifactId>
     <packaging>jar</packaging>
-    <version>3.0.2-SNAPSHOT</version>
+    <version>3.0.2</version>
     <name>usm4uvms</name>
     <description>USM integration for UnionVMS.</description>
 
@@ -38,7 +38,7 @@
 
     <scm>
         <connection>${scm.connection}</connection>
-        <tag>HEAD</tag>
+        <tag>usm4uvms-3.0.2</tag>
     </scm>
 
 <profiles>
