@@ -8,7 +8,7 @@
     <description>USM integration for UnionVMS.</description>
 
     <properties>
-        <release.branch.name>uvms-3.0.1-C3PO</release.branch.name>
+        <release.branch.name>uvms-3.0.3-C3PO</release.branch.name>
         <information.service.version>1.8.0</information.service.version>
         <javaee.version>7.0</javaee.version>
         <jjwt.version>0.4</jjwt.version>
@@ -92,7 +92,7 @@
 
         <properties>
             <scm.connection>scm:git:https://emserveje@webgate.ec.europa.eu/CITnet/stash/scm/unionvms/uvms-usm4uvmslibrary.git</scm.connection>
-        <release.branch.name>uvms-3.0.1-C3PO</release.branch.name></properties>
+        <release.branch.name>uvms-3.0.3-C3PO</release.branch.name></properties>
     </profile>
 
 </profiles>
