@@ -28,7 +28,7 @@ public class USMMessageConsumer extends AbstractConsumer {
             LOG.error("Failed to get InitialContext",e);
             throw new RuntimeException(e);
         }
-        destination = JMSUtils.lookupQueue(ctx, MessageConstants.MessageConstants.QUEUE_USM4UVMS);
+        destination = JMSUtils.lookupQueue(ctx, MessageConstants.QUEUE_USM4UVMS);
     }
 	
 	

@@ -28,7 +28,7 @@ public class USMMessageProducer extends AbstractProducer {
             LOG.error("Failed to get InitialContext",e);
             throw new RuntimeException(e);
         }
-        destination = JMSUtils.lookupQueue(ctx, MessageConstants.MessageConstants.QUEUE_USM);
+        destination = JMSUtils.lookupQueue(ctx, MessageConstants.QUEUE_USM);
     }
 	
 	
