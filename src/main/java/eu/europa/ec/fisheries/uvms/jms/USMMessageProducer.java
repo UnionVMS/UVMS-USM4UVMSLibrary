@@ -1,14 +1,14 @@
 package eu.europa.ec.fisheries.uvms.jms;
 
 import eu.europa.ec.fisheries.uvms.message.AbstractProducer;
+import eu.europa.ec.fisheries.uvms.message.JMSUtils;
 import eu.europa.ec.fisheries.uvms.message.MessageConstants;
 
-import javax.annotation.Resource;
+import javax.annotation.PostConstruct;
 import javax.ejb.Local;
 import javax.ejb.Stateless;
 import javax.jms.Destination;
 import javax.naming.InitialContext;
-import eu.europa.ec.fisheries.uvms.message.JMSUtils;
 
 /**
  * Created by georgige on 10/23/2015.
@@ -35,5 +35,10 @@ public class USMMessageProducer extends AbstractProducer {
     @Override
     protected Destination getDestination() {
         return destination;
+    }
+
+    @Override
+    public String getDestinationName() {
+        return MessageConstants.QUEUE_USM;
     }
 }

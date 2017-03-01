@@ -1,14 +1,14 @@
 package eu.europa.ec.fisheries.uvms.jms;
 
 import eu.europa.ec.fisheries.uvms.message.AbstractConsumer;
+import eu.europa.ec.fisheries.uvms.message.JMSUtils;
 import eu.europa.ec.fisheries.uvms.message.MessageConstants;
 
-import javax.annotation.Resource;
+import javax.annotation.PostConstruct;
 import javax.ejb.Local;
 import javax.ejb.Stateless;
 import javax.jms.Destination;
 import javax.naming.InitialContext;
-import eu.europa.ec.fisheries.uvms.message.JMSUtils;
 
 /**
  * Created by georgige on 10/23/2015.
@@ -35,5 +35,9 @@ public class USMMessageConsumer extends AbstractConsumer {
     @Override
     public Destination getDestination() {
         return destination;
+    }
+
+    public String getDestinationName() {
+        return MessageConstants.QUEUE_USM4UVMS;
     }
 }

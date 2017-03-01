@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.europa.ec.fisheries.uvms</groupId>
     <artifactId>usm4uvms</artifactId>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
     <version>2.0.18-SNAPSHOT</version>
     <name>usm4uvms</name>
     <description>USM integration for UnionVMS.</description>
@@ -13,7 +13,7 @@
         <information.service.version>1.8.0</information.service.version>
         <javaee.version>7.0</javaee.version>
         <jjwt.version>0.4</jjwt.version>
-        <uvms.commons.version>2.0.15</uvms.commons.version>
+        <uvms.commons.version>2.0.16-SNAPSHOT</uvms.commons.version>
         <ehcache.version>2.10.1</ehcache.version>
 
         <apache.commons.version>3.4</apache.commons.version>
@@ -217,7 +217,7 @@
         </dependency>
         <dependency>
             <groupId>eu.europa.ec.fisheries.uvms</groupId>
-            <artifactId>uvms-commons-wildfly</artifactId>
+            <artifactId>uvms-commons</artifactId>
             <version>${uvms.commons.version}</version>
             <optional>true</optional>
         </dependency>
