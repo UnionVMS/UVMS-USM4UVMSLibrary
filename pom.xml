@@ -2,8 +2,8 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.europa.ec.fisheries.uvms</groupId>
     <artifactId>usm4uvms</artifactId>
-    <packaging>pom</packaging>
-    <version>2.0.18-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <version>2.0.19-SNAPSHOT</version>
     <name>usm4uvms</name>
     <description>USM integration for UnionVMS.</description>
 
@@ -13,7 +13,7 @@
         <information.service.version>1.8.0</information.service.version>
         <javaee.version>7.0</javaee.version>
         <jjwt.version>0.4</jjwt.version>
-        <uvms.commons.version>2.0.15</uvms.commons.version>
+        <uvms.commons.version>2.0.16-SNAPSHOT</uvms.commons.version>
         <ehcache.version>2.10.1</ehcache.version>
 
         <apache.commons.version>3.4</apache.commons.version>
@@ -33,8 +33,7 @@
         <maven.scm.provider.version>2.1.1</maven.scm.provider.version>
         <maven.deploy.plugin.version>2.8.1</maven.deploy.plugin.version>
         <usm.JWTokenHandler.version>2.1.1</usm.JWTokenHandler.version>
-        <uvms-wildfly-weblogic-convertor>1.7.2</uvms-wildfly-weblogic-convertor>
-
+ 
         <scm.connection>https://github.com/UnionVMS/UVMS-USM4UVMSLibrary.git</scm.connection>
     </properties>
 
@@ -218,7 +217,7 @@
         </dependency>
         <dependency>
             <groupId>eu.europa.ec.fisheries.uvms</groupId>
-            <artifactId>uvms-commons-wildfly</artifactId>
+            <artifactId>uvms-commons</artifactId>
             <version>${uvms.commons.version}</version>
             <optional>true</optional>
         </dependency>
@@ -338,8 +337,4 @@
         </plugins>
     </build>
 
-    <modules>
-        <module>wildfly</module>
-        <module>weblogic</module>
-    </modules>
 </project>
