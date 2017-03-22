@@ -5,7 +5,7 @@ import eu.europa.ec.fisheries.uvms.message.JMSUtils;
 import eu.europa.ec.fisheries.uvms.message.MessageConstants;
 
 import javax.annotation.PostConstruct;
-import javax.ejb.Local;
+import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
 import javax.jms.Destination;
 import javax.naming.InitialContext;
@@ -14,7 +14,7 @@ import javax.naming.InitialContext;
  * Created by georgige on 10/23/2015.
  */
 @Stateless
-@Local
+@LocalBean
 public class USMMessageConsumer extends AbstractConsumer {
 
     private Destination destination;
