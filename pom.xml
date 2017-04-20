@@ -3,12 +3,11 @@
     <groupId>eu.europa.ec.fisheries.uvms</groupId>
     <artifactId>usm4uvms</artifactId>
     <packaging>jar</packaging>
-    <version>2.1.3-SNAPSHOT</version>
-    <name>usm4uvms</name>
-    <description>USM integration for UnionVMS.</description>
-
-    <properties>
-        <release.branch.name>uvms-2.1.3-morgoth</release.branch.name>
+	<version>3.0.5-SNAPSHOT</version>     
+	<name>usm4uvms</name>
+      <description>USM integration for UnionVMS.</description>		      
+      <properties>
+        <release.branch.name>uvms-3.0.1-C3PO</release.branch.name>
         <user.service.version>2.0.0</user.service.version>
         <information.service.version>1.8.0</information.service.version>
         <javaee.version>7.0</javaee.version>
