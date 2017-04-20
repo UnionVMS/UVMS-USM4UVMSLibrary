@@ -1,5 +1,6 @@
 target
 logging.properties
 *.iml
-/rest/src/main/webapp
 **/.idea
+container-conf/*
+
