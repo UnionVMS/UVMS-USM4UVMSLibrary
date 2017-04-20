@@ -9,6 +9,8 @@
 
     <properties>
         <release.branch.name>uvms-2.1.3-morgoth</release.branch.name>
+        <user.service.version>2.0.0</user.service.version>
+        <information.service.version>1.8.0</information.service.version>
         <javaee.version>7.0</javaee.version>
         <jjwt.version>0.4</jjwt.version>
         <ehcache.version>2.10.1</ehcache.version>
@@ -28,9 +30,9 @@
         <maven.release.plugin.version>2.5.3</maven.release.plugin.version>
         <maven.scm.provider.version>2.1.1</maven.scm.provider.version>
         <maven.deploy.plugin.version>2.8.1</maven.deploy.plugin.version>
+        <usm.JWTokenHandler.version>2.1.1</usm.JWTokenHandler.version>
 
-        <user.service.version>2.0.0</user.service.version>
-        <uvms.commons.version>2.0.12</uvms.commons.version>
+        <uvms.commons.version>2.0.18-SNAPSHOT</uvms.commons.version>
 
         <project.scm.id>github</project.scm.id>
     </properties>
@@ -67,11 +69,11 @@
             <artifactId>ehcache</artifactId>
             <version>${ehcache.version}</version>
         </dependency>
-        
 
-        
 
-        
+
+
+
 
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -198,15 +200,15 @@
             <version>${resteasy.version}</version>
         </dependency>
 
-        
+
         <dependency>
             <groupId>eu.europa.ec.fisheries.uvms.user</groupId>
             <artifactId>user-model</artifactId>
             <version>${user.service.version}</version>
         </dependency>
 
-        
-        
+
+
 
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
@@ -236,7 +238,19 @@
             <groupId>eu.europa.ec.fisheries.uvms</groupId>
             <artifactId>uvms-commons</artifactId>
             <version>${uvms.commons.version}</version>
+            <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.mare.usm</groupId>
+            <artifactId>jwt-handler-api</artifactId>
+            <version>${usm.JWTokenHandler.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.mare.usm</groupId>
+            <artifactId>jwt-handler-impl</artifactId>
+            <version>${usm.JWTokenHandler.version}</version>
+        </dependency>
+
     </dependencies>
 	
     <build>
@@ -281,17 +295,8 @@
                         <artifactId>maven-scm-provider-svnjava</artifactId>
                         <version>${maven.scm.provider.version}</version>
                     </dependency>
-                    <dependency>
-                        <groupId>org.apache.maven.scm</groupId>
-                        <artifactId>maven-scm-provider-gitexe</artifactId>
-                        <version>1.8.1</version>
-                    </dependency>
                 </dependencies>
                 <configuration>
-                    <providerImplementations>
-                        <svn>javasvn</svn>
-                    </providerImplementations>
-                    <tagBase>https://webgate.ec.europa.eu/CITnet/svn/UNIONVMS/tags/usm4uvms</tagBase>
                     <tagNameFormat>@{project.artifactId}-@{project.version}</tagNameFormat>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                 </configuration>

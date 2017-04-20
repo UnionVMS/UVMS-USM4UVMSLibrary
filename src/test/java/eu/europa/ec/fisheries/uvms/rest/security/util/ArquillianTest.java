@@ -46,7 +46,7 @@ public class ArquillianTest {
 //        File[] libs = Maven.configureResolver().fromFile(new File("src/test/resources/settings.xml")).loadPomFromFile("pom.xml").importDependencies(ScopeType.COMPILE, ScopeType.RUNTIME, ScopeType.TEST).resolve().withTransitivity().asFile();
         war = war.addAsLibraries(libs);
 
-        //System.out.println(war.toString(true)); 
+        System.out.println(war.toString(true));
         
         return war;
     }
