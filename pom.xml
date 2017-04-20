@@ -3,12 +3,12 @@
     <groupId>eu.europa.ec.fisheries.uvms</groupId>
     <artifactId>usm4uvms</artifactId>
     <packaging>jar</packaging>
-    <version>3.0.5-SNAPSHOT</version>
-    <name>usm4uvms</name>
-    <description>USM integration for UnionVMS.</description>
-
-    <properties>
+	<version>3.0.5-SNAPSHOT</version>     
+	<name>usm4uvms</name>
+      <description>USM integration for UnionVMS.</description>		      
+      <properties>
         <release.branch.name>uvms-3.0.1-C3PO</release.branch.name>
+        <user.service.version>2.0.0</user.service.version>
         <information.service.version>1.8.0</information.service.version>
         <javaee.version>7.0</javaee.version>
         <jjwt.version>0.4</jjwt.version>
@@ -30,72 +30,37 @@
         <maven.scm.provider.version>2.1.1</maven.scm.provider.version>
         <maven.deploy.plugin.version>2.8.1</maven.deploy.plugin.version>
         <usm.JWTokenHandler.version>2.1.1</usm.JWTokenHandler.version>
-        <user.service.version>2.0.0</user.service.version>
-        <uvms.commons.version>2.0.14</uvms.commons.version>
+
+        <uvms.commons.version>2.0.18-SNAPSHOT</uvms.commons.version>
 
         <project.scm.id>github</project.scm.id>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>focus-repo</id>
+            <name>Focus nexus repository</name>
+            <url>http://nexus.focus.fish/</url>
+        </repository>
+    </repositories>
+
+    <distributionManagement> 
+        <repository>
+            <id>focus-releases</id>
+            <name>UnionVms Repository</name>
+            <url>http://nexus.focus.fish/nexus/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>focus-snapshots</id>
+            <name>UnionVms Snapshot Repository</name>
+            <url>http://nexus.focus.fish/nexus/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <scm>
-        <connection>${scm.connection}</connection>
-        <tag>HEAD</tag>
-    </scm>
-
-<profiles>
-    <profile>
-        <id>github</id>
-        <activation>
-            <activeByDefault>true</activeByDefault>
-        </activation>
-        <repositories>
-            <repository>
-                <id>focus-repo</id>
-                <name>Focus nexus repository</name>
-                <url>http://nexus.focus.fish/</url>
-            </repository>
-        </repositories>
-
-        <distributionManagement>
-            <repository>
-                <id>focus-releases</id>
-                <name>UnionVms Repository</name>
-                <url>http://nexus.focus.fish/nexus/content/repositories/releases/</url>
-            </repository>
-            <snapshotRepository>
-                <id>focus-snapshots</id>
-                <name>UnionVms Snapshot Repository</name>
-                <url>http://nexus.focus.fish/nexus/content/repositories/snapshots/</url>
-            </snapshotRepository>
-        </distributionManagement>
-
-        <properties>
-            <scm.connection>scm:git:https://github.com/UnionVMS/UVMS-USM4UVMSLibrary.git</scm.connection>
-        </properties>
-    </profile>
-    <profile>
-        <id>dg-mare</id>
-        <activation>
-            <activeByDefault>false</activeByDefault>
-        </activation>
-		<distributionManagement>
-			<repository>
-				<id>digit-releases</id>
-				<name>DG DIGIT Repository</name>
-				<url>https://webgate.ec.europa.eu/CITnet/nexus/content/repositories/mare/</url>
-			</repository>
-			<snapshotRepository>
-				<id>digit-snapshots</id>
-				<name>DG DIGIT Snapshot Repository</name>
-				<url>https://webgate.ec.europa.eu/CITnet/nexus/content/repositories/mare-snapshots/</url>
-			</snapshotRepository>
-		</distributionManagement>
-
-        <properties>
-            <scm.connection>scm:git:https://emserveje@webgate.ec.europa.eu/CITnet/stash/scm/unionvms/uvms-usm4uvmslibrary.git</scm.connection>
-        <release.branch.name>uvms-3.0.1-C3PO</release.branch.name></properties>
-    </profile>
-
-</profiles>
+        <connection>scm:git:https://github.com/UnionVMS/UVMS-USM4UVMSLibrary.git</connection>
+      <tag>HEAD</tag>
+  </scm>
 
     <dependencies>
         <dependency>
@@ -103,6 +68,11 @@
             <artifactId>ehcache</artifactId>
             <version>${ehcache.version}</version>
         </dependency>
+
+
+
+
+
 
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -229,15 +199,15 @@
             <version>${resteasy.version}</version>
         </dependency>
 
-        
+
         <dependency>
             <groupId>eu.europa.ec.fisheries.uvms.user</groupId>
             <artifactId>user-model</artifactId>
             <version>${user.service.version}</version>
         </dependency>
 
-        
-        
+
+
 
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
@@ -267,6 +237,7 @@
             <groupId>eu.europa.ec.fisheries.uvms</groupId>
             <artifactId>uvms-commons</artifactId>
             <version>${uvms.commons.version}</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>eu.europa.ec.mare.usm</groupId>
@@ -278,8 +249,9 @@
             <artifactId>jwt-handler-impl</artifactId>
             <version>${usm.JWTokenHandler.version}</version>
         </dependency>
-    </dependencies>
 
+    </dependencies>
+	
     <build>
         <plugins>
             <plugin>
@@ -322,43 +294,11 @@
                         <artifactId>maven-scm-provider-svnjava</artifactId>
                         <version>${maven.scm.provider.version}</version>
                     </dependency>
-                    <dependency>
-                        <groupId>org.apache.maven.scm</groupId>
-                        <artifactId>maven-scm-provider-gitexe</artifactId>
-                        <version>1.8.1</version>
-                    </dependency>
                 </dependencies>
                 <configuration>
                     <tagNameFormat>@{project.artifactId}-@{project.version}</tagNameFormat>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                 </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <executions>
-                    <execution>
-                        
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
             <plugin>

@@ -15,34 +15,21 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
 import eu.europa.ec.fisheries.uvms.exception.ServiceException;
-import eu.europa.ec.fisheries.uvms.rest.security.JwtTokenHandler;
-import eu.europa.ec.fisheries.uvms.rest.security.bean.USMService;
 import eu.europa.ec.fisheries.uvms.rest.security.util.ArquillianTest;
-//import eu.europa.ec.mare.usm.information.domain.*;
-import eu.europa.ec.fisheries.wsdl.user.types.Application;
+import eu.europa.ec.mare.usm.jwt.DefaultJwtTokenHandler;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.extension.rest.client.ArquillianResteasyResource;
 import org.jboss.arquillian.extension.rest.client.Header;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.arquillian.test.api.ArquillianResource;
-import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import javax.ejb.EJB;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.net.URL;
-import java.util.Calendar;
-import java.util.HashSet;
-import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
@@ -99,7 +86,7 @@ public class RestResourceITest extends ArquillianTest {
 
 		ResteasyWebTarget usmWebTarget = new ResteasyClientBuilder().build().target("http://localhost:8080/usm-information/rest");
 		Response response = usmWebTarget.path("/userContext").request(MediaType.APPLICATION_JSON_TYPE)
-				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new JwtTokenHandler().createToken("TEST_USER")).put(Entity.json(newUserCtx));
+				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new DefaultJwtTokenHandler().createToken("TEST_USER")).put(Entity.json(newUserCtx));
 
 		assert response.getStatus() == HttpServletResponse.SC_OK;*/
 	}
@@ -115,7 +102,7 @@ public class RestResourceITest extends ArquillianTest {
 		
 		//check if we have the prerequisite - a report in the DB with ID = 1
 		Response response = webTarget.path("/list" ).request()
-				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new JwtTokenHandler().createToken("rep_power"))
+				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new DefaultJwtTokenHandler().createToken("rep_power"))
 				.header(AuthConstants.HTTP_HEADER_ROLE_NAME, "rep_power_role")
 				.header(AuthConstants.HTTP_HEADER_SCOPE_NAME, "EC")
 				.get();
@@ -130,7 +117,7 @@ public class RestResourceITest extends ArquillianTest {
 
 		//check if we have the prerequisite - a report in the DB with ID = 1
 		Response response = webTarget.path("/get" ).request()
-				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new JwtTokenHandler().createToken("Some Fake User"))
+				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new DefaultJwtTokenHandler().createToken("Some Fake User"))
 				.header(AuthConstants.HTTP_HEADER_ROLE_NAME, "TEST_ROLE")
 				.header(AuthConstants.HTTP_HEADER_SCOPE_NAME, "TEST_SCOPE")
 				.get();
@@ -143,7 +130,7 @@ public class RestResourceITest extends ArquillianTest {
 	public void testApplicationDescriptor(@ArquillianResteasyResource("test/rest/applicationDescriptor") ResteasyWebTarget webTarget) throws IOException, ServiceException {
 
 		Response response = webTarget.request()
-				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new JwtTokenHandler().createToken("rep_power"))
+				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new DefaultJwtTokenHandler().createToken("rep_power"))
 				.header(AuthConstants.HTTP_HEADER_ROLE_NAME, "rep_power_role")
 				.header(AuthConstants.HTTP_HEADER_SCOPE_NAME, "EC")
 				.get();
@@ -164,7 +151,7 @@ public class RestResourceITest extends ArquillianTest {
 	public void testDatasetsMerge(@ArquillianResteasyResource("test/rest/datasets/merge") ResteasyWebTarget webTarget) throws IOException, ServiceException {
 
 		Response response = webTarget.request()
-				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new JwtTokenHandler().createToken("rep_power"))
+				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new DefaultJwtTokenHandler().createToken("rep_power"))
 				.header(AuthConstants.HTTP_HEADER_ROLE_NAME, "rep_power_role")
 				.header(AuthConstants.HTTP_HEADER_SCOPE_NAME, "EC")
 				.get();
@@ -178,7 +165,7 @@ public class RestResourceITest extends ArquillianTest {
 	public void testDatasetsReset(@ArquillianResteasyResource("test/rest/datasets/reset") ResteasyWebTarget webTarget) throws IOException, ServiceException {
 
 		Response response = webTarget.request()
-				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new JwtTokenHandler().createToken("rep_power"))
+				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new DefaultJwtTokenHandler().createToken("rep_power"))
 				.header(AuthConstants.HTTP_HEADER_ROLE_NAME, "rep_power_role")
 				.header(AuthConstants.HTTP_HEADER_SCOPE_NAME, "EC")
 				.get();
@@ -192,7 +179,7 @@ public class RestResourceITest extends ArquillianTest {
 	public void testFeatures(@ArquillianResteasyResource("test/rest/features") ResteasyWebTarget webTarget) throws IOException, ServiceException {
 
 		Response response = webTarget.request()
-				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new JwtTokenHandler().createToken("rep_power"))
+				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new DefaultJwtTokenHandler().createToken("rep_power"))
 				.header(AuthConstants.HTTP_HEADER_ROLE_NAME, "rep_power_role")
 				.header(AuthConstants.HTTP_HEADER_SCOPE_NAME, "EC")
 				.get();
@@ -209,7 +196,7 @@ public class RestResourceITest extends ArquillianTest {
 	public void testOptions(@ArquillianResteasyResource("test/rest/options") ResteasyWebTarget webTarget) throws IOException, ServiceException {
 
 		Response response = webTarget.request()
-				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new JwtTokenHandler().createToken("rep_power"))
+				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new DefaultJwtTokenHandler().createToken("rep_power"))
 				.header(AuthConstants.HTTP_HEADER_ROLE_NAME, "rep_power_role")
 				.header(AuthConstants.HTTP_HEADER_SCOPE_NAME, "EC")
 				.get();
@@ -225,7 +212,7 @@ public class RestResourceITest extends ArquillianTest {
 	public void testPreferences(@ArquillianResteasyResource("test/rest/preferences") ResteasyWebTarget webTarget) throws IOException, ServiceException {
 
 		Response response = webTarget.request()
-				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new JwtTokenHandler().createToken("rep_power"))
+				.header(AuthConstants.HTTP_HEADER_AUTHORIZATION, new DefaultJwtTokenHandler().createToken("rep_power"))
 				.header(AuthConstants.HTTP_HEADER_ROLE_NAME, "rep_power_role")
 				.header(AuthConstants.HTTP_HEADER_SCOPE_NAME, "EC")
 				.get();
