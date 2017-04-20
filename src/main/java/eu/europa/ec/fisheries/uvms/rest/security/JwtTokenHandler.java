@@ -26,7 +26,10 @@ import java.util.Map;
 /**
  * Handles the creation, extension (of validity) and verification (parsing) 
  * of JWT tokens.
+ *
+ * DO NOT USE THIS CLASS ANYMORE! Inject/instantiate  DefaultJwtTokenHandler instead!
  */
+@Deprecated
 public class JwtTokenHandler {
   private static final Logger LOGGER = LoggerFactory.getLogger(JwtTokenHandler.class);
   private static final String PROP_KEY = "usm4uvms.jwt.secretKey";
