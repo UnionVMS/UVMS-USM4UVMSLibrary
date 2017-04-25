@@ -14,6 +14,8 @@ package eu.europa.ec.fisheries.uvms.jms;
 import eu.europa.ec.fisheries.uvms.message.AbstractProducer;
 import eu.europa.ec.fisheries.uvms.message.JMSUtils;
 import eu.europa.ec.fisheries.uvms.message.MessageConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.LocalBean;
@@ -27,6 +29,8 @@ import javax.naming.InitialContext;
 @Stateless
 @LocalBean
 public class USMMessageProducer extends AbstractProducer {
+
+    private static final Logger LOG = LoggerFactory.getLogger(USMMessageProducer.class);
 
     private Destination destination;
 
