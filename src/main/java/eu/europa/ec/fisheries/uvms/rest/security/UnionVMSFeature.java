@@ -57,5 +57,10 @@ public enum UnionVMSFeature {
     viewAudit,
 
     /** Configuration page */
-    viewConfiguration
+    viewConfiguration,
+
+    /** Sales */
+    viewSalesNotes,
+    manageSalesNotes
+
 }

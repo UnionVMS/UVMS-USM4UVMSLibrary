@@ -26,5 +26,6 @@ public enum UnionVMSModule {
 	Rules,
 	Spatial,
 	User,
-	Vessel
+	Vessel,
+	Sales
 }
