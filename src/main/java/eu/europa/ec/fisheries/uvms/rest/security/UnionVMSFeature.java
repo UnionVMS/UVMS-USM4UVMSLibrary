@@ -60,7 +60,7 @@ public enum UnionVMSFeature {
     viewConfiguration,
 
     /** Sales */
-    viewSalesNotes,
-    manageSalesNotes
+    viewSalesReports,
+    manageSalesReports
 
 }
