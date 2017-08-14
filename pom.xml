@@ -45,7 +45,7 @@
         <mockito.version>1.10.19</mockito.version>
         <usm.JWTokenHandler.version>2.1.1</usm.JWTokenHandler.version>
 
-        <uvms.commons.version>2.0.26</uvms.commons.version>
+        <uvms.commons.version>2.0.27</uvms.commons.version>
 
     </properties>
 
