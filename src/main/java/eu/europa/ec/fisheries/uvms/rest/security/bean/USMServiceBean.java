@@ -11,6 +11,19 @@ copy of the GNU General Public License along with the IFDM Suite. If not, see <h
  */
 package eu.europa.ec.fisheries.uvms.rest.security.bean;
 
+import javax.ejb.EJB;
+import javax.ejb.Local;
+import javax.ejb.Stateless;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.TextMessage;
+import javax.transaction.Transactional;
+import javax.xml.bind.JAXBException;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
 import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
 import eu.europa.ec.fisheries.uvms.exception.ServiceException;
 import eu.europa.ec.fisheries.uvms.jms.USMMessageConsumer;
@@ -19,26 +32,34 @@ import eu.europa.ec.fisheries.uvms.message.AbstractJAXBMarshaller;
 import eu.europa.ec.fisheries.uvms.message.MessageException;
 import eu.europa.ec.fisheries.uvms.user.model.exception.ModelMarshallException;
 import eu.europa.ec.fisheries.uvms.user.model.mapper.UserModuleRequestMapper;
-import eu.europa.ec.fisheries.wsdl.user.module.*;
-import eu.europa.ec.fisheries.wsdl.user.types.*;
+import eu.europa.ec.fisheries.wsdl.user.module.CreateDatasetResponse;
+import eu.europa.ec.fisheries.wsdl.user.module.DeleteDatasetResponse;
+import eu.europa.ec.fisheries.wsdl.user.module.DeployApplicationResponse;
+import eu.europa.ec.fisheries.wsdl.user.module.FilterDatasetResponse;
+import eu.europa.ec.fisheries.wsdl.user.module.GetDeploymentDescriptorRequest;
+import eu.europa.ec.fisheries.wsdl.user.module.GetDeploymentDescriptorResponse;
+import eu.europa.ec.fisheries.wsdl.user.module.GetUserContextResponse;
+import eu.europa.ec.fisheries.wsdl.user.module.PutPreferenceResponse;
+import eu.europa.ec.fisheries.wsdl.user.module.RedeployApplicationResponse;
+import eu.europa.ec.fisheries.wsdl.user.module.UserModuleMethod;
+import eu.europa.ec.fisheries.wsdl.user.types.Application;
+import eu.europa.ec.fisheries.wsdl.user.types.Context;
+import eu.europa.ec.fisheries.wsdl.user.types.Dataset;
+import eu.europa.ec.fisheries.wsdl.user.types.DatasetExtension;
+import eu.europa.ec.fisheries.wsdl.user.types.DatasetFilter;
+import eu.europa.ec.fisheries.wsdl.user.types.Feature;
+import eu.europa.ec.fisheries.wsdl.user.types.Option;
+import eu.europa.ec.fisheries.wsdl.user.types.Preference;
+import eu.europa.ec.fisheries.wsdl.user.types.UserContext;
+import eu.europa.ec.fisheries.wsdl.user.types.UserContextId;
+import eu.europa.ec.fisheries.wsdl.user.types.UserFault;
+import eu.europa.ec.fisheries.wsdl.user.types.UserPreference;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.ejb.EJB;
-import javax.ejb.Local;
-import javax.ejb.Stateless;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.TextMessage;
-import javax.transaction.Transactional;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import java.io.StringReader;
-import java.util.*;
 
 /**
  * Created by georgige on 10/30/2015.
@@ -81,7 +102,7 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
             }
         }
 
-        LOG.debug("END getOptionDefaultValue(), returning: {}", defaultOptionValue);
+        //LOG.debug("END getOptionDefaultValue(), returning: {}", defaultOptionValue);
         return defaultOptionValue;
     }
 
@@ -431,6 +452,7 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
 
                 if (response != null) {
                     UserFault error = unmarshallTextMessage((TextMessage) response, UserFault.class);
+
                     LOG.error("Error Code: {}, Message: {}", error.getCode(), error.getFault());
                 }
             }
