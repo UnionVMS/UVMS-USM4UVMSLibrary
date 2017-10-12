@@ -24,7 +24,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
 import eu.europa.ec.fisheries.uvms.exception.ServiceException;
 import eu.europa.ec.fisheries.uvms.jms.USMMessageConsumer;
 import eu.europa.ec.fisheries.uvms.jms.USMMessageProducer;
@@ -54,9 +53,6 @@ import eu.europa.ec.fisheries.wsdl.user.types.UserContext;
 import eu.europa.ec.fisheries.wsdl.user.types.UserContextId;
 import eu.europa.ec.fisheries.wsdl.user.types.UserFault;
 import eu.europa.ec.fisheries.wsdl.user.types.UserPreference;
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,8 +66,8 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
 
     private static final Logger LOG = LoggerFactory.getLogger(USMServiceBean.class);
     private static final Long UVMS_USM_TIMEOUT = 30000L;
-    public static Cache userSessionCache = CacheManager.newInstance().getCache(AuthConstants.CACHE_NAME_USER_SESSION);
-    private static Cache appCache = CacheManager.getInstance().getCache(AuthConstants.CACHE_NAME_APP_MODULE);
+    //public static Cache userSessionCache = CacheManager.newInstance().getCache(AuthConstants.CACHE_NAME_USER_SESSION);
+    //private static Cache appCache = CacheManager.getInstance().getCache(AuthConstants.CACHE_NAME_APP_MODULE);
     @EJB
     protected USMMessageProducer messageProducer;
 
@@ -82,17 +78,17 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
     @Override
     public String getOptionDefaultValue(String optionName, String applicationName) throws ServiceException {
         LOG.debug("START getOptionDefaultValue({}, {})", optionName, applicationName);
-        Element cachedApp = appCache.get(applicationName);
+        //Element cachedApp = appCache.get(applicationName);
         Application application;
         String defaultOptionValue = null;
 
-        if (cachedApp == null || cachedApp.isExpired()) {
+        //if (cachedApp == null || cachedApp.isExpired()) {
             application = getApplicationDefinition(applicationName);
-            cachedApp = new Element(applicationName, application);
-            appCache.put(cachedApp);
-        } else {
-            application = (Application) cachedApp.getObjectValue();
-        }
+            //cachedApp = new Element(applicationName, application);
+            //appCache.put(cachedApp);
+        //} else {
+        //    application = (Application) cachedApp.getObjectValue();
+        //}
 
         List<Option> allOptions = application.getOption();
         for (Option opt : allOptions) {
@@ -106,19 +102,19 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
         return defaultOptionValue;
     }
 
-    private String getCacheKey(String userName, String currentRole, String currentScope) {
-        return new StringBuilder(userName).append('_').append(currentRole).append('_').append(currentScope).toString();
-    }
+    //private String getCacheKey(String userName, String currentRole, String currentScope) {
+    //    return new StringBuilder(userName).append('_').append(currentRole).append('_').append(currentScope).toString();
+    //}
 
     @Override
     public Context getUserContext(String username, String applicationName, String currentRole, String currentScope) throws ServiceException {
         LOG.debug("START getUserContext({}, {}, {}, {})", username, applicationName, currentRole, currentScope);
         Context context = null;
-        String cacheKey = getCacheKey(username, currentRole, currentScope);
+        //String cacheKey = getCacheKey(username, currentRole, currentScope);
 
-        Element cachedContext = userSessionCache.get(cacheKey);
+        //Element cachedContext = userSessionCache.get(cacheKey);
 
-        if (cachedContext == null || cachedContext.isExpired()) {
+        //if (cachedContext == null || cachedContext.isExpired()) {
 
             UserContext fullContext = getFullUserContext(username, applicationName);
 
@@ -128,19 +124,19 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
 
                     if (isContextMatch(usmCtx, currentRole, currentScope)) {
                         context = usmCtx;
-                        cachedContext = new Element(cacheKey, usmCtx);
-                        userSessionCache.put(cachedContext);
-                        LOG.debug("the received userContext is cached with a key: {}", cacheKey);
+                       //cachedContext = new Element(cacheKey, usmCtx);
+                       // userSessionCache.put(cachedContext);
+                       // LOG.debug("the received userContext is cached with a key: {}", cacheKey);
 
                         break;
                     }
                 }
             }
 
-        } else {
-            context = (Context) cachedContext.getObjectValue();
-            LOG.debug("userContext is retrieved from the cache.");
-        }
+        //} //else {
+        //    context = (Context) cachedContext.getObjectValue();
+         //   LOG.debug("userContext is retrieved from the cache.");
+        //}
 
         if (context == null) {
             throw new ServiceException("Context with the provided username, role and scope is not found.");
@@ -220,9 +216,9 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
         LOG.debug("START getApplicationDefinition({})", applicationName);
 
         Application application = null;
-        Element cachedAppDefinition = appCache.get(applicationName);
+        //Element cachedAppDefinition = appCache.get(applicationName);
 
-        if (cachedAppDefinition == null || cachedAppDefinition.isExpired()) {
+       // if (cachedAppDefinition == null || cachedAppDefinition.isExpired()) {
             GetDeploymentDescriptorRequest getDeploymentDescriptorRequest = new GetDeploymentDescriptorRequest();
             getDeploymentDescriptorRequest.setMethod(UserModuleMethod.GET_DEPLOYMENT_DESCRIPTOR);
             getDeploymentDescriptorRequest.setApplicationName(applicationName);
@@ -250,13 +246,13 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
                 throw new ServiceException("Unable to get Application Definition", e);
             }
 
-            cachedAppDefinition = new Element(applicationName, application);
-            appCache.put(cachedAppDefinition);
-            LOG.debug("application definition is put in cache.");
-        } else {
-            application = (Application) cachedAppDefinition.getObjectValue();
-            LOG.debug("application definition is retrieved from the cache.");
-        }
+           // cachedAppDefinition = new Element(applicationName, application);
+            //appCache.put(cachedAppDefinition);
+            //LOG.debug("application definition is put in cache.");
+       // } else {
+       //     application = (Application) cachedAppDefinition.getObjectValue();
+       //     LOG.debug("application definition is retrieved from the cache.");
+       // }
 
         LOG.debug("END getApplicationDefinition()");
         return application;
@@ -305,9 +301,9 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
 
         //we must clear the app cache for the given application definition
         // since it contains all options default values
-        if (appCache.remove(deploymentDescriptor.getName())) {
-            LOG.debug("clearing {} application definition from the cache.", deploymentDescriptor.getName());
-        }
+        //if (appCache.remove(deploymentDescriptor.getName())) {
+        //    LOG.debug("clearing {} application definition from the cache.", deploymentDescriptor.getName());
+       // }
 
         try {
             String descriptorString = UserModuleRequestMapper.mapToRedeployApplicationRequest(deploymentDescriptor);
@@ -369,7 +365,7 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
             application.getOption().add(option);
         }
 
-        appCache.remove(applicationName);
+       // appCache.remove(applicationName);
 
         redeployApplicationDescriptor(application);
 
@@ -381,11 +377,11 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
     public void putUserPreference(String keyOption, String userDefinedValue, String applicationName, String scopeName, String roleName, String username) throws ServiceException {
         LOG.debug("START putUserPreference({} , {}, {}, {}, {}, {})", keyOption, userDefinedValue, applicationName, scopeName, roleName, username);
 
-        String cacheKey = getCacheKey(username, roleName, scopeName);
+        //String cacheKey = getCacheKey(username, roleName, scopeName);
 
-        if (userSessionCache.remove(cacheKey)) {
-            LOG.debug("clearing {} application definition from the cache.", applicationName);
-        }
+        //if (userSessionCache.remove(cacheKey)) {
+        //    LOG.debug("clearing {} application definition from the cache.", applicationName);
+        //}
 
         UserPreference userPreference = new UserPreference();
         userPreference.setApplicationName(applicationName);
@@ -536,9 +532,9 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
             throw new IllegalArgumentException("Application name, nor dataset name cannot be null");
         }
 
-        if (appCache.remove(applicationName)) {
-            LOG.debug("clearing {} application definition from the cache.", applicationName);
-        }
+        //if (appCache.remove(applicationName)) {
+        //    LOG.debug("clearing {} application definition from the cache.", applicationName);
+        //}
 
         try {
             DatasetExtension dataset = new DatasetExtension();
@@ -616,9 +612,9 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
     public void deleteDataset(String applicationName, String datasetName) throws ServiceException {
         LOG.debug("START deleteDataset({}, {}", applicationName, datasetName);
 
-        if (appCache.remove(applicationName)) {
-            LOG.debug("clearing {} application definition from the cache.", applicationName);
-        }
+        //if (appCache.remove(applicationName)) {
+        //    LOG.debug("clearing {} application definition from the cache.", applicationName);
+       // }
 
         try {
             DatasetExtension dataset = new DatasetExtension();
