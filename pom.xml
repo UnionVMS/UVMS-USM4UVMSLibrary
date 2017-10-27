@@ -45,7 +45,7 @@
         <mockito.version>1.10.19</mockito.version>
         <usm.JWTokenHandler.version>2.1.1</usm.JWTokenHandler.version>
 
-        <uvms.commons.version>2.0.27</uvms.commons.version>
+        <uvms.commons.version>3.0.0-SNAPSHOT</uvms.commons.version>
 
     </properties>
 
@@ -251,8 +251,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>eu.europa.ec.fisheries.uvms</groupId>
-            <artifactId>uvms-commons</artifactId>
+            <groupId>eu.europa.ec.fisheries.uvms.commons</groupId>
+            <artifactId>uvms-commons-message</artifactId>
             <version>${uvms.commons.version}</version>
         </dependency>
         <dependency>

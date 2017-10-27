@@ -24,12 +24,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import eu.europa.ec.fisheries.uvms.commons.message.api.MessageException;
+import eu.europa.ec.fisheries.uvms.commons.message.impl.AbstractJAXBMarshaller;
 import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
 import eu.europa.ec.fisheries.uvms.exception.ServiceException;
 import eu.europa.ec.fisheries.uvms.jms.USMMessageConsumer;
 import eu.europa.ec.fisheries.uvms.jms.USMMessageProducer;
-import eu.europa.ec.fisheries.uvms.message.AbstractJAXBMarshaller;
-import eu.europa.ec.fisheries.uvms.message.MessageException;
 import eu.europa.ec.fisheries.uvms.user.model.exception.ModelMarshallException;
 import eu.europa.ec.fisheries.uvms.user.model.mapper.UserModuleRequestMapper;
 import eu.europa.ec.fisheries.wsdl.user.module.CreateDatasetResponse;
