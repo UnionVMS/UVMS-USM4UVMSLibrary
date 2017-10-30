@@ -11,12 +11,13 @@ copy of the GNU General Public License along with the IFDM Suite. If not, see <h
  */
 package eu.europa.ec.fisheries.uvms.rest.security.resources;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
-import eu.europa.ec.fisheries.uvms.exception.ServiceException;
-import eu.europa.ec.fisheries.uvms.rest.security.util.ArquillianTest;
-import eu.europa.ec.mare.usm.jwt.DefaultJwtTokenHandler;
+import static org.junit.Assert.assertEquals;
+
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Response;
+
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.extension.rest.client.ArquillianResteasyResource;
 import org.jboss.arquillian.extension.rest.client.Header;
@@ -27,11 +28,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Response;
-import java.io.IOException;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 
-import static org.junit.Assert.assertEquals;
+import eu.europa.ec.fisheries.uvms.commons.service.exception.ServiceException;
+import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
+import eu.europa.ec.fisheries.uvms.rest.security.util.ArquillianTest;
+import eu.europa.ec.mare.usm.jwt.DefaultJwtTokenHandler;
 
 @RunWith(Arquillian.class)
 @RunAsClient

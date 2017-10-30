@@ -256,6 +256,12 @@
             <version>${uvms.commons.version}</version>
         </dependency>
         <dependency>
+            <groupId>eu.europa.ec.fisheries.uvms.commons</groupId>
+            <artifactId>uvms-commons-service</artifactId>
+            <version>${uvms.commons.version}</version>
+        </dependency>
+        
+        <dependency>
             <groupId>eu.europa.ec.mare.usm</groupId>
             <artifactId>jwt-handler-api</artifactId>
             <version>${usm.JWTokenHandler.version}</version>

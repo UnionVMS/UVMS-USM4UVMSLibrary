@@ -11,14 +11,13 @@ copy of the GNU General Public License along with the IFDM Suite. If not, see <h
  */
 package eu.europa.ec.fisheries.uvms.rest.security;
 
-import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
-
 import java.security.Principal;
-import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+
+import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
 
 /**
  * An extension for the HTTPServletRequest that overrides the getUserPrincipal() and isUserInRole().
