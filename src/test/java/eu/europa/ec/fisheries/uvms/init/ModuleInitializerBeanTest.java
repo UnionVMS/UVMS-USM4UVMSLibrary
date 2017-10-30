@@ -12,36 +12,19 @@ copy of the GNU General Public License along with the IFDM Suite. If not, see <h
 package eu.europa.ec.fisheries.uvms.init;
 
 
-import eu.europa.ec.fisheries.uvms.exception.ServiceException;
-import eu.europa.ec.fisheries.uvms.rest.security.bean.USMService;
-import eu.europa.ec.fisheries.uvms.user.model.exception.ModelMarshallException;
-import eu.europa.ec.fisheries.wsdl.user.module.DeployApplicationRequest;
-import eu.europa.ec.fisheries.wsdl.user.module.UserModuleMethod;
-import eu.europa.ec.fisheries.wsdl.user.types.Application;
-import eu.europa.ec.fisheries.wsdl.user.types.Dataset;
+import javax.xml.bind.JAXBException;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.mockito.internal.util.reflection.Whitebox;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import javax.jms.*;
-import javax.servlet.http.HttpServletResponse;
-import javax.transaction.HeuristicMixedException;
-import javax.transaction.HeuristicRollbackException;
-import javax.transaction.RollbackException;
-import javax.transaction.SystemException;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import java.io.IOException;
-
-import static java.lang.Integer.valueOf;
-import static org.mockito.Mockito.*;
+import eu.europa.ec.fisheries.uvms.rest.security.bean.USMService;
 @RunWith(MockitoJUnitRunner.class)
 public class ModuleInitializerBeanTest {
 
