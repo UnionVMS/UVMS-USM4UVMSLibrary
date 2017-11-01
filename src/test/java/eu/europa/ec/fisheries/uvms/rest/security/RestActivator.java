@@ -11,17 +11,19 @@ copy of the GNU General Public License along with the IFDM Suite. If not, see <h
  */
 package eu.europa.ec.fisheries.uvms.rest.security;
 
-import eu.europa.ec.fisheries.uvms.rest.security.resources.RestResource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Application;
-import java.util.HashSet;
-import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import eu.europa.ec.fisheries.uvms.rest.security.resources.RestResource;
 
 @ApplicationPath("/test")
 public class RestActivator extends Application {

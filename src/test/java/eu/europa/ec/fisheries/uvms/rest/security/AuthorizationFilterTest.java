@@ -11,16 +11,7 @@ copy of the GNU General Public License along with the IFDM Suite. If not, see <h
  */
 package eu.europa.ec.fisheries.uvms.rest.security;
 
-import eu.europa.ec.fisheries.wsdl.user.types.Context;
-import eu.europa.ec.fisheries.wsdl.user.types.Dataset;
-import eu.europa.ec.fisheries.wsdl.user.types.Scope;
-import static org.junit.Assert.*;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by georgige on 10/29/2015.

@@ -11,16 +11,23 @@ copy of the GNU General Public License along with the IFDM Suite. If not, see <h
  */
 package eu.europa.ec.fisheries.uvms.rest.security;
 
-import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
-import eu.europa.ec.fisheries.uvms.exception.ServiceException;
-import eu.europa.ec.fisheries.wsdl.user.types.Context;
+import java.io.IOException;
+import java.util.Set;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.*;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Set;
+import eu.europa.ec.fisheries.uvms.commons.service.exception.ServiceException;
+import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
+import eu.europa.ec.fisheries.wsdl.user.types.Context;
 
 /**
  * Created by georgige on 9/22/2015.

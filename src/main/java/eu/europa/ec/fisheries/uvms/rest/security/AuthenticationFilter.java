@@ -2,8 +2,6 @@ package eu.europa.ec.fisheries.uvms.rest.security;
 
 import java.io.IOException;
 
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -13,10 +11,11 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
-import eu.europa.ec.mare.usm.jwt.DefaultJwtTokenHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
+import eu.europa.ec.mare.usm.jwt.DefaultJwtTokenHandler;
 
 
 /**

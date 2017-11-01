@@ -11,7 +11,7 @@
     <groupId>eu.europa.ec.fisheries.uvms</groupId>
     <artifactId>usm4uvms</artifactId>
     <packaging>jar</packaging>
-	<version>3.0.13-SNAPSHOT</version>     
+	<version>4.0.0-SNAPSHOT</version>     
 	<name>usm4uvms</name>
       <description>USM integration for UnionVMS.</description>		      
       <properties>
@@ -45,7 +45,7 @@
         <mockito.version>1.10.19</mockito.version>
         <usm.JWTokenHandler.version>2.1.1</usm.JWTokenHandler.version>
 
-        <uvms.commons.version>2.0.27</uvms.commons.version>
+        <uvms.commons.version>3.0.0</uvms.commons.version>
 
     </properties>
 
@@ -251,10 +251,16 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>eu.europa.ec.fisheries.uvms</groupId>
-            <artifactId>uvms-commons</artifactId>
+            <groupId>eu.europa.ec.fisheries.uvms.commons</groupId>
+            <artifactId>uvms-commons-message</artifactId>
             <version>${uvms.commons.version}</version>
         </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.fisheries.uvms.commons</groupId>
+            <artifactId>uvms-commons-service</artifactId>
+            <version>${uvms.commons.version}</version>
+        </dependency>
+        
         <dependency>
             <groupId>eu.europa.ec.mare.usm</groupId>
             <artifactId>jwt-handler-api</artifactId>

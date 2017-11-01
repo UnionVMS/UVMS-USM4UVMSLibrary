@@ -11,12 +11,17 @@ copy of the GNU General Public License along with the IFDM Suite. If not, see <h
  */
 package eu.europa.ec.fisheries.uvms.rest.security.bean;
 
-import eu.europa.ec.fisheries.uvms.exception.ServiceException;
-import eu.europa.ec.fisheries.wsdl.user.types.*;
-
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Set;
+
+import javax.transaction.Transactional;
+
+import eu.europa.ec.fisheries.uvms.commons.service.exception.ServiceException;
+import eu.europa.ec.fisheries.wsdl.user.types.Application;
+import eu.europa.ec.fisheries.wsdl.user.types.Context;
+import eu.europa.ec.fisheries.wsdl.user.types.Dataset;
+import eu.europa.ec.fisheries.wsdl.user.types.DatasetExtension;
+import eu.europa.ec.fisheries.wsdl.user.types.UserContext;
 
 /**
  * Created by georgige on 11/25/2015.
