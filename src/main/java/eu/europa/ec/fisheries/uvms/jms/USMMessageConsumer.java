@@ -24,6 +24,7 @@ import eu.europa.ec.fisheries.uvms.commons.message.impl.AbstractConsumer;
 @LocalBean
 public class USMMessageConsumer extends AbstractConsumer {
 
+	@Override
 	public String getDestinationName() {
 		return MessageConstants.QUEUE_USM4UVMS;
 	}
