@@ -9,17 +9,14 @@ the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the impl
 FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details. You should have received a
 copy of the GNU General Public License along with the IFDM Suite. If not, see <http://www.gnu.org/licenses/>.
  */
-package eu.europa.ec.fisheries.uvms.init;
 
-import java.io.InputStream;
+package eu.europa.ec.fisheries.uvms.init;
 
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.jms.Queue;
+import java.io.InputStream;
 
-/**
- * Created by georgige on 9/30/2015.
- */
 @Singleton
 @Startup
 public class ModuleInitializerBean extends AbstractModuleInitializerBean {
