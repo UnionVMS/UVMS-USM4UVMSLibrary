@@ -11,9 +11,6 @@ copy of the GNU General Public License along with the IFDM Suite. If not, see <h
  */
 package eu.europa.ec.fisheries.uvms.init;
 
-import java.io.InputStream;
-import java.util.Iterator;
-
 import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.Schedule;
@@ -22,18 +19,18 @@ import javax.ejb.TimerService;
 import javax.jms.JMSException;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.InputStream;
+import java.util.Iterator;
 
 import eu.europa.ec.fisheries.uvms.commons.message.api.MessageException;
-import eu.europa.ec.fisheries.uvms.commons.message.impl.AbstractJAXBMarshaller;
 import eu.europa.ec.fisheries.uvms.commons.service.exception.ServiceException;
 import eu.europa.ec.fisheries.uvms.rest.security.bean.USMService;
 import eu.europa.ec.fisheries.wsdl.user.module.DeployApplicationRequest;
 import eu.europa.ec.fisheries.wsdl.user.types.Application;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public abstract class AbstractModuleInitializerBean extends AbstractJAXBMarshaller {
+public abstract class AbstractModuleInitializerBean {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractModuleInitializerBean.class);
 
