@@ -186,6 +186,7 @@
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
             <version>${resteasy.version}</version>
+            <scope>provided</scope>
             <exclusions>
             	<exclusion>
             		  <groupId>org.jboss.spec.javax.annotation</groupId>
@@ -197,6 +198,7 @@
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxb-provider</artifactId>
             <version>${resteasy.version}</version>
+            <scope>provided</scope>
             <exclusions>
             	<exclusion>
             		<groupId>com.sun.xml.bind</groupId>
@@ -234,8 +236,13 @@
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt</artifactId>
             <version>${jjwt.version}</version>
+            <exclusions>
+            	<exclusion>
+					<groupId>com.fasterxml.jackson.core</groupId>
+					<artifactId>jackson-databind</artifactId>
+				</exclusion>            
+            </exclusions>
         </dependency>
-
         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-api</artifactId>
