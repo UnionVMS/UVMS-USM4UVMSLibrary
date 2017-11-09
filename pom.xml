@@ -30,7 +30,7 @@
         <information.service.version>1.8.0</information.service.version>
         <javaee.version>7.0</javaee.version>
         <jjwt.version>0.4</jjwt.version>
-        <ehcache.version>2.10.1</ehcache.version>
+        <ehcache.version>2.10.4</ehcache.version>
         <apache.commons.version>3.6</apache.commons.version>
         <jackson.version>2.6.7</jackson.version>
         <junit.version>4.12</junit.version>
@@ -75,9 +75,15 @@
 
     <dependencies>
         <dependency>
-            <groupId>net.sf.ehcache</groupId>
-            <artifactId>ehcache</artifactId>
+		    <groupId>net.sf.ehcache.internal</groupId>
+		    <artifactId>ehcache-core</artifactId>
             <version>${ehcache.version}</version>
+            <exclusions>
+            	<exclusion>
+            		 <groupId>org.slf4j</groupId>
+    				 <artifactId>slf4j-api</artifactId>
+            	</exclusion>
+            </exclusions>            
         </dependency>
 
         <dependency>
