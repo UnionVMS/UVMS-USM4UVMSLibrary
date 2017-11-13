@@ -44,7 +44,7 @@
         <commons.io.version>2.5</commons.io.version>
         <mockito.version>1.10.19</mockito.version>
         <usm.JWTokenHandler.version>2.1.1</usm.JWTokenHandler.version>
-        <uvms.commons.version>3.0.4-SNAPSHOT</uvms.commons.version>
+        <uvms.commons.version>3.0.4</uvms.commons.version>
     </properties>
 
     <repositories>
