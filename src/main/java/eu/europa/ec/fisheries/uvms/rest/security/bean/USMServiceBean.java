@@ -9,24 +9,8 @@ the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the impl
 FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details. You should have received a
 copy of the GNU General Public License along with the IFDM Suite. If not, see <http://www.gnu.org/licenses/>.
  */
-package eu.europa.ec.fisheries.uvms.rest.security.bean;
 
-import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
-import eu.europa.ec.fisheries.uvms.exception.ServiceException;
-import eu.europa.ec.fisheries.uvms.jms.USMMessageConsumer;
-import eu.europa.ec.fisheries.uvms.jms.USMMessageProducer;
-import eu.europa.ec.fisheries.uvms.message.AbstractJAXBMarshaller;
-import eu.europa.ec.fisheries.uvms.message.MessageException;
-import eu.europa.ec.fisheries.uvms.user.model.exception.ModelMarshallException;
-import eu.europa.ec.fisheries.uvms.user.model.mapper.UserModuleRequestMapper;
-import eu.europa.ec.fisheries.wsdl.user.module.*;
-import eu.europa.ec.fisheries.wsdl.user.types.*;
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package eu.europa.ec.fisheries.uvms.rest.security.bean;
 
 import javax.ejb.EJB;
 import javax.ejb.Local;
@@ -35,28 +19,63 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TextMessage;
 import javax.transaction.Transactional;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import java.io.StringReader;
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
-/**
- * Created by georgige on 10/30/2015.
- */
+import eu.europa.ec.fisheries.uvms.commons.message.api.MessageException;
+import eu.europa.ec.fisheries.uvms.commons.message.impl.JAXBUtils;
+import eu.europa.ec.fisheries.uvms.commons.service.exception.ServiceException;
+import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
+import eu.europa.ec.fisheries.uvms.jms.USMMessageConsumer;
+import eu.europa.ec.fisheries.uvms.jms.USMMessageProducer;
+import eu.europa.ec.fisheries.uvms.user.model.exception.ModelMarshallException;
+import eu.europa.ec.fisheries.uvms.user.model.mapper.UserModuleRequestMapper;
+import eu.europa.ec.fisheries.wsdl.user.module.CreateDatasetResponse;
+import eu.europa.ec.fisheries.wsdl.user.module.DeleteDatasetResponse;
+import eu.europa.ec.fisheries.wsdl.user.module.DeployApplicationResponse;
+import eu.europa.ec.fisheries.wsdl.user.module.FilterDatasetResponse;
+import eu.europa.ec.fisheries.wsdl.user.module.GetDeploymentDescriptorRequest;
+import eu.europa.ec.fisheries.wsdl.user.module.GetDeploymentDescriptorResponse;
+import eu.europa.ec.fisheries.wsdl.user.module.GetUserContextResponse;
+import eu.europa.ec.fisheries.wsdl.user.module.PutPreferenceResponse;
+import eu.europa.ec.fisheries.wsdl.user.module.RedeployApplicationResponse;
+import eu.europa.ec.fisheries.wsdl.user.module.UserModuleMethod;
+import eu.europa.ec.fisheries.wsdl.user.types.Application;
+import eu.europa.ec.fisheries.wsdl.user.types.Context;
+import eu.europa.ec.fisheries.wsdl.user.types.Dataset;
+import eu.europa.ec.fisheries.wsdl.user.types.DatasetExtension;
+import eu.europa.ec.fisheries.wsdl.user.types.DatasetFilter;
+import eu.europa.ec.fisheries.wsdl.user.types.Feature;
+import eu.europa.ec.fisheries.wsdl.user.types.Option;
+import eu.europa.ec.fisheries.wsdl.user.types.Preference;
+import eu.europa.ec.fisheries.wsdl.user.types.UserContext;
+import eu.europa.ec.fisheries.wsdl.user.types.UserContextId;
+import eu.europa.ec.fisheries.wsdl.user.types.UserFault;
+import eu.europa.ec.fisheries.wsdl.user.types.UserPreference;
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Stateless
 @Local(USMService.class)
-public class USMServiceBean extends AbstractJAXBMarshaller implements USMService {
+public class USMServiceBean implements USMService {
 
     private static final Logger LOG = LoggerFactory.getLogger(USMServiceBean.class);
     private static final Long UVMS_USM_TIMEOUT = 30000L;
     public static Cache userSessionCache = CacheManager.newInstance().getCache(AuthConstants.CACHE_NAME_USER_SESSION);
     private static Cache appCache = CacheManager.getInstance().getCache(AuthConstants.CACHE_NAME_APP_MODULE);
-    @EJB
-    protected USMMessageProducer messageProducer;
 
     @EJB
-    protected USMMessageConsumer messageConsumer;
+    private USMMessageProducer messageProducer;
 
+    @EJB
+    private USMMessageConsumer messageConsumer;
 
     @Override
     public String getOptionDefaultValue(String optionName, String applicationName) throws ServiceException {
@@ -81,7 +100,6 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
             }
         }
 
-        LOG.debug("END getOptionDefaultValue(), returning: {}", defaultOptionValue);
         return defaultOptionValue;
     }
 
@@ -107,25 +125,21 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
 
                     if (isContextMatch(usmCtx, currentRole, currentScope)) {
                         context = usmCtx;
-                        cachedContext = new Element(cacheKey, usmCtx);
-                        userSessionCache.put(cachedContext);
-                        LOG.debug("the received userContext is cached with a key: {}", cacheKey);
-
-                        break;
+                       cachedContext = new Element(cacheKey, usmCtx);
+                       userSessionCache.put(cachedContext);
+                       break;
                     }
                 }
             }
 
         } else {
             context = (Context) cachedContext.getObjectValue();
-            LOG.debug("userContext is retrieved from the cache.");
         }
 
         if (context == null) {
             throw new ServiceException("Context with the provided username, role and scope is not found.");
         }
 
-        LOG.debug("END getUserContext(..)");
         return context;
     }
 
@@ -134,53 +148,22 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
         LOG.debug("START getUserPreference({}, {}, {}, {}, {})", preferenceName, username, applicationName, currentRole, currentScope);
         String userPrefValue = null;
 
-//        try {
-//            String msgId = messageProducer.sendModuleMessage(marshallJaxBObjectToString(getDeploymentDescriptorRequest), messageConsumer.getDestination());
-//            LOG.debug("JMS message with ID: {} is sent to USM.", msgId);
-//
-//            Message response = messageConsumer.getMessage(msgId, GetDeploymentDescriptorResponse.class, UVMS_USM_TIMEOUT);
-//
-//            if (response != null && !isUserFault((TextMessage) response)) {
-//                GetDeploymentDescriptorResponse getDeploymentDescriptorResponse = unmarshallTextMessage((TextMessage) response, GetDeploymentDescriptorResponse.class);
-//                LOG.debug("Response concerning message with ID: {} is received.", msgId);
-//                application = getDeploymentDescriptorResponse.getApplication();
-//            } else {
-//                LOG.error("Error occurred while receiving JMS response for message ID: {}", msgId);
-//
-//                if (response != null) {
-//                    UserFault error = unmarshallTextMessage((TextMessage) response, UserFault.class);
-//                    LOG.error("Error Code: {}, Message: {}", error.getCode(), error.getFault());
-//                    throw new ServiceException("Unable to receive a response from USM.");
-//                }
-//            }
-//        } catch (MessageException | JMSException | JAXBException e) {
-//            throw new ServiceException("Unable to get Application Definition", e);
-//        }
 
         Context userContext = getUserContext(username, applicationName, currentRole, currentScope);
 
-   //     Map<String, String> userPreferences = new HashMap<>();
-
         userPrefValue = getUserPreference(preferenceName, userContext);
 
-        LOG.debug("END getUserPreference(), returning: {}", userPrefValue);
         return userPrefValue;
     }
 
     @Override
     public String getUserPreference(String preferenceName, Context userContext) throws ServiceException {
-        LOG.debug("START getUserPreference({}, {})", preferenceName, userContext);
         String userPrefValue = null;
 
         if (userContext != null) {
-           // Map<String, String> userPreferences = new HashMap<>();
 
             if (userContext.getPreferences() != null) {
                 List<Preference> listPrefs = userContext.getPreferences().getPreference();
-                //lets filter out all other preferences which comes from the other apps
-               /* for (Preference pref : listPrefs) {
-                    userPreferences.put(pref.getOptionName(), pref.getOptionValue());
-                }*/
                 for (Preference pref : listPrefs) {
                     if (pref.getOptionName().equals(preferenceName)) {
                         userPrefValue = pref.getOptionValue();
@@ -190,7 +173,6 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
             }
         }
 
-        LOG.debug("END getUserPreference(), returning: {}", userPrefValue);
         return userPrefValue;
     }
 
@@ -207,20 +189,20 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
             getDeploymentDescriptorRequest.setApplicationName(applicationName);
 
             try {
-                String msgId = messageProducer.sendModuleMessage(marshallJaxBObjectToString(getDeploymentDescriptorRequest), messageConsumer.getDestination());
+                String msgId = messageProducer.sendModuleMessage(JAXBUtils.marshallJaxBObjectToString(getDeploymentDescriptorRequest), messageConsumer.getDestination());
                 LOG.debug("JMS message with ID: {} is sent to USM.", msgId);
 
                 Message response = messageConsumer.getMessage(msgId, GetDeploymentDescriptorResponse.class, UVMS_USM_TIMEOUT);
 
                 if (response != null && !isUserFault((TextMessage) response)) {
-                    GetDeploymentDescriptorResponse getDeploymentDescriptorResponse = unmarshallTextMessage((TextMessage) response, GetDeploymentDescriptorResponse.class);
+                    GetDeploymentDescriptorResponse getDeploymentDescriptorResponse = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), GetDeploymentDescriptorResponse.class);
                     LOG.debug("Response concerning message with ID: {} is received.", msgId);
                     application = getDeploymentDescriptorResponse.getApplication();
                 } else {
                     LOG.error("Error occurred while receiving JMS response for message ID: {}", msgId);
 
                     if (response != null) {
-                        UserFault error = unmarshallTextMessage((TextMessage) response, UserFault.class);
+                        UserFault error = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), UserFault.class);
                         LOG.error("Error Code: {}, Message: {}", error.getCode(), error.getFault());
                         throw new ServiceException("Unable to receive a response from USM.");
                     }
@@ -231,13 +213,10 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
 
             cachedAppDefinition = new Element(applicationName, application);
             appCache.put(cachedAppDefinition);
-            LOG.debug("application definition is put in cache.");
         } else {
             application = (Application) cachedAppDefinition.getObjectValue();
-            LOG.debug("application definition is retrieved from the cache.");
         }
 
-        LOG.debug("END getApplicationDefinition()");
         return application;
     }
 
@@ -252,7 +231,7 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
             Message response = messageConsumer.getMessage(msgId, DeployApplicationResponse.class, UVMS_USM_TIMEOUT);
 
             if (response != null && !isUserFault((TextMessage) response)) {
-                DeployApplicationResponse deployApplicationResponse = unmarshallTextMessage((TextMessage) response, DeployApplicationResponse.class);
+                DeployApplicationResponse deployApplicationResponse = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), DeployApplicationResponse.class);
                 LOG.debug("Response concerning message with ID: {} is received.", msgId);
                 if ("OK".equalsIgnoreCase(deployApplicationResponse.getResponse())) {
                     LOG.info("Application successfully registered into USM.");
@@ -263,7 +242,7 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
                 LOG.error("Error occurred while receiving JMS response for message ID: {}", msgId);
 
                 if (response != null) {
-                    UserFault error = unmarshallTextMessage((TextMessage) response, UserFault.class);
+                    UserFault error = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), UserFault.class);
                     LOG.error("Error Code: {}, Message: {}", error.getCode(), error.getFault());
                     throw new ServiceException("Unable to register into USM.");
                 } else {
@@ -274,8 +253,6 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
         } catch (MessageException | JMSException | JAXBException | ModelMarshallException e) {
             throw new ServiceException("Unable to deploy Application descriptor", e);
         }
-
-        LOG.debug("END deployApplicationDescriptor()");
     }
 
     @Override
@@ -296,7 +273,7 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
             Message response = messageConsumer.getMessage(msgId, RedeployApplicationResponse.class, UVMS_USM_TIMEOUT);
 
             if (response != null && !isUserFault((TextMessage) response)) {
-                RedeployApplicationResponse redeployApplicationResponse = unmarshallTextMessage((TextMessage) response, RedeployApplicationResponse.class);
+                RedeployApplicationResponse redeployApplicationResponse = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), RedeployApplicationResponse.class);
                 LOG.debug("Response concerning message with ID: {} is received.", msgId);
                 if ("OK".equalsIgnoreCase(redeployApplicationResponse.getResponse())) {
                     LOG.info("Application successfully registered into USM.");
@@ -307,7 +284,7 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
                 LOG.error("Error occurred while receiving JMS response for message ID: {}", msgId);
 
                 if (response != null) {
-                    UserFault error = unmarshallTextMessage((TextMessage) response, UserFault.class);
+                    UserFault error = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), UserFault.class);
                     LOG.error("Error Code: {}, Message: {}", error.getCode(), error.getFault());
                     throw new ServiceException("Unable to register into USM.");
                 } else {
@@ -318,8 +295,6 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
         } catch (MessageException | JMSException | JAXBException | ModelMarshallException e) {
             throw new ServiceException("Unable to deploy Application descriptor", e);
         }
-
-        LOG.debug("END redeployApplicationDescriptor()");
     }
 
 
@@ -351,8 +326,6 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
         appCache.remove(applicationName);
 
         redeployApplicationDescriptor(application);
-
-        LOG.debug("END setOptionDefaultValue()");
     }
 
     @Override
@@ -376,8 +349,6 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
 
         putUserPreference(userPreference);
 
-
-        LOG.debug("END putUserPreference()");
     }
 
     private void putUserPreference(UserPreference userPreference) throws ServiceException {
@@ -393,13 +364,13 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
             Message response = messageConsumer.getMessage(messageID, PutPreferenceResponse.class, UVMS_USM_TIMEOUT);
 
             if (response != null && !isUserFault((TextMessage) response)) {
-                PutPreferenceResponse putPreferenceResponse = unmarshallTextMessage((TextMessage) response, PutPreferenceResponse.class);
+                PutPreferenceResponse putPreferenceResponse = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), PutPreferenceResponse.class);
                 LOG.debug("Response concerning message with ID: {} is received. The response is: {}", messageID, putPreferenceResponse.getResponse());
             } else {
                 LOG.error("Error occurred while receiving JMS response for message ID: {}", messageID);
 
                 if (response != null) {
-                    UserFault error = unmarshallTextMessage((TextMessage) response, UserFault.class);
+                    UserFault error = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), UserFault.class);
                     LOG.error("Error Code: {}, Message: {}", error.getCode(), error.getFault());
                 }
             }
@@ -410,70 +381,6 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
 
         LOG.debug("END putUserPreference");
     }
-
-   /* private void updateUserPreference(UserPreference userPreference) throws ServiceException {
-        LOG.debug("START updateUserPreference");
-
-        String payload = null;
-        try {
-            payload = UserModuleRequestMapper.mapToUpdateUserPreferenceRequest(userPreference);
-
-            String messageID = messageProducer.sendModuleMessage(payload, messageConsumer.getDestination());
-            LOG.debug("JMS message with ID: {} is successfully sent to USM.", messageID);
-
-            Message response = messageConsumer.getMessage(messageID, UpdatePreferenceResponse.class, UVMS_USM_TIMEOUT);
-
-            if (response != null && !isUserFault((TextMessage) response)) {
-                UpdatePreferenceResponse updatePreferenceResponse = unmarshallTextMessage((TextMessage) response, UpdatePreferenceResponse.class);
-                LOG.debug("Response concerning message with ID: {} is received. The response is: {}", messageID, updatePreferenceResponse.getResponse());
-            } else {
-                LOG.error("Error occurred while receiving JMS response for message ID: {}", messageID);
-
-                if (response != null) {
-                    UserFault error = unmarshallTextMessage((TextMessage) response, UserFault.class);
-                    LOG.error("Error Code: {}, Message: {}", error.getCode(), error.getFault());
-                }
-            }
-
-        } catch (ModelMarshallException | MessageException | JMSException | JAXBException e) {
-            throw new ServiceException("Unable to set user preference into USM.", e);
-        }
-
-        LOG.debug("END updateUserPreference");
-    }
-
-    private void createUserPreference(UserPreference userPreference) throws ServiceException {
-        LOG.debug("START createUserPreference");
-
-
-
-        String payload = null;
-        try {
-            payload = UserModuleRequestMapper.mapToCreateUserPreferenceRequest(userPreference);
-
-            String messageID = messageProducer.sendModuleMessage(payload, messageConsumer.getDestination());
-            LOG.debug("JMS message with ID: {} is successfully sent to USM.", messageID);
-
-            Message response = messageConsumer.getMessage(messageID, CreatePreferenceRequest.class, UVMS_USM_TIMEOUT);
-
-            if (response != null && !isUserFault((TextMessage) response)) {
-                CreatePreferenceResponse createPreferenceRequest = unmarshallTextMessage((TextMessage) response, CreatePreferenceResponse.class);
-                LOG.debug("Response concerning message with ID: {} is received. The response is: {}", messageID, createPreferenceRequest.getResponse());
-            } else {
-                LOG.error("Error occurred while receiving JMS response for message ID: {}", messageID);
-
-                if (response != null) {
-                    UserFault error = unmarshallTextMessage((TextMessage) response, UserFault.class);
-                    LOG.error("Error Code: {}, Message: {}", error.getCode(), error.getFault());
-                }
-            }
-
-        } catch (ModelMarshallException | MessageException | JMSException | JAXBException e) {
-            throw new ServiceException("Unable to set user preference into USM.", e);
-        }
-
-        LOG.debug("END createUserPreference");
-    }*/
 
 
     @Override
@@ -535,13 +442,13 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
             Message response = messageConsumer.getMessage(messageID, CreateDatasetResponse.class, UVMS_USM_TIMEOUT);
 
             if (response != null && !isUserFault((TextMessage) response)) {
-                CreateDatasetResponse createDatasetResponse = unmarshallTextMessage((TextMessage) response, CreateDatasetResponse.class);
+                CreateDatasetResponse createDatasetResponse = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), CreateDatasetResponse.class);
                 LOG.debug("Response concerning message with ID: {} is received. The response is: {}", messageID, createDatasetResponse.getResponse());
             } else {
                 LOG.error("Error occurred while receiving JMS response for message ID: {}", messageID);
 
                 if (response != null) {
-                    UserFault error = unmarshallTextMessage((TextMessage) response, UserFault.class);
+                    UserFault error = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), UserFault.class);
                     LOG.error("Error Code: {}, Message: {}", error.getCode(), error.getFault());
                 }
             }
@@ -550,45 +457,8 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
             throw new ServiceException("Unable to update Dataset.", e);
         }
 
-        LOG.debug("END createDataset(...)");
     }
 
-    /*@Override
-    public void renameDataset(String applicationName, String oldDatasetName, String newDatasetName) throws ServiceException {
-
-        LOG.debug("START renameDataset({}, old-> {}, new->{}", applicationName, oldDatasetName, newDatasetName);
-
-        if (appCache.remove(applicationName)) {
-            LOG.debug("clearing {} application definition from the cache.", applicationName);
-        }
-
-        try {
-            String payload = UserModuleRequestMapper.mapToUpdateDatasetRequest(dataset);
-
-
-            String messageID = messageProducer.sendModuleMessage(payload, messageConsumer.getDestination());
-            LOG.debug("JMS message with ID: {} is sent to USM.", messageID);
-
-            Message response = messageConsumer.getMessage(messageID, UpdateDatasetResponse.class, UVMS_USM_TIMEOUT);
-
-            if (response != null && !isUserFault((TextMessage) response)) {
-                UpdateDatasetResponse updateDatasetResponse = unmarshallTextMessage((TextMessage) response, UpdateDatasetResponse.class);
-                LOG.debug("Response concerning message with ID: {} is received. The response is: {}", messageID, updateDatasetResponse.getResponse());
-            } else {
-                LOG.error("Error occurred while receiving JMS response for message ID: {}", messageID);
-
-                if (response != null) {
-                    UserFault error = unmarshallTextMessage((TextMessage) response, UserFault.class);
-                    LOG.error("Error Code: {}, Message: {}", error.getCode(), error.getFault());
-                }
-            }
-
-        } catch (ModelMarshallException | MessageException | JMSException | JAXBException e) {
-            throw new ServiceException("Unable to update Dataset.", e);
-        }
-
-        LOG.debug("END renameDataset(...)");
-    }*/
 
     @Override
     public void deleteDataset(String applicationName, String datasetName) throws ServiceException {
@@ -611,13 +481,13 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
             Message response = messageConsumer.getMessage(messageID, DeleteDatasetResponse.class, UVMS_USM_TIMEOUT);
 
             if (response != null && !isUserFault((TextMessage) response)) {
-                DeleteDatasetResponse deleteDatasetResponse = unmarshallTextMessage((TextMessage) response, DeleteDatasetResponse.class);
+                DeleteDatasetResponse deleteDatasetResponse = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), DeleteDatasetResponse.class);
                 LOG.debug("Response concerning message with ID: {} is received. The response is: {}", messageID, deleteDatasetResponse.getResponse());
             } else {
                 LOG.error("Error occurred while receiving JMS response for message ID: {}", messageID);
 
                 if (response != null) {
-                    UserFault error = unmarshallTextMessage((TextMessage) response, UserFault.class);
+                    UserFault error = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), UserFault.class);
                     LOG.error("Error Code: {}, Message: {}", error.getCode(), error.getFault());
                 }
             }
@@ -625,8 +495,6 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
         } catch (ModelMarshallException | MessageException | JMSException | JAXBException e) {
             throw new ServiceException("Unable to update Dataset.", e);
         }
-
-        LOG.debug("END deleteDataset(...)");
     }
 
 
@@ -648,14 +516,14 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
             Message response = messageConsumer.getMessage(messageID, DeleteDatasetResponse.class, UVMS_USM_TIMEOUT);
 
             if (response != null && !isUserFault((TextMessage) response)) {
-                FilterDatasetResponse filterDatasetResponse = unmarshallTextMessage((TextMessage) response, FilterDatasetResponse.class);
+                FilterDatasetResponse filterDatasetResponse = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), FilterDatasetResponse.class);
                 LOG.debug("Response concerning message with ID: {} is received. The response is: {}", messageID, filterDatasetResponse.getDatasetList().getList());
                 listToReturn = filterDatasetResponse.getDatasetList().getList();
             } else {
                 LOG.error("Error occurred while receiving JMS response for message ID: {}", messageID);
 
                 if (response != null) {
-                    UserFault error = unmarshallTextMessage((TextMessage) response, UserFault.class);
+                    UserFault error = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), UserFault.class);
                     LOG.error("Error Code: {}, Message: {}", error.getCode(), error.getFault());
                 }
             }
@@ -688,14 +556,14 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
             Message response = messageConsumer.getMessage(messageID, GetUserContextResponse.class, UVMS_USM_TIMEOUT);
 
             if (response != null && !isUserFault((TextMessage) response)) {
-                GetUserContextResponse userContextResponse = unmarshallTextMessage((TextMessage) response, GetUserContextResponse.class);
+                GetUserContextResponse userContextResponse = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), GetUserContextResponse.class);
                 LOG.debug("Response concerning message with ID: {} is received.", messageID);
                 userContext = userContextResponse.getContext();
             } else {
                 LOG.error("Error occurred while receiving JMS response for message ID: {}", messageID);
 
                 if (response != null) {
-                    UserFault error = unmarshallTextMessage((TextMessage) response, UserFault.class);
+                    UserFault error = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), UserFault.class);
                     LOG.error("Error Code: {}, Message: {}", error.getCode(), error.getFault());
                     throw new ServiceException("Unable to receive a response from USM.");
                 }
@@ -703,7 +571,6 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
         } catch (ModelMarshallException | MessageException | JMSException | JAXBException e) {
             throw new ServiceException("Unexpected exception while trying to get user context.", e);
         }
-        LOG.debug("END getFullUserContext(...)");
         return userContext;
     }
 
@@ -738,7 +605,7 @@ public class USMServiceBean extends AbstractJAXBMarshaller implements USMService
         boolean isErrorResponse = false;
 
         try {
-            UserFault userFault = unmarshallTextMessage(message, UserFault.class);
+            UserFault userFault = JAXBUtils.unMarshallMessage(message.getText(), UserFault.class);
             isErrorResponse = true;
         } catch (JAXBException | JMSException e) {
             //do nothing  since it's not a UserFault

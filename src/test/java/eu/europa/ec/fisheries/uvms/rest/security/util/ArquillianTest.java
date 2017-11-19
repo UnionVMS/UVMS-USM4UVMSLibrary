@@ -11,14 +11,14 @@ copy of the GNU General Public License along with the IFDM Suite. If not, see <h
  */
 package eu.europa.ec.fisheries.uvms.rest.security.util;
 
+import java.io.File;
+
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.jboss.shrinkwrap.resolver.api.maven.ScopeType;
-
-import java.io.File;
 
 public class ArquillianTest {
 
@@ -46,7 +46,7 @@ public class ArquillianTest {
 //        File[] libs = Maven.configureResolver().fromFile(new File("src/test/resources/settings.xml")).loadPomFromFile("pom.xml").importDependencies(ScopeType.COMPILE, ScopeType.RUNTIME, ScopeType.TEST).resolve().withTransitivity().asFile();
         war = war.addAsLibraries(libs);
 
-        System.out.println(war.toString(true)); 
+        System.out.println(war.toString(true));
         
         return war;
     }

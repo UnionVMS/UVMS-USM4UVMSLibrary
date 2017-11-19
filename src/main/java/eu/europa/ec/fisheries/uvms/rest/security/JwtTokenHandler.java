@@ -11,22 +11,35 @@ copy of the GNU General Public License along with the IFDM Suite. If not, see <h
  */
 package eu.europa.ec.fisheries.uvms.rest.security;
 
-import io.jsonwebtoken.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.crypto.spec.SecretKeySpec;
-import javax.naming.InitialContext;
-import javax.xml.bind.DatatypeConverter;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.crypto.spec.SecretKeySpec;
+import javax.naming.InitialContext;
+import javax.xml.bind.DatatypeConverter;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Header;
+import io.jsonwebtoken.JwsHeader;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.UnsupportedJwtException;
+
 /**
  * Handles the creation, extension (of validity) and verification (parsing) 
  * of JWT tokens.
+ *
+ * DO NOT USE THIS CLASS ANYMORE! Inject/instantiate  DefaultJwtTokenHandler instead!
  */
+@Deprecated
 public class JwtTokenHandler {
   private static final Logger LOGGER = LoggerFactory.getLogger(JwtTokenHandler.class);
   private static final String PROP_KEY = "usm4uvms.jwt.secretKey";

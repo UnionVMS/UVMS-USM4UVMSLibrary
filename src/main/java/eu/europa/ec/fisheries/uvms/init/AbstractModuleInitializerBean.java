@@ -11,37 +11,26 @@ copy of the GNU General Public License along with the IFDM Suite. If not, see <h
  */
 package eu.europa.ec.fisheries.uvms.init;
 
-import eu.europa.ec.fisheries.uvms.exception.ServiceException;
-import eu.europa.ec.fisheries.uvms.jms.USMMessageConsumer;
-import eu.europa.ec.fisheries.uvms.jms.USMMessageProducer;
-import eu.europa.ec.fisheries.uvms.message.AbstractJAXBMarshaller;
-import eu.europa.ec.fisheries.uvms.message.MessageConsumer;
-import eu.europa.ec.fisheries.uvms.message.MessageException;
-import eu.europa.ec.fisheries.uvms.rest.security.bean.USMService;
-import eu.europa.ec.fisheries.uvms.user.model.exception.ModelMarshallException;
-import eu.europa.ec.fisheries.uvms.user.model.mapper.UserModuleRequestMapper;
-import eu.europa.ec.fisheries.wsdl.user.module.*;
-import eu.europa.ec.fisheries.wsdl.user.types.Application;
-import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.Schedule;
 import javax.ejb.Timer;
 import javax.ejb.TimerService;
-import javax.jms.*;
+import javax.jms.JMSException;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.util.Iterator;
 
-public abstract class AbstractModuleInitializerBean extends AbstractJAXBMarshaller {
+import eu.europa.ec.fisheries.uvms.commons.message.api.MessageException;
+import eu.europa.ec.fisheries.uvms.commons.service.exception.ServiceException;
+import eu.europa.ec.fisheries.uvms.rest.security.bean.USMService;
+import eu.europa.ec.fisheries.wsdl.user.module.DeployApplicationRequest;
+import eu.europa.ec.fisheries.wsdl.user.types.Application;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public abstract class AbstractModuleInitializerBean {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractModuleInitializerBean.class);
 

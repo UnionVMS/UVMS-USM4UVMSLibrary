@@ -11,26 +11,21 @@ copy of the GNU General Public License along with the IFDM Suite. If not, see <h
  */
 package eu.europa.ec.fisheries.uvms.jms;
 
-import eu.europa.ec.fisheries.uvms.message.AbstractProducer;
-import eu.europa.ec.fisheries.uvms.message.MessageConstants;
-
-import javax.annotation.Resource;
-import javax.ejb.Local;
+import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
-import javax.jms.Destination;
+
+import eu.europa.ec.fisheries.uvms.commons.message.api.MessageConstants;
+import eu.europa.ec.fisheries.uvms.commons.message.impl.AbstractProducer;
 
 /**
  * Created by georgige on 10/23/2015.
  */
 @Stateless
-@Local
+@LocalBean
 public class USMMessageProducer extends AbstractProducer {
 
-    @Resource(mappedName = MessageConstants.QUEUE_USM)
-    private Destination destination;
-
     @Override
-    protected Destination getDestination() {
-        return destination;
+    public String getDestinationName() {
+        return MessageConstants.QUEUE_USM;
     }
 }
