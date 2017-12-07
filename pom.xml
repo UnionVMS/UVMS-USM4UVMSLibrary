@@ -27,7 +27,7 @@
         <scm.url>scm:git:https://github.com/UnionVMS/UVMS-USM4UVMSLibrary.git</scm.url>
       
         <user.service.version>2.0.0</user.service.version>
-        <information.service.version>1.8.0</information.service.version>
+        <information.service.version>2.0.0</information.service.version>
         <javaee.version>7.0</javaee.version>
         <jjwt.version>0.4</jjwt.version>
         <ehcache.version>2.10.4</ehcache.version>
