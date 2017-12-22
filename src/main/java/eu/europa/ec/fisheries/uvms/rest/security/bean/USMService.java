@@ -11,10 +11,9 @@ copy of the GNU General Public License along with the IFDM Suite. If not, see <h
  */
 package eu.europa.ec.fisheries.uvms.rest.security.bean;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Set;
-
-import javax.transaction.Transactional;
 
 import eu.europa.ec.fisheries.uvms.commons.service.exception.ServiceException;
 import eu.europa.ec.fisheries.wsdl.user.types.Application;
@@ -71,7 +70,6 @@ public interface USMService {
     Set<String> getUserFeatures(String username, String applicationName, String currentRole, String currentScope) throws ServiceException;
 
     Set<String> getUserFeatures(String username, Context userContext) throws ServiceException;
-
 
     @Transactional
     void putUserPreference(String keyOption, String userDefinedValue, String applicationName, String scopeName, String roleName, String username) throws ServiceException;

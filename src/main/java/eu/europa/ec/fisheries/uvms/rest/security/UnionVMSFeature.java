@@ -61,6 +61,9 @@ public enum UnionVMSFeature {
 
     /** Sales */
     viewSalesReports,
-    manageSalesReports
+    manageSalesReports,
 
+    /** Subscription */
+    VIEW_SUBSCRIPTION,
+    MANAGE_SUBSCRIPTION
 }
