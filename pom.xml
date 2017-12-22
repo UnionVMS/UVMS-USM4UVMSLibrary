@@ -41,10 +41,10 @@
         <arquillian.transaction.version>1.0.1.Final</arquillian.transaction.version>
         <resteasy.jackson.version>3.0.10.Final</resteasy.jackson.version>
         <resteasy.version>3.0.11.Final</resteasy.version>
-        <commons.io.version>2.5</commons.io.version>
+        <commons.io.version>2.6</commons.io.version>
         <mockito.version>1.10.19</mockito.version>
         <usm.JWTokenHandler.version>2.1.1</usm.JWTokenHandler.version>
-        <uvms.commons.version>3.0.6</uvms.commons.version>
+        <uvms.commons.version>3.0.7</uvms.commons.version>
     </properties>
 
     <repositories>
