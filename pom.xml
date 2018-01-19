@@ -1,11 +1,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    
+
     <parent>
-        <groupId>fish.focus.maven</groupId>
-	    <artifactId>focus-pom</artifactId>
-	    <version>1.12</version>
-        <relativePath />
+        <groupId>fish.focus.uvms.maven</groupId>
+        <artifactId>uvms-pom</artifactId>
+        <version>1.16</version>
     </parent>
     
     <groupId>eu.europa.ec.fisheries.uvms</groupId>
@@ -44,7 +43,7 @@
         <commons.io.version>2.6</commons.io.version>
         <mockito.version>1.10.19</mockito.version>
         <usm.JWTokenHandler.version>2.1.1</usm.JWTokenHandler.version>
-        <uvms.commons.version>3.0.7-SNAPSHOT</uvms.commons.version>
+        <uvms.commons.version>3.0.8</uvms.commons.version>
     </properties>
 
     <repositories>
