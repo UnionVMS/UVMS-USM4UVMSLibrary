@@ -83,7 +83,6 @@ public class USMServiceBean implements USMService {
         Element cachedApp = appCache.get(applicationName);
         Application application;
         String defaultOptionValue = null;
-
         if (cachedApp == null || cachedApp.isExpired()) {
             application = getApplicationDefinition(applicationName);
             cachedApp = new Element(applicationName, application);
@@ -91,7 +90,6 @@ public class USMServiceBean implements USMService {
         } else {
             application = (Application) cachedApp.getObjectValue();
         }
-
         List<Option> allOptions = application.getOption();
         for (Option opt : allOptions) {
             if (opt.getName().equalsIgnoreCase(optionName)) {
@@ -99,7 +97,6 @@ public class USMServiceBean implements USMService {
                 break;
             }
         }
-
         return defaultOptionValue;
     }
 
@@ -112,17 +109,11 @@ public class USMServiceBean implements USMService {
         LOG.debug("START getUserContext({}, {}, {}, {})", username, applicationName, currentRole, currentScope);
         Context context = null;
         String cacheKey = getCacheKey(username, currentRole, currentScope);
-
         Element cachedContext = userSessionCache.get(cacheKey);
-
         if (cachedContext == null || cachedContext.isExpired()) {
-
             UserContext fullContext = getFullUserContext(username, applicationName);
-
             if (fullContext != null) {
-
                 for (Context usmCtx : fullContext.getContextSet().getContexts()) {
-
                     if (isContextMatch(usmCtx, currentRole, currentScope)) {
                         context = usmCtx;
                        cachedContext = new Element(cacheKey, usmCtx);
@@ -131,37 +122,28 @@ public class USMServiceBean implements USMService {
                     }
                 }
             }
-
         } else {
             context = (Context) cachedContext.getObjectValue();
         }
-
         if (context == null) {
             throw new ServiceException("Context with the provided username, role and scope is not found.");
         }
-
         return context;
     }
 
     @Override
     public String getUserPreference(String preferenceName, String username, String applicationName, String currentRole, String currentScope) throws ServiceException {
         LOG.debug("START getUserPreference({}, {}, {}, {}, {})", preferenceName, username, applicationName, currentRole, currentScope);
-        String userPrefValue = null;
-
-
+        String userPrefValue;
         Context userContext = getUserContext(username, applicationName, currentRole, currentScope);
-
         userPrefValue = getUserPreference(preferenceName, userContext);
-
         return userPrefValue;
     }
 
     @Override
     public String getUserPreference(String preferenceName, Context userContext) throws ServiceException {
         String userPrefValue = null;
-
         if (userContext != null) {
-
             if (userContext.getPreferences() != null) {
                 List<Preference> listPrefs = userContext.getPreferences().getPreference();
                 for (Preference pref : listPrefs) {
@@ -172,28 +154,22 @@ public class USMServiceBean implements USMService {
                 }
             }
         }
-
         return userPrefValue;
     }
 
     @Override
     public Application getApplicationDefinition(String applicationName) throws ServiceException {
         LOG.debug("START getApplicationDefinition({})", applicationName);
-
         Application application = null;
         Element cachedAppDefinition = appCache.get(applicationName);
-
         if (cachedAppDefinition == null || cachedAppDefinition.isExpired()) {
             GetDeploymentDescriptorRequest getDeploymentDescriptorRequest = new GetDeploymentDescriptorRequest();
             getDeploymentDescriptorRequest.setMethod(UserModuleMethod.GET_DEPLOYMENT_DESCRIPTOR);
             getDeploymentDescriptorRequest.setApplicationName(applicationName);
-
             try {
                 String msgId = messageProducer.sendModuleMessage(JAXBUtils.marshallJaxBObjectToString(getDeploymentDescriptorRequest), messageConsumer.getDestination());
                 LOG.debug("JMS message with ID: {} is sent to USM.", msgId);
-
                 Message response = messageConsumer.getMessage(msgId, GetDeploymentDescriptorResponse.class, UVMS_USM_TIMEOUT);
-
                 if (response != null && !isUserFault((TextMessage) response)) {
                     GetDeploymentDescriptorResponse getDeploymentDescriptorResponse = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), GetDeploymentDescriptorResponse.class);
                     LOG.debug("Response concerning message with ID: {} is received.", msgId);
@@ -224,12 +200,10 @@ public class USMServiceBean implements USMService {
     @Transactional
     public void deployApplicationDescriptor(Application descriptor) throws ServiceException {
         LOG.debug("START deployApplicationDescriptor({})", descriptor);
-
         try {
             String descriptorString = UserModuleRequestMapper.mapToDeployApplicationRequest(descriptor);
             String msgId = messageProducer.sendModuleMessage(descriptorString, messageConsumer.getDestination());
             Message response = messageConsumer.getMessage(msgId, DeployApplicationResponse.class, UVMS_USM_TIMEOUT);
-
             if (response != null && !isUserFault((TextMessage) response)) {
                 DeployApplicationResponse deployApplicationResponse = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), DeployApplicationResponse.class);
                 LOG.debug("Response concerning message with ID: {} is received.", msgId);
@@ -249,7 +223,6 @@ public class USMServiceBean implements USMService {
                     throw new ServiceException("Unable to register into USM.");
                 }
             }
-
         } catch (MessageException | JMSException | JAXBException | ModelMarshallException e) {
             throw new ServiceException("Unable to deploy Application descriptor", e);
         }
@@ -258,13 +231,11 @@ public class USMServiceBean implements USMService {
     @Override
     public void redeployApplicationDescriptor(Application deploymentDescriptor) throws ServiceException {
         LOG.debug("START redeployApplicationDescriptor({})", deploymentDescriptor);
-
         //we must clear the app cache for the given application definition
         // since it contains all options default values
         if (appCache.remove(deploymentDescriptor.getName())) {
             LOG.debug("clearing {} application definition from the cache.", deploymentDescriptor.getName());
         }
-
         try {
             String descriptorString = UserModuleRequestMapper.mapToRedeployApplicationRequest(deploymentDescriptor);
             String msgId = messageProducer.sendModuleMessage(descriptorString, messageConsumer.getDestination());
@@ -291,7 +262,6 @@ public class USMServiceBean implements USMService {
                     throw new ServiceException("Unable to register into USM.");
                 }
             }
-
         } catch (MessageException | JMSException | JAXBException | ModelMarshallException e) {
             throw new ServiceException("Unable to deploy Application descriptor", e);
         }
@@ -301,13 +271,10 @@ public class USMServiceBean implements USMService {
     @Override
     @Transactional
     public void setOptionDefaultValue(String keyOption, String defaultValue, String applicationName) throws ServiceException {
-
         LOG.debug("START setOptionDefaultValue({}, {}, {})", keyOption, defaultValue, applicationName);
-
         Application application = getApplicationDefinition(applicationName);
         List<Option> optionList = application.getOption();
         boolean isOptionAdd = true;
-
         for (Option option : optionList) {
             if (option.getName().equals(keyOption)) {
                 isOptionAdd = false;
@@ -315,16 +282,13 @@ public class USMServiceBean implements USMService {
                 break;
             }
         }
-
         if (isOptionAdd) {
             Option option = new Option();
             option.setName(keyOption);
             option.setDefaultValue(defaultValue);
             application.getOption().add(option);
         }
-
         appCache.remove(applicationName);
-
         redeployApplicationDescriptor(application);
     }
 
@@ -332,13 +296,10 @@ public class USMServiceBean implements USMService {
     @Transactional
     public void putUserPreference(String keyOption, String userDefinedValue, String applicationName, String scopeName, String roleName, String username) throws ServiceException {
         LOG.debug("START putUserPreference({} , {}, {}, {}, {}, {})", keyOption, userDefinedValue, applicationName, scopeName, roleName, username);
-
         String cacheKey = getCacheKey(username, roleName, scopeName);
-
         if (userSessionCache.remove(cacheKey)) {
             LOG.debug("clearing {} application definition from the cache.", applicationName);
         }
-
         UserPreference userPreference = new UserPreference();
         userPreference.setApplicationName(applicationName);
         userPreference.setOptionName(keyOption);
@@ -346,23 +307,17 @@ public class USMServiceBean implements USMService {
         userPreference.setScopeName(scopeName);
         userPreference.setUserName(username);
         userPreference.setRoleName(roleName);
-
         putUserPreference(userPreference);
-
     }
 
     private void putUserPreference(UserPreference userPreference) throws ServiceException {
         LOG.debug("START putUserPreference param: {}", userPreference);
-
-        String payload = null;
+        String payload;
         try {
             payload = UserModuleRequestMapper.mapToPutUserPreferenceRequest(userPreference);
-
             String messageID = messageProducer.sendModuleMessage(payload, messageConsumer.getDestination());
             LOG.debug("JMS message with ID: {} is successfully sent to USM.", messageID);
-
             Message response = messageConsumer.getMessage(messageID, PutPreferenceResponse.class, UVMS_USM_TIMEOUT);
-
             if (response != null && !isUserFault((TextMessage) response)) {
                 PutPreferenceResponse putPreferenceResponse = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), PutPreferenceResponse.class);
                 LOG.debug("Response concerning message with ID: {} is received. The response is: {}", messageID, putPreferenceResponse.getResponse());
@@ -374,29 +329,23 @@ public class USMServiceBean implements USMService {
                     LOG.error("Error Code: {}, Message: {}", error.getCode(), error.getFault());
                 }
             }
-
         } catch (ModelMarshallException | MessageException | JMSException | JAXBException e) {
             throw new ServiceException("Unable to set user preference into USM.", e);
         }
-
         LOG.debug("END putUserPreference");
     }
 
 
     @Override
     public List<Dataset> getDatasetsPerCategory(String category, String username, String applicationName, String currentRole, String currentScope) throws ServiceException {
-
         Context ctxt = getUserContext(username, applicationName, currentRole, currentScope);
-
         return getDatasetsPerCategory(category, ctxt);
     }
 
     @Override
     public List<Dataset> getDatasetsPerCategory(String category, Context userContext) throws ServiceException {
         LOG.debug("START getDatasetsPerCategory({}, {})", category, userContext);
-
         List<Dataset> filteredDatasets = new LinkedList<>();
-
         if (userContext != null) {
             List<Dataset> datasetList = userContext.getScope().getDataset();
 
@@ -406,7 +355,6 @@ public class USMServiceBean implements USMService {
                 }
             }
         }
-
         LOG.debug("END getDatasetsPerCategory(...), return {} datasets.", filteredDatasets.size());
         return filteredDatasets;
     }
@@ -414,17 +362,13 @@ public class USMServiceBean implements USMService {
     @Override
     @Transactional
     public void createDataset(String applicationName, String datasetName, String discriminator, String category, String description) throws ServiceException {
-
         LOG.debug("START createDataset({}, {}, {}, {}, {})", applicationName, datasetName, discriminator, category, description);
-
         if (StringUtils.isEmpty(applicationName) || StringUtils.isEmpty(datasetName)) {
             throw new IllegalArgumentException("Application name, nor dataset name cannot be null");
         }
-
         if (appCache.remove(applicationName)) {
             LOG.debug("clearing {} application definition from the cache.", applicationName);
         }
-
         try {
             DatasetExtension dataset = new DatasetExtension();
             dataset.setApplicationName(applicationName);
@@ -432,15 +376,10 @@ public class USMServiceBean implements USMService {
             dataset.setName(datasetName);
             dataset.setCategory(category);
             dataset.setDescription(description);
-
             String payload = UserModuleRequestMapper.mapToCreateDatasetRequest(dataset);
-
-
             String messageID = messageProducer.sendModuleMessage(payload, messageConsumer.getDestination());
             LOG.debug("JMS message with ID: {} is sent to USM.", messageID);
-
             Message response = messageConsumer.getMessage(messageID, CreateDatasetResponse.class, UVMS_USM_TIMEOUT);
-
             if (response != null && !isUserFault((TextMessage) response)) {
                 CreateDatasetResponse createDatasetResponse = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), CreateDatasetResponse.class);
                 LOG.debug("Response concerning message with ID: {} is received. The response is: {}", messageID, createDatasetResponse.getResponse());
@@ -452,46 +391,36 @@ public class USMServiceBean implements USMService {
                     LOG.error("Error Code: {}, Message: {}", error.getCode(), error.getFault());
                 }
             }
-
         } catch (ModelMarshallException | MessageException | JMSException | JAXBException e) {
             throw new ServiceException("Unable to update Dataset.", e);
         }
-
     }
 
 
     @Override
     public void deleteDataset(String applicationName, String datasetName) throws ServiceException {
         LOG.debug("START deleteDataset({}, {}", applicationName, datasetName);
-
         if (appCache.remove(applicationName)) {
             LOG.debug("clearing {} application definition from the cache.", applicationName);
         }
-
         try {
             DatasetExtension dataset = new DatasetExtension();
             dataset.setApplicationName(applicationName);
             dataset.setName(datasetName);
-
             String payload = UserModuleRequestMapper.mapToDeleteDatasetRequest(dataset);
-
             String messageID = messageProducer.sendModuleMessage(payload, messageConsumer.getDestination());
             LOG.debug("JMS message with ID: {} is sent to USM.", messageID);
-
             Message response = messageConsumer.getMessage(messageID, DeleteDatasetResponse.class, UVMS_USM_TIMEOUT);
-
             if (response != null && !isUserFault((TextMessage) response)) {
                 DeleteDatasetResponse deleteDatasetResponse = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), DeleteDatasetResponse.class);
                 LOG.debug("Response concerning message with ID: {} is received. The response is: {}", messageID, deleteDatasetResponse.getResponse());
             } else {
                 LOG.error("Error occurred while receiving JMS response for message ID: {}", messageID);
-
                 if (response != null) {
                     UserFault error = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), UserFault.class);
                     LOG.error("Error Code: {}, Message: {}", error.getCode(), error.getFault());
                 }
             }
-
         } catch (ModelMarshallException | MessageException | JMSException | JAXBException e) {
             throw new ServiceException("Unable to update Dataset.", e);
         }
@@ -502,19 +431,14 @@ public class USMServiceBean implements USMService {
     public List<DatasetExtension> findDatasetsByDiscriminator(String applicationName, String discriminator) throws ServiceException {
         LOG.debug("START findDatasetByDiscriminator({}, {}", applicationName, discriminator);
         List<DatasetExtension> listToReturn = null;
-
         try {
             DatasetFilter datasetFilter = new DatasetFilter();
             datasetFilter.setApplicationName(applicationName);
             datasetFilter.setDiscriminator(discriminator);
-
             String payload = UserModuleRequestMapper.mapToFindDatasetRequest(datasetFilter);
-
             String messageID = messageProducer.sendModuleMessage(payload, messageConsumer.getDestination());
             LOG.debug("JMS message with ID: {} is sent to USM.", messageID);
-
             Message response = messageConsumer.getMessage(messageID, DeleteDatasetResponse.class, UVMS_USM_TIMEOUT);
-
             if (response != null && !isUserFault((TextMessage) response)) {
                 FilterDatasetResponse filterDatasetResponse = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), FilterDatasetResponse.class);
                 LOG.debug("Response concerning message with ID: {} is received. The response is: {}", messageID, filterDatasetResponse.getDatasetList().getList());
@@ -527,12 +451,9 @@ public class USMServiceBean implements USMService {
                     LOG.error("Error Code: {}, Message: {}", error.getCode(), error.getFault());
                 }
             }
-
-
         } catch (ModelMarshallException | MessageException | JMSException | JAXBException e) {
             throw new ServiceException("Unable to update Dataset.", e);
         }
-
         LOG.debug("END findDatasetByDiscriminator(...), returning {}", listToReturn);
         return listToReturn;
     }
@@ -545,23 +466,18 @@ public class USMServiceBean implements USMService {
         UserContextId contextId = new UserContextId();
         contextId.setApplicationName(applicationName);
         contextId.setUserName(remoteUser);
-
         String payload;
         try {
             payload = UserModuleRequestMapper.mapToGetUserContextRequest(contextId);
-
             String messageID = messageProducer.sendModuleMessage(payload, messageConsumer.getDestination());
             LOG.debug("JMS message with ID: {} is sent to USM.", messageID);
-
             Message response = messageConsumer.getMessage(messageID, GetUserContextResponse.class, UVMS_USM_TIMEOUT);
-
             if (response != null && !isUserFault((TextMessage) response)) {
                 GetUserContextResponse userContextResponse = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), GetUserContextResponse.class);
                 LOG.debug("Response concerning message with ID: {} is received.", messageID);
                 userContext = userContextResponse.getContext();
             } else {
                 LOG.error("Error occurred while receiving JMS response for message ID: {}", messageID);
-
                 if (response != null) {
                     UserFault error = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), UserFault.class);
                     LOG.error("Error Code: {}, Message: {}", error.getCode(), error.getFault());
@@ -577,40 +493,33 @@ public class USMServiceBean implements USMService {
     @Override
     public Set<String> getUserFeatures(String username, Context userContext) throws ServiceException {
         LOG.debug("START getUserFeatures({} ,{})", username, userContext);
-
         if (userContext == null) {
             return null;
         }
-
         List<Feature> features = userContext.getRole().getFeature();
         Set<String> featuresStr = new HashSet<>(features.size());
-
         //extract only the features that the particular application is interested in
         for (Feature feature : features) {
             featuresStr.add(feature.getName());
         }
-
         LOG.debug("END getUserFeatures(...), returns {} ", featuresStr);
         return featuresStr;
     }
 
     @Override
     public Set<String> getUserFeatures(String username, String applicationName, String currentRole, String currentScope) throws ServiceException {
-
         Context ctxt = getUserContext(username, applicationName, currentRole, currentScope);
         return getUserFeatures(username, ctxt);
     }
 
     private boolean isUserFault(TextMessage message) {
         boolean isErrorResponse = false;
-
         try {
             UserFault userFault = JAXBUtils.unMarshallMessage(message.getText(), UserFault.class);
             isErrorResponse = true;
         } catch (JAXBException | JMSException e) {
             //do nothing  since it's not a UserFault
         }
-
         return isErrorResponse;
     }
 
@@ -620,7 +529,6 @@ public class USMServiceBean implements USMService {
         if (usmCtx.getRole().getRoleName().equalsIgnoreCase(currentRole)) {
             isContextMatch = true;
         }
-
         //check if our user has a scope (it is possible to have a context without a scope)
         if (StringUtils.isNotBlank(currentScope)) {
             if (usmCtx.getScope() == null || !usmCtx.getScope().getScopeName().equalsIgnoreCase(currentScope)) {

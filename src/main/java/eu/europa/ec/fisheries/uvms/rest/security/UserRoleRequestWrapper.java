@@ -11,33 +11,29 @@ copy of the GNU General Public License along with the IFDM Suite. If not, see <h
  */
 package eu.europa.ec.fisheries.uvms.rest.security;
 
+import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
 import java.security.Principal;
 import java.util.Set;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
-import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
-
 /**
  * An extension for the HTTPServletRequest that overrides the getUserPrincipal() and isUserInRole().
- *  We supply these implementations here, where they are not normally populated unless we are going through
- *  the facility provided by the container.
+ * We supply these implementations here, where they are not normally populated unless we are going through
+ * the facility provided by the container.
  * <p>If he user or roles are null on this wrapper, the parent request is consulted to try to fetch what ever the container has set for us.
  * This is intended to be created and used by the UserRoleFilter.
  * Created by georgige on 9/22/2015.
- *
  */
 public class UserRoleRequestWrapper extends HttpServletRequestWrapper {
 
-
     private String user;
-
     private Set<String> roles = null;
     private HttpServletRequest realRequest;
 
     /**
      * a constructor which allows us to insert the available roles into the current request
+     *
      * @param user
      * @param roles
      * @param request
@@ -52,27 +48,23 @@ public class UserRoleRequestWrapper extends HttpServletRequestWrapper {
 
     /**
      * sets only the username
+     *
      * @param delegate
      * @param remoteUser
      */
-    public UserRoleRequestWrapper(HttpServletRequest delegate,
-                                String remoteUser)
-    {
+    public UserRoleRequestWrapper(HttpServletRequest delegate, String remoteUser) {
         super(delegate);
         this.user = remoteUser;
     }
 
     @Override
-    public String getRemoteUser()
-    {
+    public String getRemoteUser() {
         String ret;
-
         if (user != null) {
             ret = user;
         } else {
             ret = super.getRemoteUser();
         }
-
         return ret;
     }
 
@@ -89,7 +81,6 @@ public class UserRoleRequestWrapper extends HttpServletRequestWrapper {
         if (this.user == null) {
             return realRequest.getUserPrincipal();
         }
-
         // make an anonymous implementation to just return our user
         return new Principal() {
             @Override
@@ -99,7 +90,7 @@ public class UserRoleRequestWrapper extends HttpServletRequestWrapper {
         };
     }
 
-    public Set<String> getRoles() {
+    private Set<String> getRoles() {
         return roles;
     }
 

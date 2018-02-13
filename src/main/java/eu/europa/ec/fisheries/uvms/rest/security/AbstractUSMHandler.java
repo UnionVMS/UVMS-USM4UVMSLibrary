@@ -11,28 +11,20 @@ copy of the GNU General Public License along with the IFDM Suite. If not, see <h
  */
 package eu.europa.ec.fisheries.uvms.rest.security;
 
-import javax.ejb.EJB;
 import javax.servlet.ServletContext;
-
-import eu.europa.ec.fisheries.uvms.rest.security.bean.USMService;
 
 /**
  * Created by georgige on 9/22/2015.
  */
-public abstract class AbstractUSMHandler  {
+abstract class AbstractUSMHandler  {
 
     private static String UNION_VMS_APPLICATION = "Union-VMS";
 
-    @EJB
-    protected USMService usmService;
-
-
-    protected String getApplicationName(ServletContext servletContext) {
+    String getApplicationName(ServletContext servletContext) {
         String cfgName = servletContext.getInitParameter("usmApplication");
         if (cfgName == null) {
             cfgName = UNION_VMS_APPLICATION;
         }
-
         return cfgName;
     }
 
