@@ -11,6 +11,13 @@ copy of the GNU General Public License along with the IFDM Suite. If not, see <h
  */
 package eu.europa.ec.fisheries.uvms.init;
 
+import eu.europa.ec.fisheries.uvms.commons.message.api.MessageException;
+import eu.europa.ec.fisheries.uvms.commons.service.exception.ServiceException;
+import eu.europa.ec.fisheries.uvms.rest.security.bean.USMService;
+import eu.europa.ec.fisheries.wsdl.user.module.DeployApplicationRequest;
+import eu.europa.ec.fisheries.wsdl.user.types.Application;
+import java.io.InputStream;
+import java.util.Iterator;
 import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.Schedule;
@@ -19,14 +26,6 @@ import javax.ejb.TimerService;
 import javax.jms.JMSException;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import java.io.InputStream;
-import java.util.Iterator;
-
-import eu.europa.ec.fisheries.uvms.commons.message.api.MessageException;
-import eu.europa.ec.fisheries.uvms.commons.service.exception.ServiceException;
-import eu.europa.ec.fisheries.uvms.rest.security.bean.USMService;
-import eu.europa.ec.fisheries.wsdl.user.module.DeployApplicationRequest;
-import eu.europa.ec.fisheries.wsdl.user.types.Application;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,26 +38,24 @@ public abstract class AbstractModuleInitializerBean {
     private int count = 0;
 
     @EJB
-    protected USMService usmService;
+    private USMService usmService;
 
     @Resource
-    TimerService timerService;
+    private TimerService timerService;
 
-    @Schedule(minute="*", hour="*", persistent=false, info="AUTO_TIMER_0")
+    @Schedule(minute = "*", hour = "*", persistent = false, info = "AUTO_TIMER_0")
     public void atSchedule() throws InterruptedException, JAXBException, MessageException, JMSException, ServiceException {
         try {
-            if(count < 5) {
+            if (count < 5) {
                 // do something on application startup
                 InputStream deploymentDescInStream = getDeploymentDescriptorRequest();
                 if (deploymentDescInStream != null) {
                     JAXBContext jaxBcontext = JAXBContext.newInstance(DeployApplicationRequest.class);
                     javax.xml.bind.Unmarshaller um = jaxBcontext.createUnmarshaller();
-
                     DeployApplicationRequest applicationDefinition = (DeployApplicationRequest) um.unmarshal(deploymentDescInStream);
-
                     if (!isAppDeployed(applicationDefinition.getApplication())) {
                         usmService.deployApplicationDescriptor(applicationDefinition.getApplication());
-                    } else if(mustRedeploy()) {
+                    } else if (mustRedeploy()) {
                         usmService.redeployApplicationDescriptor(applicationDefinition.getApplication());
                     }
                 } else {
@@ -67,7 +64,7 @@ public abstract class AbstractModuleInitializerBean {
                 stopTimer(); // Stop timer as there is no exception and communication to USM is successful
             }
         } catch (ServiceException e) {
-            count ++;
+            count++;
             LOG.info("Failed to connect to USM. Retry count " + count);
             if (count == 5) { // Stop timer after 5 retry
                 stopTimer();
@@ -79,38 +76,33 @@ public abstract class AbstractModuleInitializerBean {
     private void stopTimer() {
         Iterator<Timer> timerIterator = timerService.getTimers().iterator();
         Timer timerToCancel = null;
-        while(timerIterator.hasNext()) {
+        while (timerIterator.hasNext()) {
             Timer tmpTimer = timerIterator.next();
-            if(tmpTimer.getInfo().equals("AUTO_TIMER_0")) {
+            if (tmpTimer.getInfo().equals("AUTO_TIMER_0")) {
                 timerToCancel = tmpTimer;
                 break;
             }
         }
-        if(timerToCancel != null) {
+        if (timerToCancel != null) {
             timerToCancel.cancel();
         }
     }
 
     private boolean isAppDeployed(Application deploymentDescriptor) throws JAXBException, JMSException, ServiceException, MessageException {
         boolean isAppDeployed = false;
-
         Application application = usmService.getApplicationDefinition(deploymentDescriptor.getName());
-
         if (application != null) {
             isAppDeployed = true;
         }
-
         return isAppDeployed;
     }
 
     /**
-     *
      * @return InputStream with the String representation of Application descriptor
      */
     protected abstract InputStream getDeploymentDescriptorRequest();
 
     /**
-     *
      * @return true if the application descriptor must be redeployed
      */
     protected abstract boolean mustRedeploy();

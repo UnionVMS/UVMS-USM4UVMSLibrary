@@ -9,10 +9,14 @@ the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the impl
 FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details. You should have received a
 copy of the GNU General Public License along with the IFDM Suite. If not, see <http://www.gnu.org/licenses/>.
  */
-package eu.europa.ec.fisheries.uvms.rest.security; 
+package eu.europa.ec.fisheries.uvms.rest.security;
 
+import eu.europa.ec.fisheries.uvms.commons.service.exception.ServiceException;
+import eu.europa.ec.fisheries.uvms.rest.security.bean.USMService;
+import eu.europa.ec.fisheries.wsdl.user.types.Feature;
+import eu.europa.ec.fisheries.wsdl.user.types.UserContext;
 import java.io.IOException;
-
+import javax.ejb.EJB;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -24,15 +28,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
-import eu.europa.ec.fisheries.uvms.commons.service.exception.ServiceException;
-import eu.europa.ec.fisheries.wsdl.user.types.Feature;
-import eu.europa.ec.fisheries.wsdl.user.types.UserContext;
-
 @Provider
 public class UnionVMSFeatureFilter extends AbstractUSMHandler implements ContainerRequestFilter {
 
     @Context
-    ResourceInfo resourceInfo;
+    private ResourceInfo resourceInfo;
 
     @Context
     private ServletContext servletContext;
@@ -40,19 +40,19 @@ public class UnionVMSFeatureFilter extends AbstractUSMHandler implements Contain
     @Context
     private HttpServletRequest servletRequest;
 
+    @EJB
+    private USMService usmService;
+
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
         UnionVMSFeature feature;
         if (resourceInfo.getResourceMethod().isAnnotationPresent(RequiresFeature.class)) {
             feature = resourceInfo.getResourceMethod().getAnnotation(RequiresFeature.class).value();
-        }
-        else if (resourceInfo.getResourceClass().isAnnotationPresent(RequiresFeature.class)) {
+        } else if (resourceInfo.getResourceClass().isAnnotationPresent(RequiresFeature.class)) {
             feature = resourceInfo.getResourceClass().getAnnotation(RequiresFeature.class).value();
-        }
-        else {
+        } else {
             return;
         }
-
         try {
             UserContext ctx = usmService.getFullUserContext(servletRequest.getRemoteUser(), getApplicationName(servletContext));
 
@@ -70,17 +70,14 @@ public class UnionVMSFeatureFilter extends AbstractUSMHandler implements Contain
     }
 
     private void sendAccessForbidden(ContainerRequestContext requestContext) {
-        requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
-                .entity("User cannot access the resource.")
-                .build());
+        requestContext.abortWith(Response.status(Response.Status.FORBIDDEN).header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+                .entity("User cannot access the resource.").build());
     }
 
     private boolean hasFeature(UserContext userContext, UnionVMSFeature feature, String roleName, String scopeName) {
         if (servletRequest.getRemoteUser() == null) {
             return false;
         }
-
         for (eu.europa.ec.fisheries.wsdl.user.types.Context c : userContext.getContextSet().getContexts()) {
             for (Feature f : c.getRole().getFeature()) {
                 if (feature.name().equals(f.getName())) {
@@ -88,7 +85,6 @@ public class UnionVMSFeatureFilter extends AbstractUSMHandler implements Contain
                 }
             }
         }
-
         return false;
     }
 
