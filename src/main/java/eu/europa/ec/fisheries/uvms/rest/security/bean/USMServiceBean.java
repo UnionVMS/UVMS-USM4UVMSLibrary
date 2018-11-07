@@ -68,7 +68,7 @@ public class USMServiceBean implements USMService {
 
     private static final Logger LOG = LoggerFactory.getLogger(USMServiceBean.class);
     private static final Long UVMS_USM_TIMEOUT = 30000L;
-    public static Cache userSessionCache = CacheManager.newInstance().getCache(AuthConstants.CACHE_NAME_USER_SESSION);
+    private static Cache userSessionCache = CacheManager.newInstance().getCache(AuthConstants.CACHE_NAME_USER_SESSION);
     private static Cache appCache = CacheManager.getInstance().getCache(AuthConstants.CACHE_NAME_APP_MODULE);
 
     @EJB

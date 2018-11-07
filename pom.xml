@@ -4,7 +4,7 @@
     <parent>
         <groupId>fish.focus.uvms.maven</groupId>
         <artifactId>uvms-pom</artifactId>
-        <version>1.18</version>
+        <version>1.21</version>
     </parent>
     
     <groupId>eu.europa.ec.fisheries.uvms</groupId>
@@ -41,7 +41,7 @@
         <commons.io.version>2.6</commons.io.version>
         <mockito.version>1.10.19</mockito.version>
         <usm.JWTokenHandler.version>2.1.1</usm.JWTokenHandler.version>
-        <uvms.commons.version>3.0.25</uvms.commons.version>
+        <uvms.commons.version>3.0.29</uvms.commons.version>
     </properties>
 
     <repositories>
@@ -114,7 +114,6 @@
             <scope>test</scope>
             <version>${junit.version}</version>
         </dependency>
-
 
         <dependency>
             <groupId>org.jboss.arquillian</groupId>
