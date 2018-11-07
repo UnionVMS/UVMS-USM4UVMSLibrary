@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
  * of the JWT token (if present).
  */
 public class AuthenticationFilter implements Filter {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationFilter.class);
     private static final String CHALLENGEAUTH = "/challengeauth";
     private static final String AUTHENTICATE = "/authenticate";
@@ -102,7 +103,7 @@ public class AuthenticationFilter implements Filter {
     }
 
     @Override
-    public void init(FilterConfig fc) throws ServletException {
+    public void init(FilterConfig fc) {
         tokenHandler = new DefaultJwtTokenHandler();
     }
 
