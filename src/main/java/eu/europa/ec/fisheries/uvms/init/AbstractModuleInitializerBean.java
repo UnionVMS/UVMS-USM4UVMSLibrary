@@ -11,23 +11,22 @@ copy of the GNU General Public License along with the IFDM Suite. If not, see <h
  */
 package eu.europa.ec.fisheries.uvms.init;
 
-import eu.europa.ec.fisheries.uvms.commons.message.api.MessageException;
 import eu.europa.ec.fisheries.uvms.commons.service.exception.ServiceException;
 import eu.europa.ec.fisheries.uvms.rest.security.bean.USMService;
 import eu.europa.ec.fisheries.wsdl.user.module.DeployApplicationRequest;
 import eu.europa.ec.fisheries.wsdl.user.types.Application;
-import java.io.InputStream;
-import java.util.Iterator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.Schedule;
 import javax.ejb.Timer;
 import javax.ejb.TimerService;
-import javax.jms.JMSException;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.InputStream;
+import java.util.Iterator;
 
 public abstract class AbstractModuleInitializerBean {
 
@@ -44,7 +43,7 @@ public abstract class AbstractModuleInitializerBean {
     private TimerService timerService;
 
     @Schedule(minute = "*", hour = "*", persistent = false, info = "AUTO_TIMER_0")
-    public void atSchedule() throws InterruptedException, JAXBException, MessageException, JMSException, ServiceException {
+    public void atSchedule() throws JAXBException, ServiceException {
         try {
             if (count < 5) {
                 // do something on application startup
@@ -88,7 +87,7 @@ public abstract class AbstractModuleInitializerBean {
         }
     }
 
-    private boolean isAppDeployed(Application deploymentDescriptor) throws JAXBException, JMSException, ServiceException, MessageException {
+    private boolean isAppDeployed(Application deploymentDescriptor) throws ServiceException {
         boolean isAppDeployed = false;
         Application application = usmService.getApplicationDefinition(deploymentDescriptor.getName());
         if (application != null) {
