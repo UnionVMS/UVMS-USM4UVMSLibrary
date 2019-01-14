@@ -6,7 +6,7 @@
     <persistence-unit name="uvms" transaction-type="JTA">
         <jta-data-source>java:/jdbc/USM2</jta-data-source>
          <properties>
-            <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQL9Dialect"/>
             <property name="show_sql" value="true" />
             
 			<property name="format_sql" value="true" />
