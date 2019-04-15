@@ -29,7 +29,7 @@
 		<resteasy.version>3.0.11.Final</resteasy.version>
 
 		<user.service.version>2.0.12</user.service.version>
-		<usm.JWTokenHandler.version>2.1.4</usm.JWTokenHandler.version>
+		<usm.JWTokenHandler.version>2.1.5</usm.JWTokenHandler.version>
 		<uvms.commons.version>3.0.29</uvms.commons.version>
 	</properties>
 
