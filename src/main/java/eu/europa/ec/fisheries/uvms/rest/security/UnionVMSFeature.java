@@ -16,50 +16,93 @@ package eu.europa.ec.fisheries.uvms.rest.security;
  */
 public enum UnionVMSFeature {
 
-	/** Viewing both vessels and mobile terminals */
-	viewVesselsAndMobileTerminals,
-	/** Managing mobile terminals */
-	manageMobileTerminals,
-	/** Managing vessels */
-	manageVessels,
 
-	/** Viewing mobile terminal polls */
-	viewMobileTerminalPolls,
-	/** Managing mobile terminal polls */
-	managePolls,
+    /**
+     * Viewing both vessels and mobile terminals
+     */
+    viewVesselsAndMobileTerminals(292),
+    /**
+     * Managing mobile terminals
+     */
+    manageMobileTerminals(294),
+    /**
+     * Managing vessels
+     */
+    manageVessels(295),
 
-	mobileTerminalPlugins,
-	
-    /** Viewing movements */
-    viewMovements,
-    /** Viewing manual movements */
-    viewManualMovements,
-    /** Managing movements */
-    manageManualMovements,
+    /**
+     * Viewing mobile terminal polls
+     */
+    viewMobileTerminalPolls(297),
+    /**
+     * Managing mobile terminal polls
+     */
+    managePolls(201),
 
-    /** Viewing exchange */
-    viewExchange,
-    /** Managing sending queue */
-    manageExchangeSendingQueue,
-    /** Managing transmission statuses */
-    manageExchangeTransmissionStatuses,
+    mobileTerminalPlugins(203),  // <<<<< 242
 
-    /** Rules */
-    viewAlarmRules,
-    manageAlarmRules,
-    viewAlarmsHoldingTable,
-    manageAlarmsHoldingTable,
-    viewAlarmsOpenTickets,
-    manageAlarmsOpenTickets,
-    manageGlobalAlarmsRules,
-    
-    /** Viewing audit */
-    viewAudit,
+    /**
+     * Viewing movements
+     */
+    viewMovements(267),
+    /**
+     * Viewing manual movements
+     */
+    viewManualMovements(276),
+    /**
+     * Managing movements
+     */
+    manageManualMovements(279),
 
-    /** Configuration page */
-    viewConfiguration,
+    /**
+     * Viewing exchange
+     */
+    viewExchange(249),
+    /**
+     * Managing sending queue
+     */
+    manageExchangeSendingQueue(204),
+    /**
+     * Managing transmission statuses
+     */
+    manageExchangeTransmissionStatuses(205),
 
-    /** Sales */
-    viewSalesReports,
-    manageSalesReports,
+    /**
+     * Rules
+     */
+    viewAlarmRules(206),
+    manageAlarmRules(207),
+    viewAlarmsHoldingTable(208),
+    manageAlarmsHoldingTable(209),
+    viewAlarmsOpenTickets(210),
+    manageAlarmsOpenTickets(211),
+    manageGlobalAlarmsRules(215),
+
+    /**
+     * Viewing audit
+     */
+    viewAudit(286),
+
+    /**
+     * Configuration page
+     */
+    viewConfiguration(214),
+
+    /**
+     * Sales
+     */
+    viewSalesReports(-1),              // not in db
+    manageSalesReports(-1);            // not in db
+
+
+    private int featureId;
+
+    UnionVMSFeature(int featureId) {
+        this.featureId = featureId;
+    }
+
+    public int getFeatureId(){
+        return this.featureId;
+    }
+
 }

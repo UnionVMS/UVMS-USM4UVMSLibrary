@@ -11,12 +11,13 @@ copy of the GNU General Public License along with the IFDM Suite. If not, see <h
  */
 package eu.europa.ec.fisheries.uvms.rest.security;
 
-import eu.europa.ec.fisheries.uvms.commons.service.exception.ServiceException;
 import eu.europa.ec.fisheries.uvms.rest.security.bean.USMService;
 import eu.europa.ec.fisheries.wsdl.user.types.Feature;
 import eu.europa.ec.fisheries.wsdl.user.types.UserContext;
-import java.io.IOException;
+import eu.europa.ec.mare.usm.jwt.JwtTokenHandler;
+
 import javax.ejb.EJB;
+import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -27,9 +28,13 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
+import java.util.List;
 
 @Provider
 public class UnionVMSFeatureFilter extends AbstractUSMHandler implements ContainerRequestFilter {
+
+    @Inject
+    private JwtTokenHandler jwtTokenHandler;
 
     @Context
     private ResourceInfo resourceInfo;
@@ -44,7 +49,7 @@ public class UnionVMSFeatureFilter extends AbstractUSMHandler implements Contain
     private USMService usmService;
 
     @Override
-    public void filter(ContainerRequestContext requestContext) throws IOException {
+    public void filter(ContainerRequestContext requestContext) {
         UnionVMSFeature feature;
         if (resourceInfo.getResourceMethod().isAnnotationPresent(RequiresFeature.class)) {
             feature = resourceInfo.getResourceMethod().getAnnotation(RequiresFeature.class).value();
@@ -53,22 +58,16 @@ public class UnionVMSFeatureFilter extends AbstractUSMHandler implements Contain
         } else {
             return;
         }
-        try {
-            UserContext ctx = usmService.getFullUserContext(servletRequest.getRemoteUser(), getApplicationName(servletContext));
 
-            if (ctx != null && ctx.getContextSet() != null) {
-                if (!hasFeature(ctx, feature, null, null)) {
-                    sendAccessForbidden(requestContext);
-                }
-            } else {
-                sendAccessForbidden(requestContext);
-            }
-        } catch (ServiceException e) {
+        String authorizationHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
+        List<Integer> featuresThisUserHas = jwtTokenHandler.parseTokenFeatures(authorizationHeader);
+
+        if (featuresThisUserHas.stream().noneMatch(f -> f.equals(feature.getFeatureId()))) {
             sendAccessForbidden(requestContext);
         }
-
     }
 
+    
     private void sendAccessForbidden(ContainerRequestContext requestContext) {
         requestContext.abortWith(Response.status(Response.Status.FORBIDDEN).header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
                 .entity("User cannot access the resource.").build());
