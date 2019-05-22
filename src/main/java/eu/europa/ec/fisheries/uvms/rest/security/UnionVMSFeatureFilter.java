@@ -67,7 +67,7 @@ public class UnionVMSFeatureFilter extends AbstractUSMHandler implements Contain
         }
     }
 
-    
+
     private void sendAccessForbidden(ContainerRequestContext requestContext) {
         requestContext.abortWith(Response.status(Response.Status.FORBIDDEN).header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
                 .entity("User cannot access the resource.").build());
