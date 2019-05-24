@@ -14,8 +14,6 @@ package eu.europa.ec.fisheries.uvms.rest.security;
 import eu.europa.ec.mare.usm.jwt.JwtTokenHandler;
 
 import javax.inject.Inject;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ResourceInfo;
@@ -35,11 +33,6 @@ public class UnionVMSFeatureFilter extends AbstractUSMHandler implements Contain
     @Context
     private ResourceInfo resourceInfo;
 
-    @Context
-    private ServletContext servletContext;
-
-    @Context
-    private HttpServletRequest servletRequest;
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
