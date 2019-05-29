@@ -12,8 +12,7 @@ copy of the GNU General Public License along with the IFDM Suite. If not, see <h
 package eu.europa.ec.fisheries.uvms.rest.security;
 
 import eu.europa.ec.mare.usm.jwt.JwtTokenHandler;
-
-import javax.inject.Inject;
+import javax.ejb.EJB;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ResourceInfo;
@@ -27,7 +26,7 @@ import java.util.List;
 @Provider
 public class UnionVMSFeatureFilter extends AbstractUSMHandler implements ContainerRequestFilter {
 
-    @Inject
+    @EJB
     private JwtTokenHandler jwtTokenHandler;
 
     @Context
