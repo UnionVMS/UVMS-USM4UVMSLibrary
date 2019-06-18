@@ -162,7 +162,7 @@ public class USMServiceBean implements USMService {
             getDeploymentDescriptorRequest.setMethod(UserModuleMethod.GET_DEPLOYMENT_DESCRIPTOR);
             getDeploymentDescriptorRequest.setApplicationName(applicationName);
             try {
-                String msgId = messageProducer.sendUSMMessage(JAXBUtils.marshallJaxBObjectToString(getDeploymentDescriptorRequest), messageConsumer.getDestination());
+                String msgId = messageProducer.sendMessage(JAXBUtils.marshallJaxBObjectToString(getDeploymentDescriptorRequest), messageConsumer.getDestination());
                 LOG.debug("JMS message with ID: {} is sent to USM.", msgId);
                 String response = messageConsumer.getMessageBody(msgId, String.class, UVMS_USM_TIMEOUT);
                 if (response != null && !isUserFault(response)) {
@@ -197,7 +197,7 @@ public class USMServiceBean implements USMService {
         LOG.debug("START deployApplicationDescriptor({})", descriptor);
         try {
             String descriptorString = UserModuleRequestMapper.mapToDeployApplicationRequest(descriptor);
-            String msgId = messageProducer.sendUSMMessage(descriptorString, messageConsumer.getDestination());
+            String msgId = messageProducer.sendMessage(descriptorString, messageConsumer.getDestination());
             String response = messageConsumer.getMessageBody(msgId, String.class, UVMS_USM_TIMEOUT);
             if (response != null && !isUserFault(response)) {
                 DeployApplicationResponse deployApplicationResponse = JAXBUtils.unMarshallMessage(response, DeployApplicationResponse.class);
@@ -233,7 +233,7 @@ public class USMServiceBean implements USMService {
         }
         try {
             String descriptorString = UserModuleRequestMapper.mapToRedeployApplicationRequest(deploymentDescriptor);
-            String msgId = messageProducer.sendUSMMessage(descriptorString, messageConsumer.getDestination());
+            String msgId = messageProducer.sendMessage(descriptorString, messageConsumer.getDestination());
             LOG.debug("JMS message with ID: {} is sent to USM.", msgId);
 
             String response = messageConsumer.getMessageBody(msgId, String.class, UVMS_USM_TIMEOUT);
@@ -310,7 +310,7 @@ public class USMServiceBean implements USMService {
         String payload;
         try {
             payload = UserModuleRequestMapper.mapToPutUserPreferenceRequest(userPreference);
-            String messageID = messageProducer.sendUSMMessage(payload, messageConsumer.getDestination());
+            String messageID = messageProducer.sendMessage(payload, messageConsumer.getDestination());
             LOG.debug("JMS message with ID: {} is successfully sent to USM.", messageID);
             String response = messageConsumer.getMessageBody(messageID, String.class, UVMS_USM_TIMEOUT);
             if (response != null && !isUserFault(response)) {
@@ -372,7 +372,7 @@ public class USMServiceBean implements USMService {
             dataset.setCategory(category);
             dataset.setDescription(description);
             String payload = UserModuleRequestMapper.mapToCreateDatasetRequest(dataset);
-            String messageID = messageProducer.sendUSMMessage(payload, messageConsumer.getDestination());
+            String messageID = messageProducer.sendMessage(payload, messageConsumer.getDestination());
             LOG.debug("JMS message with ID: {} is sent to USM.", messageID);
             String response = messageConsumer.getMessageBody(messageID, String.class, UVMS_USM_TIMEOUT);
             if (response != null && !isUserFault(response)) {
@@ -403,7 +403,7 @@ public class USMServiceBean implements USMService {
             dataset.setApplicationName(applicationName);
             dataset.setName(datasetName);
             String payload = UserModuleRequestMapper.mapToDeleteDatasetRequest(dataset);
-            String messageID = messageProducer.sendUSMMessage(payload, messageConsumer.getDestination());
+            String messageID = messageProducer.sendMessage(payload, messageConsumer.getDestination());
             LOG.debug("JMS message with ID: {} is sent to USM.", messageID);
             String response = messageConsumer.getMessageBody(messageID, String.class, UVMS_USM_TIMEOUT);
             if (response != null && !isUserFault(response)) {
@@ -431,7 +431,7 @@ public class USMServiceBean implements USMService {
             datasetFilter.setApplicationName(applicationName);
             datasetFilter.setDiscriminator(discriminator);
             String payload = UserModuleRequestMapper.mapToFindDatasetRequest(datasetFilter);
-            String messageID = messageProducer.sendUSMMessage(payload, messageConsumer.getDestination());
+            String messageID = messageProducer.sendMessage(payload, messageConsumer.getDestination());
             LOG.debug("JMS message with ID: {} is sent to USM.", messageID);
             String response = messageConsumer.getMessageBody(messageID, String.class, UVMS_USM_TIMEOUT);
             if (response != null && !isUserFault(response)) {
@@ -464,7 +464,7 @@ public class USMServiceBean implements USMService {
         String payload;
         try {
             payload = UserModuleRequestMapper.mapToGetUserContextRequest(contextId);
-            String messageID = messageProducer.sendUSMMessage(payload, messageConsumer.getDestination());
+            String messageID = messageProducer.sendMessage(payload, messageConsumer.getDestination());
             LOG.debug("JMS message with ID: {} is sent to USM.", messageID);
             String response = messageConsumer.getMessageBody(messageID, String.class, UVMS_USM_TIMEOUT);
             if (response != null && !isUserFault(response)) {

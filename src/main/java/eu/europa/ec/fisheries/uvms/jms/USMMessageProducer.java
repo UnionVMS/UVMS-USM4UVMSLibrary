@@ -35,7 +35,7 @@ public class USMMessageProducer extends AbstractProducer {
     }
 
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public String sendUSMMessage(String text, Destination replyTo) throws JMSException {
+    public String sendMessage(String text, Destination replyTo) throws JMSException {
         return sendModuleMessage(text, replyTo);
     }
 }
