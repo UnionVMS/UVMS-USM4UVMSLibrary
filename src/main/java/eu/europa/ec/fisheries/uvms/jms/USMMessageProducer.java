@@ -11,9 +11,12 @@ copy of the GNU General Public License along with the IFDM Suite. If not, see <h
  */
 package eu.europa.ec.fisheries.uvms.jms;
 
-import javax.ejb.LocalBean;
+import javax.annotation.Resource;
 import javax.ejb.Stateless;
-
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.jms.Destination;
+import javax.jms.JMSException;
 import eu.europa.ec.fisheries.uvms.commons.message.api.MessageConstants;
 import eu.europa.ec.fisheries.uvms.commons.message.impl.AbstractProducer;
 
@@ -21,11 +24,18 @@ import eu.europa.ec.fisheries.uvms.commons.message.impl.AbstractProducer;
  * Created by georgige on 10/23/2015.
  */
 @Stateless
-@LocalBean
 public class USMMessageProducer extends AbstractProducer {
 
+    @Resource(mappedName = "java:/" + MessageConstants.QUEUE_USM)
+    private Destination destination;
+
     @Override
-    public String getDestinationName() {
-        return MessageConstants.QUEUE_USM;
+    public Destination getDestination() {
+        return destination;
+    }
+
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public String sendUSMMessage(String text, Destination replyTo) throws JMSException {
+        return sendModuleMessage(text, replyTo);
     }
 }

@@ -11,9 +11,9 @@ copy of the GNU General Public License along with the IFDM Suite. If not, see <h
  */
 package eu.europa.ec.fisheries.uvms.jms;
 
-import javax.ejb.LocalBean;
+import javax.annotation.Resource;
 import javax.ejb.Stateless;
-
+import javax.jms.Destination;
 import eu.europa.ec.fisheries.uvms.commons.message.api.MessageConstants;
 import eu.europa.ec.fisheries.uvms.commons.message.impl.AbstractConsumer;
 
@@ -21,11 +21,13 @@ import eu.europa.ec.fisheries.uvms.commons.message.impl.AbstractConsumer;
  * Created by georgige on 10/23/2015.
  */
 @Stateless
-@LocalBean
 public class USMMessageConsumer extends AbstractConsumer {
 
-	@Override
-	public String getDestinationName() {
-		return MessageConstants.QUEUE_USM4UVMS;
-	}
+    @Resource(mappedName = "java:/" + MessageConstants.QUEUE_USM4UVMS)
+    private Destination destination;
+
+    @Override
+    public Destination getDestination() {
+        return destination;
+    }
 }
