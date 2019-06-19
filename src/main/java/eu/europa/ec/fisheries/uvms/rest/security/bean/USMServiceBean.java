@@ -12,12 +12,9 @@ copy of the GNU General Public License along with the IFDM Suite. If not, see <h
 
 package eu.europa.ec.fisheries.uvms.rest.security.bean;
 
-import javax.ejb.EJB;
-import javax.ejb.Local;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.TextMessage;
 import javax.transaction.Transactional;
 import javax.xml.bind.JAXBException;
 import java.util.HashSet;
@@ -25,7 +22,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import eu.europa.ec.fisheries.uvms.commons.message.api.MessageException;
 import eu.europa.ec.fisheries.uvms.commons.message.impl.JAXBUtils;
 import eu.europa.ec.fisheries.uvms.commons.service.exception.ServiceException;
 import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
@@ -63,7 +59,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Stateless
-@Local(USMService.class)
 public class USMServiceBean implements USMService {
 
     private static final Logger LOG = LoggerFactory.getLogger(USMServiceBean.class);
@@ -71,10 +66,10 @@ public class USMServiceBean implements USMService {
     private static Cache userSessionCache = CacheManager.newInstance().getCache(AuthConstants.CACHE_NAME_USER_SESSION);
     private static Cache appCache = CacheManager.getInstance().getCache(AuthConstants.CACHE_NAME_APP_MODULE);
 
-    @EJB
+    @Inject
     private USMMessageProducer messageProducer;
 
-    @EJB
+    @Inject
     private USMMessageConsumer messageConsumer;
 
     @Override
@@ -167,23 +162,23 @@ public class USMServiceBean implements USMService {
             getDeploymentDescriptorRequest.setMethod(UserModuleMethod.GET_DEPLOYMENT_DESCRIPTOR);
             getDeploymentDescriptorRequest.setApplicationName(applicationName);
             try {
-                String msgId = messageProducer.sendModuleMessage(JAXBUtils.marshallJaxBObjectToString(getDeploymentDescriptorRequest), messageConsumer.getDestination());
+                String msgId = messageProducer.sendMessage(JAXBUtils.marshallJaxBObjectToString(getDeploymentDescriptorRequest), messageConsumer.getDestination());
                 LOG.debug("JMS message with ID: {} is sent to USM.", msgId);
-                Message response = messageConsumer.getMessage(msgId, GetDeploymentDescriptorResponse.class, UVMS_USM_TIMEOUT);
-                if (response != null && !isUserFault((TextMessage) response)) {
-                    GetDeploymentDescriptorResponse getDeploymentDescriptorResponse = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), GetDeploymentDescriptorResponse.class);
+                String response = messageConsumer.getMessageBody(msgId, String.class, UVMS_USM_TIMEOUT);
+                if (response != null && !isUserFault(response)) {
+                    GetDeploymentDescriptorResponse getDeploymentDescriptorResponse = JAXBUtils.unMarshallMessage(response, GetDeploymentDescriptorResponse.class);
                     LOG.debug("Response concerning message with ID: {} is received.", msgId);
                     application = getDeploymentDescriptorResponse.getApplication();
                 } else {
                     LOG.error("Error occurred while receiving JMS response for message ID: {}", msgId);
 
                     if (response != null) {
-                        UserFault error = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), UserFault.class);
+                        UserFault error = JAXBUtils.unMarshallMessage(response, UserFault.class);
                         LOG.error("Error Code: {}, Message: {}", error.getCode(), error.getFault());
                         throw new ServiceException("Unable to receive a response from USM.");
                     }
                 }
-            } catch (MessageException | JMSException | JAXBException e) {
+            } catch (JMSException | JAXBException e) {
                 throw new ServiceException("Unable to get Application Definition", e);
             }
 
@@ -202,10 +197,10 @@ public class USMServiceBean implements USMService {
         LOG.debug("START deployApplicationDescriptor({})", descriptor);
         try {
             String descriptorString = UserModuleRequestMapper.mapToDeployApplicationRequest(descriptor);
-            String msgId = messageProducer.sendModuleMessage(descriptorString, messageConsumer.getDestination());
-            Message response = messageConsumer.getMessage(msgId, DeployApplicationResponse.class, UVMS_USM_TIMEOUT);
-            if (response != null && !isUserFault((TextMessage) response)) {
-                DeployApplicationResponse deployApplicationResponse = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), DeployApplicationResponse.class);
+            String msgId = messageProducer.sendMessage(descriptorString, messageConsumer.getDestination());
+            String response = messageConsumer.getMessageBody(msgId, String.class, UVMS_USM_TIMEOUT);
+            if (response != null && !isUserFault(response)) {
+                DeployApplicationResponse deployApplicationResponse = JAXBUtils.unMarshallMessage(response, DeployApplicationResponse.class);
                 LOG.debug("Response concerning message with ID: {} is received.", msgId);
                 if ("OK".equalsIgnoreCase(deployApplicationResponse.getResponse())) {
                     LOG.info("Application successfully registered into USM.");
@@ -216,14 +211,14 @@ public class USMServiceBean implements USMService {
                 LOG.error("Error occurred while receiving JMS response for message ID: {}", msgId);
 
                 if (response != null) {
-                    UserFault error = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), UserFault.class);
+                    UserFault error = JAXBUtils.unMarshallMessage(response, UserFault.class);
                     LOG.error("Error Code: {}, Message: {}", error.getCode(), error.getFault());
                     throw new ServiceException("Unable to register into USM.");
                 } else {
                     throw new ServiceException("Unable to register into USM.");
                 }
             }
-        } catch (MessageException | JMSException | JAXBException | ModelMarshallException e) {
+        } catch (JMSException | JAXBException | ModelMarshallException e) {
             throw new ServiceException("Unable to deploy Application descriptor", e);
         }
     }
@@ -238,13 +233,13 @@ public class USMServiceBean implements USMService {
         }
         try {
             String descriptorString = UserModuleRequestMapper.mapToRedeployApplicationRequest(deploymentDescriptor);
-            String msgId = messageProducer.sendModuleMessage(descriptorString, messageConsumer.getDestination());
+            String msgId = messageProducer.sendMessage(descriptorString, messageConsumer.getDestination());
             LOG.debug("JMS message with ID: {} is sent to USM.", msgId);
 
-            Message response = messageConsumer.getMessage(msgId, RedeployApplicationResponse.class, UVMS_USM_TIMEOUT);
+            String response = messageConsumer.getMessageBody(msgId, String.class, UVMS_USM_TIMEOUT);
 
-            if (response != null && !isUserFault((TextMessage) response)) {
-                RedeployApplicationResponse redeployApplicationResponse = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), RedeployApplicationResponse.class);
+            if (response != null && !isUserFault(response)) {
+                RedeployApplicationResponse redeployApplicationResponse = JAXBUtils.unMarshallMessage(response, RedeployApplicationResponse.class);
                 LOG.debug("Response concerning message with ID: {} is received.", msgId);
                 if ("OK".equalsIgnoreCase(redeployApplicationResponse.getResponse())) {
                     LOG.info("Application successfully registered into USM.");
@@ -255,14 +250,14 @@ public class USMServiceBean implements USMService {
                 LOG.error("Error occurred while receiving JMS response for message ID: {}", msgId);
 
                 if (response != null) {
-                    UserFault error = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), UserFault.class);
+                    UserFault error = JAXBUtils.unMarshallMessage(response, UserFault.class);
                     LOG.error("Error Code: {}, Message: {}", error.getCode(), error.getFault());
                     throw new ServiceException("Unable to register into USM.");
                 } else {
                     throw new ServiceException("Unable to register into USM.");
                 }
             }
-        } catch (MessageException | JMSException | JAXBException | ModelMarshallException e) {
+        } catch (JMSException | JAXBException | ModelMarshallException e) {
             throw new ServiceException("Unable to deploy Application descriptor", e);
         }
     }
@@ -315,21 +310,21 @@ public class USMServiceBean implements USMService {
         String payload;
         try {
             payload = UserModuleRequestMapper.mapToPutUserPreferenceRequest(userPreference);
-            String messageID = messageProducer.sendModuleMessage(payload, messageConsumer.getDestination());
+            String messageID = messageProducer.sendMessage(payload, messageConsumer.getDestination());
             LOG.debug("JMS message with ID: {} is successfully sent to USM.", messageID);
-            Message response = messageConsumer.getMessage(messageID, PutPreferenceResponse.class, UVMS_USM_TIMEOUT);
-            if (response != null && !isUserFault((TextMessage) response)) {
-                PutPreferenceResponse putPreferenceResponse = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), PutPreferenceResponse.class);
+            String response = messageConsumer.getMessageBody(messageID, String.class, UVMS_USM_TIMEOUT);
+            if (response != null && !isUserFault(response)) {
+                PutPreferenceResponse putPreferenceResponse = JAXBUtils.unMarshallMessage(response, PutPreferenceResponse.class);
                 LOG.debug("Response concerning message with ID: {} is received. The response is: {}", messageID, putPreferenceResponse.getResponse());
             } else {
                 LOG.error("Error occurred while receiving JMS response for message ID: {}", messageID);
 
                 if (response != null) {
-                    UserFault error = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), UserFault.class);
+                    UserFault error = JAXBUtils.unMarshallMessage(response, UserFault.class);
                     LOG.error("Error Code: {}, Message: {}", error.getCode(), error.getFault());
                 }
             }
-        } catch (ModelMarshallException | MessageException | JMSException | JAXBException e) {
+        } catch (ModelMarshallException | JMSException | JAXBException e) {
             throw new ServiceException("Unable to set user preference into USM.", e);
         }
         LOG.debug("END putUserPreference");
@@ -377,21 +372,21 @@ public class USMServiceBean implements USMService {
             dataset.setCategory(category);
             dataset.setDescription(description);
             String payload = UserModuleRequestMapper.mapToCreateDatasetRequest(dataset);
-            String messageID = messageProducer.sendModuleMessage(payload, messageConsumer.getDestination());
+            String messageID = messageProducer.sendMessage(payload, messageConsumer.getDestination());
             LOG.debug("JMS message with ID: {} is sent to USM.", messageID);
-            Message response = messageConsumer.getMessage(messageID, CreateDatasetResponse.class, UVMS_USM_TIMEOUT);
-            if (response != null && !isUserFault((TextMessage) response)) {
-                CreateDatasetResponse createDatasetResponse = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), CreateDatasetResponse.class);
+            String response = messageConsumer.getMessageBody(messageID, String.class, UVMS_USM_TIMEOUT);
+            if (response != null && !isUserFault(response)) {
+                CreateDatasetResponse createDatasetResponse = JAXBUtils.unMarshallMessage(response, CreateDatasetResponse.class);
                 LOG.debug("Response concerning message with ID: {} is received. The response is: {}", messageID, createDatasetResponse.getResponse());
             } else {
                 LOG.error("Error occurred while receiving JMS response for message ID: {}", messageID);
 
                 if (response != null) {
-                    UserFault error = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), UserFault.class);
+                    UserFault error = JAXBUtils.unMarshallMessage(response, UserFault.class);
                     LOG.error("Error Code: {}, Message: {}", error.getCode(), error.getFault());
                 }
             }
-        } catch (ModelMarshallException | MessageException | JMSException | JAXBException e) {
+        } catch (ModelMarshallException | JMSException | JAXBException e) {
             throw new ServiceException("Unable to update Dataset.", e);
         }
     }
@@ -408,20 +403,20 @@ public class USMServiceBean implements USMService {
             dataset.setApplicationName(applicationName);
             dataset.setName(datasetName);
             String payload = UserModuleRequestMapper.mapToDeleteDatasetRequest(dataset);
-            String messageID = messageProducer.sendModuleMessage(payload, messageConsumer.getDestination());
+            String messageID = messageProducer.sendMessage(payload, messageConsumer.getDestination());
             LOG.debug("JMS message with ID: {} is sent to USM.", messageID);
-            Message response = messageConsumer.getMessage(messageID, DeleteDatasetResponse.class, UVMS_USM_TIMEOUT);
-            if (response != null && !isUserFault((TextMessage) response)) {
-                DeleteDatasetResponse deleteDatasetResponse = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), DeleteDatasetResponse.class);
+            String response = messageConsumer.getMessageBody(messageID, String.class, UVMS_USM_TIMEOUT);
+            if (response != null && !isUserFault(response)) {
+                DeleteDatasetResponse deleteDatasetResponse = JAXBUtils.unMarshallMessage(response, DeleteDatasetResponse.class);
                 LOG.debug("Response concerning message with ID: {} is received. The response is: {}", messageID, deleteDatasetResponse.getResponse());
             } else {
                 LOG.error("Error occurred while receiving JMS response for message ID: {}", messageID);
                 if (response != null) {
-                    UserFault error = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), UserFault.class);
+                    UserFault error = JAXBUtils.unMarshallMessage(response, UserFault.class);
                     LOG.error("Error Code: {}, Message: {}", error.getCode(), error.getFault());
                 }
             }
-        } catch (ModelMarshallException | MessageException | JMSException | JAXBException e) {
+        } catch (ModelMarshallException | JMSException | JAXBException e) {
             throw new ServiceException("Unable to update Dataset.", e);
         }
     }
@@ -436,22 +431,22 @@ public class USMServiceBean implements USMService {
             datasetFilter.setApplicationName(applicationName);
             datasetFilter.setDiscriminator(discriminator);
             String payload = UserModuleRequestMapper.mapToFindDatasetRequest(datasetFilter);
-            String messageID = messageProducer.sendModuleMessage(payload, messageConsumer.getDestination());
+            String messageID = messageProducer.sendMessage(payload, messageConsumer.getDestination());
             LOG.debug("JMS message with ID: {} is sent to USM.", messageID);
-            Message response = messageConsumer.getMessage(messageID, DeleteDatasetResponse.class, UVMS_USM_TIMEOUT);
-            if (response != null && !isUserFault((TextMessage) response)) {
-                FilterDatasetResponse filterDatasetResponse = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), FilterDatasetResponse.class);
+            String response = messageConsumer.getMessageBody(messageID, String.class, UVMS_USM_TIMEOUT);
+            if (response != null && !isUserFault(response)) {
+                FilterDatasetResponse filterDatasetResponse = JAXBUtils.unMarshallMessage(response, FilterDatasetResponse.class);
                 LOG.debug("Response concerning message with ID: {} is received. The response is: {}", messageID, filterDatasetResponse.getDatasetList().getList());
                 listToReturn = filterDatasetResponse.getDatasetList().getList();
             } else {
                 LOG.error("Error occurred while receiving JMS response for message ID: {}", messageID);
 
                 if (response != null) {
-                    UserFault error = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), UserFault.class);
+                    UserFault error = JAXBUtils.unMarshallMessage(response, UserFault.class);
                     LOG.error("Error Code: {}, Message: {}", error.getCode(), error.getFault());
                 }
             }
-        } catch (ModelMarshallException | MessageException | JMSException | JAXBException e) {
+        } catch (ModelMarshallException | JMSException | JAXBException e) {
             throw new ServiceException("Unable to update Dataset.", e);
         }
         LOG.debug("END findDatasetByDiscriminator(...), returning {}", listToReturn);
@@ -469,22 +464,22 @@ public class USMServiceBean implements USMService {
         String payload;
         try {
             payload = UserModuleRequestMapper.mapToGetUserContextRequest(contextId);
-            String messageID = messageProducer.sendModuleMessage(payload, messageConsumer.getDestination());
+            String messageID = messageProducer.sendMessage(payload, messageConsumer.getDestination());
             LOG.debug("JMS message with ID: {} is sent to USM.", messageID);
-            Message response = messageConsumer.getMessage(messageID, GetUserContextResponse.class, UVMS_USM_TIMEOUT);
-            if (response != null && !isUserFault((TextMessage) response)) {
-                GetUserContextResponse userContextResponse = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), GetUserContextResponse.class);
+            String response = messageConsumer.getMessageBody(messageID, String.class, UVMS_USM_TIMEOUT);
+            if (response != null && !isUserFault(response)) {
+                GetUserContextResponse userContextResponse = JAXBUtils.unMarshallMessage(response, GetUserContextResponse.class);
                 LOG.debug("Response concerning message with ID: {} is received.", messageID);
                 userContext = userContextResponse.getContext();
             } else {
                 LOG.error("Error occurred while receiving JMS response for message ID: {}", messageID);
                 if (response != null) {
-                    UserFault error = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), UserFault.class);
+                    UserFault error = JAXBUtils.unMarshallMessage(response, UserFault.class);
                     LOG.error("Error Code: {}, Message: {}", error.getCode(), error.getFault());
                     throw new ServiceException("Unable to receive a response from USM.");
                 }
             }
-        } catch (ModelMarshallException | MessageException | JMSException | JAXBException e) {
+        } catch (ModelMarshallException | JMSException | JAXBException e) {
             throw new ServiceException("Unexpected exception while trying to get user context.", e);
         }
         return userContext;
@@ -512,12 +507,12 @@ public class USMServiceBean implements USMService {
         return getUserFeatures(username, ctxt);
     }
 
-    private boolean isUserFault(TextMessage message) {
+    private boolean isUserFault(String message) {
         boolean isErrorResponse = false;
         try {
-            UserFault userFault = JAXBUtils.unMarshallMessage(message.getText(), UserFault.class);
+            JAXBUtils.unMarshallMessage(message, UserFault.class);
             isErrorResponse = true;
-        } catch (JAXBException | JMSException e) {
+        } catch (JAXBException e) {
             //do nothing  since it's not a UserFault
         }
         return isErrorResponse;
