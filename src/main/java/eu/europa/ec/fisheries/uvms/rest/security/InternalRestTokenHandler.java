@@ -1,23 +1,34 @@
 package eu.europa.ec.fisheries.uvms.rest.security;
 
+import eu.europa.ec.mare.usm.jwt.DefaultJwtTokenHandler;
 import eu.europa.ec.mare.usm.jwt.JwtTokenHandler;
 
-import javax.inject.Inject;
-import java.util.List;
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+import java.time.Instant;
+import java.util.Collections;
 
+@Stateless
 public class InternalRestTokenHandler {
 
-    @Inject
+    @EJB
     private JwtTokenHandler handler;
 
     private String token;
+    private Instant validTo;
 
-    private InternalRestTokenHandler(){}
-
-    public String createAndFetchToken(String username, List<Integer> features) {
-        if(token == null) {
-            token = handler.createToken(username, features);
+    public String createAndFetchToken(String username) {
+        if(token != null && isValid()) {
+            return token;
+        } else {
+            validTo = Instant.now().plusMillis(DefaultJwtTokenHandler.getDefaultTtl());
+            token = handler.createToken(username,
+                    Collections.singletonList(UnionVMSFeature.manageInternalRest.getFeatureId()));
+            return token;
         }
-        return token;
+    }
+
+    private boolean isValid() {
+        return this.validTo.isAfter(Instant.now());
     }
 }
