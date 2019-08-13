@@ -92,7 +92,12 @@ public enum UnionVMSFeature {
      * Sales
      */
     viewSalesReports(-1),              // not in db
-    manageSalesReports(-1);            // not in db
+    manageSalesReports(-1),            // not in db
+
+    /**
+     * Managing internal resources
+     */
+    manageInternalRest(0);
 
 
     private int featureId;
