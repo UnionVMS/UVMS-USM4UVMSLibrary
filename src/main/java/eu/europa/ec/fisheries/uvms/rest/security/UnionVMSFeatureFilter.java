@@ -12,7 +12,10 @@ copy of the GNU General Public License along with the IFDM Suite. If not, see <h
 package eu.europa.ec.fisheries.uvms.rest.security;
 
 import eu.europa.ec.mare.usm.jwt.JwtTokenHandler;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
 import javax.ejb.EJB;
+import javax.faces.context.ExceptionHandler;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ResourceInfo;
@@ -46,6 +49,10 @@ public class UnionVMSFeatureFilter extends AbstractUSMHandler implements Contain
 
         try {
             String authorizationHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
+            if(authorizationHeader == null || authorizationHeader.isEmpty()){
+                sendAccessForbidden(requestContext);
+                return;
+            }
             List<Integer> featuresThisUserHas = jwtTokenHandler.parseTokenFeatures(authorizationHeader);
 
             if (featuresThisUserHas.stream().noneMatch(f -> f.equals(feature.getFeatureId()))) {
@@ -54,7 +61,7 @@ public class UnionVMSFeatureFilter extends AbstractUSMHandler implements Contain
             }
         }catch(Exception e){
             requestContext.abortWith(Response.status(Response.Status.INTERNAL_SERVER_ERROR).header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
-                    .entity(e).build());
+                    .entity(ExceptionUtils.getRootCause(e)).build());
             return;
 
         }
