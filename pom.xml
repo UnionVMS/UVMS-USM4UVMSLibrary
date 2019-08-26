@@ -24,13 +24,13 @@
 		<scm.url>scm:git:https://github.com/UnionVMS/UVMS-USM4UVMSLibrary.git</scm.url>
 
 		<javaee.version>8.0</javaee.version>
-		<ehcache.version>2.10.4</ehcache.version>
-		<arquillian.rest.version>1.0.0.Alpha3</arquillian.rest.version>
-		<resteasy.version>3.0.11.Final</resteasy.version>
+		<ehcache.version>2.10.6</ehcache.version>
+		<arquillian.rest.version>1.0.0.Alpha4</arquillian.rest.version>
+		<resteasy.version>3.0.12.Final</resteasy.version>
 
-		<user.service.version>2.0.17</user.service.version>
-		<usm.JWTokenHandler.version>2.1.9</usm.JWTokenHandler.version>
-		<uvms.commons.version>4.0.0</uvms.commons.version>
+		<user.service.version>2.0.22</user.service.version>
+		<usm.JWTokenHandler.version>2.1.10</usm.JWTokenHandler.version>
+		<uvms.commons.version>4.0.3</uvms.commons.version>
 	</properties>
 
 	<repositories>
