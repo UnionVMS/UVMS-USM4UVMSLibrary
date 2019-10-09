@@ -39,7 +39,7 @@ pipeline {
 		          mavenSettingsConfig: 'sword-settings',
 		          // use a local repo
 		          mavenLocalRepo: '.repo') {
-		          	sh 'mvn -Dclean deploy -DaltDeploymentRepository=swordnexus-repo-snapshot::default::http://nexus:8081/repository/unionvms-snapshots/'
+		          	sh 'mvn clean deploy -DaltDeploymentRepository=swordnexus-repo-snapshot::default::http://nexus:8081/repository/unionvms-snapshots/'
 		      	}
 	      	}
 	   	}
