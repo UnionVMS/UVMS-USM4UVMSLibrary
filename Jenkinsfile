@@ -4,7 +4,6 @@ pipeline {
 	  buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '2', numToKeepStr: '5')
 	  skipStagesAfterUnstable()
 	}
-	parameters { string(name: 'DEPLOY_ENV', defaultValue: 'staging', description: '') }
 	stages{
 		 stage('Clean repo') {
 			steps{
