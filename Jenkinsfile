@@ -4,6 +4,7 @@ pipeline {
 	  buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '2', numToKeepStr: '5')
 	  skipStagesAfterUnstable()
 	}
+
 	stages{
 		 stage('Clean repo') {
 			steps{
@@ -11,7 +12,7 @@ pipeline {
 		        // or artifacts that other modules of the project provide
 		        // these will be downloaded again from the repo making it explicit
 		        sh """
-		        mkdir .repo && find .repo -name '*SNAPSHOT' -exec rm -rf {} + \
+		        mkdir -p .repo && find .repo -name '*SNAPSHOT' -exec rm -rf {} + \
 			    && rm -rf .repo/repository/eu/europa/ec/fisheries \
 			    && rm -rf .repo/repository/eu/europa/ec/mare \
 			    && rm -rf .repo/repository/fish/focus
