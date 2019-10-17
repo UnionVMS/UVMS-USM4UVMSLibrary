@@ -6,3 +6,4 @@ logging.properties
 /rest/src/main/webapp
 **/.idea
 container-conf/*
+.flattened-pom.xml
