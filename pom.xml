@@ -1,16 +1,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>fish.focus.uvms.maven</groupId>
-    <artifactId>uvms-pom</artifactId>
-    <version>1.21</version>
-  </parent>
+	<parent>
+		<groupId>eu.europa.ec.fisheries.uvms</groupId>
+		<artifactId>mare-pom</artifactId>
+		<version>1.6.0-MARE</version>
+		<relativePath />
+	</parent>
     
   <groupId>eu.europa.ec.fisheries.uvms</groupId>
   <artifactId>usm4uvms</artifactId>
   <packaging>jar</packaging>
-  <version>4.0.15.1-SNAPSHOT</version>
+  <version>${uvms.uvms4usm.version}</version>
   <name>usm4uvms</name>
   <description>USM integration for UnionVMS.</description>
   <properties>
@@ -22,9 +23,7 @@
     <project.scm.id>github</project.scm.id>
     <scm.connection>scm:git:https://github.com/UnionVMS/UVMS-USM4UVMSLibrary.git</scm.connection>
     <scm.url>scm:git:https://github.com/UnionVMS/UVMS-USM4UVMSLibrary.git</scm.url>
-      
-    <user.service.version>2.0.0</user.service.version>
-    <information.service.version>2.0.0</information.service.version>
+
     <javaee.version>8.0</javaee.version>
     <jjwt.version>0.4</jjwt.version>
     <ehcache.version>2.10.4</ehcache.version>
@@ -38,10 +37,9 @@
     <arquillian.transaction.version>1.0.1.Final</arquillian.transaction.version>
     <resteasy.jackson.version>3.0.10.Final</resteasy.jackson.version>
     <resteasy.version>3.0.11.Final</resteasy.version>
+	<jaxb.version>2.3.0</jaxb.version>
     <commons.io.version>2.6</commons.io.version>
     <mockito.version>1.10.19</mockito.version>
-    <usm.JWTokenHandler.version>2.1.1</usm.JWTokenHandler.version>
-    <uvms.commons.version>3.4-SNAPSHOT</uvms.commons.version>
   </properties>
 
   <repositories>
@@ -211,7 +209,7 @@
     <dependency>
       <groupId>com.sun.xml.bind</groupId>
       <artifactId>jaxb-impl</artifactId>
-      <version>2.2.7</version>
+      <version>${jaxb.version}</version>
       <scope>provided</scope>
     </dependency>
         
@@ -231,7 +229,7 @@
     <dependency>
       <groupId>eu.europa.ec.fisheries.uvms.user</groupId>
       <artifactId>user-model</artifactId>
-      <version>${user.service.version}</version>
+      <version>${uvms.user.module.version}</version>
     </dependency>
 
     <dependency>
@@ -266,23 +264,23 @@
     <dependency>
       <groupId>eu.europa.ec.fisheries.uvms.commons</groupId>
       <artifactId>uvms-commons-message</artifactId>
-      <version>${uvms.commons.version}</version>
+      <version>${uvms.commonsLibrary.version}</version>
     </dependency>
     <dependency>
       <groupId>eu.europa.ec.fisheries.uvms.commons</groupId>
       <artifactId>uvms-commons-service</artifactId>
-      <version>${uvms.commons.version}</version>
+      <version>${uvms.commonsLibrary.version}</version>
     </dependency>
         
     <dependency>
-      <groupId>eu.europa.ec.mare.usm</groupId>
+      <groupId>eu.europa.ec.mare.oss.usm</groupId>
       <artifactId>jwt-handler-api</artifactId>
-      <version>${usm.JWTokenHandler.version}</version>
+      <version>${usm.jwt-handler.version}</version>
     </dependency>
     <dependency>
-      <groupId>eu.europa.ec.mare.usm</groupId>
+      <groupId>eu.europa.ec.mare.oss.usm</groupId>
       <artifactId>jwt-handler-impl</artifactId>
-      <version>${usm.JWTokenHandler.version}</version>
+      <version>${usm.jwt-handler.version}</version>
     </dependency>
   </dependencies>
 
