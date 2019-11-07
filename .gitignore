@@ -7,3 +7,7 @@ logging.properties
 **/.idea
 container-conf/*
 .flattened-pom.xml
+.project
+.classpath
+.settings/
+pom.xml.versionsBackup
