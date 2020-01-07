@@ -273,12 +273,12 @@
     </dependency>
         
     <dependency>
-      <groupId>eu.europa.ec.mare.oss.usm</groupId>
+      <groupId>eu.europa.ec.mare.usm</groupId>
       <artifactId>jwt-handler-api</artifactId>
       <version>${usm.jwt-handler.version}</version>
     </dependency>
     <dependency>
-      <groupId>eu.europa.ec.mare.oss.usm</groupId>
+      <groupId>eu.europa.ec.mare.usm</groupId>
       <artifactId>jwt-handler-impl</artifactId>
       <version>${usm.jwt-handler.version}</version>
     </dependency>
