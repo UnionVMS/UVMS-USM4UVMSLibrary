@@ -25,7 +25,6 @@
     <scm.url>scm:git:https://github.com/UnionVMS/UVMS-USM4UVMSLibrary.git</scm.url>
 
     <javaee.version>8.0</javaee.version>
-    <jjwt.version>0.4</jjwt.version>
     <ehcache.version>2.10.4</ehcache.version>
     <apache.commons.version>3.7</apache.commons.version>
     <jackson.version>2.6.7</jackson.version>
@@ -232,17 +231,6 @@
       <version>${uvms.user.module.version}</version>
     </dependency>
 
-    <dependency>
-      <groupId>io.jsonwebtoken</groupId>
-      <artifactId>jjwt</artifactId>
-      <version>${jjwt.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>com.fasterxml.jackson.core</groupId>
-          <artifactId>jackson-databind</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
     <dependency>
       <groupId>javax</groupId>
       <artifactId>javaee-api</artifactId>
