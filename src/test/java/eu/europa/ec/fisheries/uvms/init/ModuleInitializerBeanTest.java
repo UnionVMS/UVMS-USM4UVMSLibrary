@@ -11,7 +11,6 @@ copy of the GNU General Public License along with the IFDM Suite. If not, see <h
  */
 package eu.europa.ec.fisheries.uvms.init;
 
-
 import javax.xml.bind.JAXBException;
 
 import org.junit.Before;
@@ -21,10 +20,11 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
-import org.mockito.internal.util.reflection.Whitebox;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import eu.europa.ec.fisheries.uvms.rest.security.bean.USMService;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.powermock.reflect.Whitebox;
+
 @RunWith(MockitoJUnitRunner.class)
 public class ModuleInitializerBeanTest {
 
