@@ -29,7 +29,6 @@ public class UserRoleRequestWrapper extends HttpServletRequestWrapper {
 
     private String user;
     private Set<String> roles = null;
-    private HttpServletRequest realRequest;
 
     /**
      * a constructor which allows us to insert the available roles into the current request
@@ -42,8 +41,6 @@ public class UserRoleRequestWrapper extends HttpServletRequestWrapper {
         super(request);
         this.user = user;
         this.setRoles(roles);
-        request.getServletContext().setAttribute(AuthConstants.HTTP_SERVLET_CONTEXT_ATTR_FEATURES, roles); //this is needed, because RESTEasy creates proxy objects and in a rest method, I cannot cast to this wrapper and call wrapper.getRoles();
-        this.realRequest = request;
     }
 
     /**
@@ -71,7 +68,7 @@ public class UserRoleRequestWrapper extends HttpServletRequestWrapper {
     @Override
     public boolean isUserInRole(String role) {
         if (getRoles() == null) {
-            return this.realRequest.isUserInRole(role);
+            return ((HttpServletRequest) getRequest()).isUserInRole(role);
         }
         return getRoles().contains(role);
     }
@@ -79,7 +76,7 @@ public class UserRoleRequestWrapper extends HttpServletRequestWrapper {
     @Override
     public Principal getUserPrincipal() {
         if (this.user == null) {
-            return realRequest.getUserPrincipal();
+            return ((HttpServletRequest) getRequest()).getUserPrincipal();
         }
         // make an anonymous implementation to just return our user
         return new Principal() {
@@ -97,5 +94,4 @@ public class UserRoleRequestWrapper extends HttpServletRequestWrapper {
     public void setRoles(Set<String> roles) {
         this.roles = roles;
     }
-
 }
