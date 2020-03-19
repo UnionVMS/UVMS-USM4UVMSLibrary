@@ -24,10 +24,6 @@ public interface AuthConstants {
 
     String JWTCALLBACK = "jwtcallback";
 
-    String HTTP_SERVLET_CONTEXT_ATTR_FEATURES = "servletContextUserFeatures";
-
-    String HTTP_SESSION_ATTR_ROLES_NAME = HTTP_SERVLET_CONTEXT_ATTR_FEATURES;
-
     String CACHE_NAME_USER_SESSION = "userSessionCache";
     String CACHE_NAME_APP_MODULE = "appModuleCache";
 }
