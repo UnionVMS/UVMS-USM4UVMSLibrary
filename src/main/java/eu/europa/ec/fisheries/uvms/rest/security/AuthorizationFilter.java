@@ -70,6 +70,7 @@ public class AuthorizationFilter extends AbstractUSMHandler implements Filter, A
                         currentScope, currentRole);
             } else {
                 requestWrapper.setRoles(featuresStr);
+                requestWrapper.setAttribute(HTTP_REQUEST_ROLES_ATTRIBUTE, featuresStr);
             }
         }
         try {
