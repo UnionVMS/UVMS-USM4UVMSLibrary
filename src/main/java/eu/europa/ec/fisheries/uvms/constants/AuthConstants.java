@@ -22,6 +22,8 @@ public interface AuthConstants {
     String HTTP_HEADER_SCOPE_NAME = "scopeName";
     String HTTP_HEADER_AUTHORIZATION = HttpHeaders.AUTHORIZATION;
 
+    String HTTP_REQUEST_ROLES_ATTRIBUTE = "eu.europa.ec.fisheries.uvms.roles";
+
     String JWTCALLBACK = "jwtcallback";
 
     String CACHE_NAME_USER_SESSION = "userSessionCache";
