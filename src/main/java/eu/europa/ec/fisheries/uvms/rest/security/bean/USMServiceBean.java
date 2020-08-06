@@ -167,7 +167,7 @@ public class USMServiceBean implements USMService {
             getDeploymentDescriptorRequest.setMethod(UserModuleMethod.GET_DEPLOYMENT_DESCRIPTOR);
             getDeploymentDescriptorRequest.setApplicationName(applicationName);
             try {
-                String msgId = messageProducer.sendModuleMessage(JAXBUtils.marshallJaxBObjectToString(getDeploymentDescriptorRequest), messageConsumer.getDestination());
+                String msgId = messageProducer.sendModuleMessageNonPersistent(JAXBUtils.marshallJaxBObjectToString(getDeploymentDescriptorRequest), messageConsumer.getDestination(), UVMS_USM_TIMEOUT);
                 LOG.debug("JMS message with ID: {} is sent to USM.", msgId);
                 Message response = messageConsumer.getMessage(msgId, GetDeploymentDescriptorResponse.class, UVMS_USM_TIMEOUT);
                 if (response != null && !isUserFault((TextMessage) response)) {
@@ -202,7 +202,7 @@ public class USMServiceBean implements USMService {
         LOG.debug("START deployApplicationDescriptor({})", descriptor);
         try {
             String descriptorString = UserModuleRequestMapper.mapToDeployApplicationRequest(descriptor);
-            String msgId = messageProducer.sendModuleMessage(descriptorString, messageConsumer.getDestination());
+            String msgId = messageProducer.sendModuleMessageNonPersistent(descriptorString, messageConsumer.getDestination(), UVMS_USM_TIMEOUT);
             Message response = messageConsumer.getMessage(msgId, DeployApplicationResponse.class, UVMS_USM_TIMEOUT);
             if (response != null && !isUserFault((TextMessage) response)) {
                 DeployApplicationResponse deployApplicationResponse = JAXBUtils.unMarshallMessage(((TextMessage) response).getText(), DeployApplicationResponse.class);
@@ -238,7 +238,7 @@ public class USMServiceBean implements USMService {
         }
         try {
             String descriptorString = UserModuleRequestMapper.mapToRedeployApplicationRequest(deploymentDescriptor);
-            String msgId = messageProducer.sendModuleMessage(descriptorString, messageConsumer.getDestination());
+            String msgId = messageProducer.sendModuleMessageNonPersistent(descriptorString, messageConsumer.getDestination(), UVMS_USM_TIMEOUT);
             LOG.debug("JMS message with ID: {} is sent to USM.", msgId);
 
             Message response = messageConsumer.getMessage(msgId, RedeployApplicationResponse.class, UVMS_USM_TIMEOUT);
