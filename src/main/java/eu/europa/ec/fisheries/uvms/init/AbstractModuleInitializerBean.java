@@ -16,6 +16,7 @@ import javax.ejb.EJB;
 import javax.ejb.Schedule;
 import javax.ejb.Timer;
 import javax.ejb.TimerService;
+import javax.inject.Inject;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import java.io.InputStream;
@@ -34,6 +35,9 @@ public abstract class AbstractModuleInitializerBean {
 
     private Application application;
 
+    @Inject
+    private ReadinessService readinessService;
+
     @EJB
     private USMService usmService;
 
@@ -50,6 +54,7 @@ public abstract class AbstractModuleInitializerBean {
             } else if (mustRedeploy()) {
                 usmService.redeployApplicationDescriptor(application);
             }
+            readinessService.setUsmReady(true);
             stopTimer(); // Stop timer as there is no exception and communication to USM is successful
         } catch (ServiceException e) {
             LOG.info("Could not update USM");
