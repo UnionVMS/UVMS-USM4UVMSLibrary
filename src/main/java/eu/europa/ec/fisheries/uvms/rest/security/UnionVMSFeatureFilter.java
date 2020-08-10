@@ -53,9 +53,9 @@ public class UnionVMSFeatureFilter extends AbstractUSMHandler implements Contain
                 sendAccessForbidden(requestContext);
                 return;
             }
-            List<Integer> featuresThisUserHas = jwtTokenHandler.parseTokenFeatures(authorizationHeader);
 
-            if (featuresThisUserHas.stream().noneMatch(f -> f.equals(feature.getFeatureId()))) {
+            List<Integer> featuresThisUserHas = jwtTokenHandler.parseTokenFeatures(authorizationHeader);
+            if (featuresThisUserHas == null || featuresThisUserHas.stream().noneMatch(f -> f.equals(feature.getFeatureId()))) {
                 sendAccessForbidden(requestContext);
                 return;
             }
