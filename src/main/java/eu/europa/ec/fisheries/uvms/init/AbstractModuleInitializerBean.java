@@ -64,10 +64,10 @@ public abstract class AbstractModuleInitializerBean {
             }
         } catch (ServiceException e) {
             count++;
-            LOG.info("Failed to connect to USM. Retry count " + count);
+            LOG.info("Failed to connect to USM. Retry count " + count,e);
             if (count == 5) { // Stop timer after 5 retry
                 stopTimer();
-                throw new ServiceException("Deployment failed : Could not connect to USM");
+                throw new ServiceException("Deployment failed : Could not connect to USM",e);
             }
         }
     }
