@@ -80,6 +80,7 @@ public class RestResource {
 		try {
 			application = usmService.getApplicationDefinition(APP_NAME);
 		} catch (ServiceException e) {
+			LOG.error("Could not get application definition ",e);
 			return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
 		}
 
@@ -93,6 +94,7 @@ public class RestResource {
 		try {
 			application = usmService.getApplicationDefinition(APP_NAME);
 		} catch (ServiceException e) {
+			LOG.error("Could not get application definition ",e);
 			return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
 		}
 
@@ -114,6 +116,7 @@ public class RestResource {
 		try {
 			usmService.setOptionDefaultValue(TEST_USER_PREFERENCE, newDefaultValue, APP_NAME);
 		} catch (ServiceException e) {
+			LOG.error("Could not set default value ",e);
 			return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
 		}
 
@@ -122,6 +125,7 @@ public class RestResource {
 		try {
 			optionDefaultValue = usmService.getOptionDefaultValue(TEST_USER_PREFERENCE, APP_NAME);
 		} catch (ServiceException e) {
+			LOG.error("Could not get option default value ",e);
 			return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
 		}
 		timeDiff = new Date().getTime() - timeDiff;
@@ -136,6 +140,7 @@ public class RestResource {
 		try {
 			optionDefaultValue = usmService.getOptionDefaultValue(TEST_USER_PREFERENCE, APP_NAME);
 		} catch (ServiceException e) {
+			LOG.error("Could not get option default value ",e);
 			return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
 		}
 		timeDiff2 = new Date().getTime() - timeDiff2;
@@ -158,6 +163,7 @@ public class RestResource {
 		try {
 			usmService.putUserPreference(TEST_USER_PREFERENCE, newValue, APP_NAME, "EC", "rep_power_role", "rep_power");
 		} catch (ServiceException e) {
+			LOG.error("Could not put user preference",e);
 			return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
 		}
 
@@ -165,6 +171,7 @@ public class RestResource {
 		try {
 			ctxt = usmService.getUserContext("rep_power", APP_NAME, "rep_power_role", "EC");
 		} catch (ServiceException e) {
+			LOG.error("Could not get user context ",e);
 			return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
 		}
 
@@ -172,6 +179,7 @@ public class RestResource {
 		try {
 			userPref = usmService.getUserPreference(TEST_USER_PREFERENCE, ctxt);
 		} catch (ServiceException e) {
+			LOG.error("Could not get user preference ",e);
 			return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
 		}
 
@@ -182,6 +190,7 @@ public class RestResource {
 		try {
 			userPref = usmService.getUserPreference(TEST_USER_PREFERENCE, ctxt);
 		} catch (ServiceException e) {
+			LOG.error("Could not get user preference ",e);
 			return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
 		}
 

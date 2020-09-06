@@ -15,6 +15,9 @@ import eu.europa.ec.fisheries.uvms.commons.service.exception.ServiceException;
 import eu.europa.ec.fisheries.uvms.rest.security.bean.USMService;
 import eu.europa.ec.fisheries.wsdl.user.types.Feature;
 import eu.europa.ec.fisheries.wsdl.user.types.UserContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import javax.ejb.EJB;
 import javax.servlet.ServletContext;
@@ -30,6 +33,8 @@ import javax.ws.rs.ext.Provider;
 
 @Provider
 public class UnionVMSFeatureFilter extends AbstractUSMHandler implements ContainerRequestFilter {
+
+    private static final Logger LOG = LoggerFactory.getLogger(UnionVMSFeatureFilter.class);
 
     @Context
     private ResourceInfo resourceInfo;
@@ -64,6 +69,7 @@ public class UnionVMSFeatureFilter extends AbstractUSMHandler implements Contain
                 sendAccessForbidden(requestContext);
             }
         } catch (ServiceException e) {
+            LOG.error("Service exception",e);
             sendAccessForbidden(requestContext);
         }
 

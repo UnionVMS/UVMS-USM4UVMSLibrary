@@ -76,7 +76,7 @@ public class AuthorizationFilter extends AbstractUSMHandler implements Filter, A
         try {
             chain.doFilter(request, response);
         } catch (IOException e) {
-            LOGGER.error("failed to call WebFilter chain.doFilter(request,response). Caused by: {}", e.getMessage());
+            LOGGER.error("failed to call WebFilter chain.doFilter(request,response). Caused by: " + e.getMessage(),e);
         }
     }
 
