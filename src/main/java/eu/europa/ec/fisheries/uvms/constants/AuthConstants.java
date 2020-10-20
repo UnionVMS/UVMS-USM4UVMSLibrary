@@ -21,6 +21,7 @@ public interface AuthConstants {
     String HTTP_HEADER_ROLE_NAME = "roleName";
     String HTTP_HEADER_SCOPE_NAME = "scopeName";
     String HTTP_HEADER_AUTHORIZATION = HttpHeaders.AUTHORIZATION;
+    String HTTP_HEADER_ACCESS_CONTROL_EXPOSE_HEADERS = "Access-Control-Expose-Headers";
 
     String JWTCALLBACK = "jwtcallback";
 

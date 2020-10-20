@@ -9,6 +9,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.HttpHeaders;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
@@ -76,6 +78,7 @@ public class AuthenticationFilter implements Filter {
                 refreshedToken = tokenHandler.createToken(remoteUser);
             }
             httpResponse.addHeader(AuthConstants.HTTP_HEADER_AUTHORIZATION, refreshedToken);
+            httpResponse.addHeader(AuthConstants.HTTP_HEADER_ACCESS_CONTROL_EXPOSE_HEADERS, AuthConstants.HTTP_HEADER_AUTHORIZATION);
 
             if (PING.equals(httpRequest.getPathInfo())) {
                 if (httpRequest.getUserPrincipal() != null
