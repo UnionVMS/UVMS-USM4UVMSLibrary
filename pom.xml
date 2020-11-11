@@ -27,7 +27,7 @@
 		<arquillian.rest.version>1.0.0.Alpha4</arquillian.rest.version>
 		<resteasy.version>3.0.12.Final</resteasy.version>
 
-		<user.service.version>2.2.0</user.service.version>
+		<user.service.version>2.2.1</user.service.version>
 		<usm.JWTokenHandler.version>2.2.8</usm.JWTokenHandler.version>
 		<uvms.commons.version>4.1.1</uvms.commons.version>
 		<uvms.pom.version>3.4</uvms.pom.version>
