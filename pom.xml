@@ -23,7 +23,7 @@
 		<scm.connection>scm:git:https://github.com/UnionVMS/UVMS-USM4UVMSLibrary.git</scm.connection>
 		<scm.url>scm:git:https://github.com/UnionVMS/UVMS-USM4UVMSLibrary.git</scm.url>
 
-		<ehcache.version>2.10.6</ehcache.version>
+		<ehcache.version>2.10.9.2</ehcache.version>
 		<arquillian.rest.version>1.0.0.Alpha4</arquillian.rest.version>
 		<resteasy.version>3.0.12.Final</resteasy.version>
 
