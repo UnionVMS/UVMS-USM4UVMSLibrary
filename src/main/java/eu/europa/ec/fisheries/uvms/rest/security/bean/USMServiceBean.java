@@ -346,7 +346,7 @@ public class USMServiceBean implements USMService {
     public List<Dataset> getDatasetsPerCategory(String category, Context userContext) throws ServiceException {
         LOG.debug("START getDatasetsPerCategory({}, {})", category, userContext);
         List<Dataset> filteredDatasets = new LinkedList<>();
-        if (userContext != null) {
+        if (userContext != null && userContext.getScope() != null) {
             List<Dataset> datasetList = userContext.getScope().getDataset();
 
             for (Dataset dataset : datasetList) {
