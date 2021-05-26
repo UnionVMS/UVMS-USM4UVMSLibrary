@@ -31,8 +31,8 @@ import org.junit.runner.RunWith;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
-import eu.europa.ec.fisheries.uvms.commons.service.exception.ServiceException;
 import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
+import eu.europa.ec.fisheries.uvms.exception.ServiceException;
 import eu.europa.ec.fisheries.uvms.rest.security.util.ArquillianTest;
 import eu.europa.ec.mare.usm.jwt.DefaultJwtTokenHandler;
 
