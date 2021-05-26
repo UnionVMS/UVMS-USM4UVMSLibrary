@@ -29,7 +29,7 @@
 
 		<user.service.version>2.2.1</user.service.version>
 		<usm.JWTokenHandler.version>2.2.8</usm.JWTokenHandler.version>
-		<uvms.commons.version>4.1.1</uvms.commons.version>
+		<uvms.commons.version>4.1.8</uvms.commons.version>
 		<uvms.pom.version>3.5</uvms.pom.version>
 	</properties>
 
@@ -85,11 +85,6 @@
 		<dependency>
 			<groupId>eu.europa.ec.fisheries.uvms.commons</groupId>
 			<artifactId>uvms-commons-message</artifactId>
-			<version>${uvms.commons.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>eu.europa.ec.fisheries.uvms.commons</groupId>
-			<artifactId>uvms-commons-service</artifactId>
 			<version>${uvms.commons.version}</version>
 		</dependency>
 

@@ -11,7 +11,7 @@ copy of the GNU General Public License along with the IFDM Suite. If not, see <h
  */
 package eu.europa.ec.fisheries.uvms.init;
 
-import eu.europa.ec.fisheries.uvms.commons.service.exception.ServiceException;
+import eu.europa.ec.fisheries.uvms.exception.ServiceException;
 import eu.europa.ec.fisheries.uvms.rest.security.bean.USMService;
 import eu.europa.ec.fisheries.wsdl.user.module.DeployApplicationRequest;
 import eu.europa.ec.fisheries.wsdl.user.types.Application;
