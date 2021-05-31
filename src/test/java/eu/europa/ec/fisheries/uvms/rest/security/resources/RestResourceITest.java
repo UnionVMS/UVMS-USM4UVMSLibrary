@@ -28,9 +28,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-
 import eu.europa.ec.fisheries.uvms.constants.AuthConstants;
 import eu.europa.ec.fisheries.uvms.exception.ServiceException;
 import eu.europa.ec.fisheries.uvms.rest.security.util.ArquillianTest;
@@ -101,7 +98,7 @@ public class RestResourceITest extends ArquillianTest {
 	
 	@Test
 	@Header(name="connection", value = "Keep-Alive")
-	public void testAuthorizationPositive(@ArquillianResteasyResource("test/rest") ResteasyWebTarget webTarget) throws JsonParseException, JsonMappingException, IOException {
+	public void testAuthorizationPositive(@ArquillianResteasyResource("test/rest") ResteasyWebTarget webTarget) throws IOException {
 		
 		//check if we have the prerequisite - a report in the DB with ID = 1
 		Response response = webTarget.path("/list" ).request()
@@ -116,7 +113,7 @@ public class RestResourceITest extends ArquillianTest {
 
 	@Test
 	@Header(name="connection", value = "Keep-Alive")
-	public void testAuthorizationNegative(@ArquillianResteasyResource("test/rest") ResteasyWebTarget webTarget) throws JsonParseException, JsonMappingException, IOException {
+	public void testAuthorizationNegative(@ArquillianResteasyResource("test/rest") ResteasyWebTarget webTarget) throws IOException {
 
 		//check if we have the prerequisite - a report in the DB with ID = 1
 		Response response = webTarget.path("/get" ).request()
