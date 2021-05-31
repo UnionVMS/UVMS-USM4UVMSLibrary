@@ -20,7 +20,7 @@ public class InternalRestTokenHandler {
         if(token != null && isValid()) {
             return token;
         } else {
-            validTo = Instant.now().plusMillis(DefaultJwtTokenHandler.getDefaultTtl());
+            validTo = Instant.now().plusMillis(DefaultJwtTokenHandler.DEFAULT_TTL);
             token = handler.createToken(username,
                     Collections.singletonList(UnionVMSFeature.manageInternalRest.getFeatureId()));
             return token;
