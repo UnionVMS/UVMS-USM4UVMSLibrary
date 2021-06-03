@@ -24,7 +24,7 @@
 		<scm.url>scm:git:https://github.com/UnionVMS/UVMS-USM4UVMSLibrary.git</scm.url>
 
 		<arquillian.rest.version>1.0.0.Alpha4</arquillian.rest.version>
-		<resteasy.version>3.0.12.Final</resteasy.version>
+		<resteasy.version>4.5.7.Final</resteasy.version>
 
 		<user.service.version>2.2.2</user.service.version>
 		<usm.JWTokenHandler.version>2.2.12</usm.JWTokenHandler.version>
