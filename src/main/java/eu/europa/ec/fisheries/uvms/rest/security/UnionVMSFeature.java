@@ -43,6 +43,8 @@ public enum UnionVMSFeature {
     manageExchangeSendingQueue,
     /** Managing transmission statuses */
     manageExchangeTransmissionStatuses,
+    /** Manage exchange parameters in admin  */
+    manageExchangeParameters,
 
     /** Rules */
     viewAlarmRules,
