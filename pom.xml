@@ -1,330 +1,342 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>eu.europa.ec.fisheries.uvms</groupId>
-		<artifactId>mare-pom</artifactId>
-		<version>1.6.0-MARE-SNAPSHOT</version>
-		<relativePath />
-	</parent>
-    
-  <groupId>eu.europa.ec.fisheries.uvms</groupId>
-  <artifactId>usm4uvms</artifactId>
-  <packaging>jar</packaging>
-  <version>${uvms.uvms4usm.version}</version>
-  <name>usm4uvms</name>
-  <description>USM integration for UnionVMS.</description>
-  <properties>
-      
-    <!-- ================= -->
-    <!-- Global Properties -->
-    <!-- ================= -->
-    <!-- Maven default properties -->
-    <project.scm.id>github</project.scm.id>
-    <scm.connection>scm:git:https://github.com/UnionVMS/UVMS-USM4UVMSLibrary.git</scm.connection>
-    <scm.url>scm:git:https://github.com/UnionVMS/UVMS-USM4UVMSLibrary.git</scm.url>
+    <parent>
+        <groupId>eu.europa.ec.fisheries.uvms</groupId>
+        <artifactId>mare-pom</artifactId>
+        <version>1.6.0-MARE-SNAPSHOT</version>
+        <relativePath/>
+    </parent>
 
-    <javaee.version>8.0</javaee.version>
-    <ehcache.version>2.10.4</ehcache.version>
-    <apache.commons.version>3.7</apache.commons.version>
-    <jackson.version>2.6.7</jackson.version>
-    <junit.version>4.12</junit.version>
-    <arquillian.version>1.1.8.Final</arquillian.version>
-    <shrinkwrap.version>2.2.0-beta-2</shrinkwrap.version>
-    <arquillian.container.version>1.0.0.Alpha5</arquillian.container.version>
-    <arquillian.rest.version>1.0.0.Alpha3</arquillian.rest.version>
-    <arquillian.transaction.version>1.0.1.Final</arquillian.transaction.version>
-    <resteasy.jackson.version>3.0.10.Final</resteasy.jackson.version>
-    <resteasy.version>3.0.11.Final</resteasy.version>
-	<jaxb.version>2.3.0</jaxb.version>
-    <commons.io.version>2.6</commons.io.version>
-    <mockito.version>1.10.19</mockito.version>
-  </properties>
+    <groupId>eu.europa.ec.fisheries.uvms</groupId>
+    <artifactId>usm4uvms</artifactId>
+    <packaging>jar</packaging>
+    <version>${uvms.uvms4usm.version}</version>
+    <name>usm4uvms</name>
+    <description>USM integration for UnionVMS.</description>
+    <properties>
 
-  <repositories>
-    <repository>
-      <id>focus-repo</id>
-      <name>Focus nexus repository</name>
-      <url>http://nexus.focus.fish/nexus</url>
-    </repository>
-  </repositories>
+        <!-- ================= -->
+        <!-- Global Properties -->
+        <!-- ================= -->
+        <!-- Maven default properties -->
+        <project.scm.id>github</project.scm.id>
+        <scm.connection>scm:git:https://github.com/UnionVMS/UVMS-USM4UVMSLibrary.git</scm.connection>
+        <scm.url>scm:git:https://github.com/UnionVMS/UVMS-USM4UVMSLibrary.git</scm.url>
 
-  <distributionManagement>
-    <repository>
-      <id>focus-releases</id>
-      <name>UnionVms Repository</name>
-      <url>http://nexus.focus.fish/nexus/content/repositories/releases/</url>
-    </repository>
-    <snapshotRepository>
-      <id>focus-snapshots</id>
-      <name>UnionVms Snapshot Repository</name>
-      <url>http://nexus.focus.fish/nexus/content/repositories/snapshots/</url>
-    </snapshotRepository>
-  </distributionManagement>
+        <javaee.version>8.0</javaee.version>
+        <ehcache.version>2.10.4</ehcache.version>
+        <apache.commons.version>3.7</apache.commons.version>
+        <jackson.version>2.6.7</jackson.version>
+        <junit.version>4.12</junit.version>
+        <arquillian.version>1.1.8.Final</arquillian.version>
+        <shrinkwrap.version>2.2.0-beta-2</shrinkwrap.version>
+        <arquillian.container.version>1.0.0.Alpha5</arquillian.container.version>
+        <arquillian.rest.version>1.0.0.Alpha3</arquillian.rest.version>
+        <arquillian.transaction.version>1.0.1.Final</arquillian.transaction.version>
+        <resteasy.jackson.version>3.0.10.Final</resteasy.jackson.version>
+        <resteasy.version>3.0.11.Final</resteasy.version>
+        <jaxb.version>2.3.0</jaxb.version>
+        <commons.io.version>2.6</commons.io.version>
+        <mockito.version>1.10.19</mockito.version>
+    </properties>
 
-  <scm>
-    <connection>scm:git:https://github.com/UnionVMS/UVMS-USM4UVMSLibrary.git</connection>
-    <tag>HEAD</tag>
-  </scm>
+    <repositories>
+        <repository>
+            <id>focus-repo</id>
+            <name>Focus nexus repository</name>
+            <url>http://nexus.focus.fish/nexus</url>
+        </repository>
+    </repositories>
 
-  <dependencies>
-    <dependency>
-      <groupId>net.sf.ehcache.internal</groupId>
-      <artifactId>ehcache-core</artifactId>
-      <version>${ehcache.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-api</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
+    <distributionManagement>
+        <repository>
+            <id>focus-releases</id>
+            <name>UnionVms Repository</name>
+            <url>http://nexus.focus.fish/nexus/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>focus-snapshots</id>
+            <name>UnionVms Snapshot Repository</name>
+            <url>http://nexus.focus.fish/nexus/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
-      <version>${apache.commons.version}</version>
-    </dependency>
+    <scm>
+        <connection>scm:git:https://github.com/UnionVMS/UVMS-USM4UVMSLibrary.git</connection>
+        <tag>HEAD</tag>
+    </scm>
 
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-      <scope>provided</scope>
-      <version>${jackson.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-annotations</artifactId>
-      <scope>provided</scope>
-      <version>${jackson.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <scope>provided</scope>
-      <version>${jackson.version}</version>
-    </dependency>
+    <dependencies>
+        <dependency>
+            <groupId>net.sf.ehcache.internal</groupId>
+            <artifactId>ehcache-core</artifactId>
+            <version>${ehcache.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-      <version>${junit.version}</version>
-    </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${apache.commons.version}</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.jboss.arquillian</groupId>
-      <artifactId>arquillian-bom</artifactId>
-      <type>pom</type>
-      <scope>test</scope>
-      <version>${arquillian.version}</version>
-    </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <scope>provided</scope>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <scope>provided</scope>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <scope>provided</scope>
+            <version>${jackson.version}</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.jboss.arquillian.junit</groupId>
-      <artifactId>arquillian-junit-container</artifactId>
-      <scope>test</scope>
-      <version>${arquillian.version}</version>
-    </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+            <version>${junit.version}</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.jboss.shrinkwrap.resolver</groupId>
-      <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
-      <version>${shrinkwrap.version}</version>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.jboss.arquillian</groupId>
+            <artifactId>arquillian-bom</artifactId>
+            <type>pom</type>
+            <scope>test</scope>
+            <version>${arquillian.version}</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.wildfly.arquillian</groupId>
-      <artifactId>wildfly-arquillian-container-remote</artifactId>
-      <version>${arquillian.container.version}</version>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>sun.jdk</groupId>
-          <artifactId>jconsole</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
+        <dependency>
+            <groupId>org.jboss.arquillian.junit</groupId>
+            <artifactId>arquillian-junit-container</artifactId>
+            <scope>test</scope>
+            <version>${arquillian.version}</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.jboss.arquillian.extension</groupId>
-      <artifactId>arquillian-rest-warp-impl-resteasy</artifactId>
-      <version>${arquillian.rest.version}</version>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.jboss.shrinkwrap.resolver</groupId>
+            <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
+            <version>${shrinkwrap.version}</version>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>org.jboss.arquillian.extension</groupId>
-      <artifactId>arquillian-rest-client-api</artifactId>
-      <version>${arquillian.rest.version}</version>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.wildfly.arquillian</groupId>
+            <artifactId>wildfly-arquillian-container-remote</artifactId>
+            <version>${arquillian.container.version}</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>sun.jdk</groupId>
+                    <artifactId>jconsole</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
-    <dependency>
-      <groupId>org.jboss.arquillian.extension</groupId>
-      <artifactId>arquillian-rest-client-impl-3x</artifactId>
-      <version>${arquillian.rest.version}</version>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.jboss.arquillian.extension</groupId>
+            <artifactId>arquillian-rest-warp-impl-resteasy</artifactId>
+            <version>${arquillian.rest.version}</version>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>org.jboss.arquillian.extension</groupId>
-      <artifactId>arquillian-transaction-impl-base</artifactId>
-      <version>${arquillian.transaction.version}</version>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.jboss.arquillian.extension</groupId>
+            <artifactId>arquillian-rest-client-api</artifactId>
+            <version>${arquillian.rest.version}</version>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-jackson-provider</artifactId>
-      <scope>test</scope>
-      <version>${resteasy.jackson.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-jaxrs</artifactId>
-      <version>${resteasy.version}</version>
-      <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.jboss.spec.javax.annotation</groupId>
-          <artifactId>jboss-annotations-api_1.1_spec</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-jaxb-provider</artifactId>
-      <version>${resteasy.version}</version>
-      <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>com.sun.xml.bind</groupId>
-          <artifactId>jaxb-impl</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.xml.bind</groupId>
-      <artifactId>jaxb-impl</artifactId>
-      <version>${jaxb.version}</version>
-      <scope>provided</scope>
-    </dependency>
-        
-    <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>jaxrs-api</artifactId>
-      <scope>test</scope>
-      <version>${resteasy.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-client</artifactId>
-      <scope>test</scope>
-      <version>${resteasy.version}</version>
-    </dependency>
+        <dependency>
+            <groupId>org.jboss.arquillian.extension</groupId>
+            <artifactId>arquillian-rest-client-impl-3x</artifactId>
+            <version>${arquillian.rest.version}</version>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>eu.europa.ec.fisheries.uvms.user</groupId>
-      <artifactId>user-model</artifactId>
-      <version>${uvms.user.module.version}</version>
-    </dependency>
+        <dependency>
+            <groupId>org.jboss.arquillian.extension</groupId>
+            <artifactId>arquillian-transaction-impl-base</artifactId>
+            <version>${arquillian.transaction.version}</version>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>javax</groupId>
-      <artifactId>javaee-api</artifactId>
-      <scope>provided</scope>
-      <version>${javaee.version}</version>
-    </dependency>
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jackson-provider</artifactId>
+            <scope>test</scope>
+            <version>${resteasy.jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jaxrs</artifactId>
+            <version>${resteasy.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jboss.spec.javax.annotation</groupId>
+                    <artifactId>jboss-annotations-api_1.1_spec</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jaxb-provider</artifactId>
+            <version>${resteasy.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.sun.xml.bind</groupId>
+                    <artifactId>jaxb-impl</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>${jaxb.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <version>${commons.io.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-all</artifactId>
-      <version>${mockito.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>eu.europa.ec.fisheries.uvms.commons</groupId>
-      <artifactId>uvms-commons-message</artifactId>
-      <version>${uvms.commonsLibrary.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>eu.europa.ec.fisheries.uvms.commons</groupId>
-      <artifactId>uvms-commons-service</artifactId>
-      <version>${uvms.commonsLibrary.version}</version>
-    </dependency>
-        
-    <dependency>
-      <groupId>eu.europa.ec.mare.usm</groupId>
-      <artifactId>jwt-handler-api</artifactId>
-      <version>${usm.jwt-handler.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>eu.europa.ec.mare.usm</groupId>
-      <artifactId>jwt-handler-impl</artifactId>
-      <version>${usm.jwt-handler.version}</version>
-    </dependency>
-  </dependencies>
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>jaxrs-api</artifactId>
+            <scope>test</scope>
+            <version>${resteasy.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-client</artifactId>
+            <scope>test</scope>
+            <version>${resteasy.version}</version>
+        </dependency>
 
-  <profiles>
-    <!-- enforce-jdk-version -->
-    <profile>
-      <id>enforce-jdk-version</id>
-      <activation>
-        <!-- To disable profile, define property -Dfocus-pom.enforce.jdk.version.disabled=true -->
-        <property>
-          <name>!focus-pom.enforce.jdk.version.disabled</name>
-        </property>
-      </activation>
-      <build>
+        <dependency>
+            <groupId>eu.europa.ec.fisheries.uvms.user</groupId>
+            <artifactId>user-model</artifactId>
+            <version>${uvms.user.module.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <scope>provided</scope>
+            <version>${javaee.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons.io.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.fisheries.uvms.commons</groupId>
+            <artifactId>uvms-commons-message</artifactId>
+            <version>${uvms.commonsLibrary.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.fisheries.uvms.commons</groupId>
+            <artifactId>uvms-commons-service</artifactId>
+            <version>${uvms.commonsLibrary.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>eu.europa.ec.mare.usm</groupId>
+            <artifactId>jwt-handler-api</artifactId>
+            <version>${usm.jwt-handler.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>fish.focus.uvms.maven</groupId>
+                    <artifactId>uvms-pom-logging-deps</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>eu.europa.ec.mare.usm</groupId>
+            <artifactId>jwt-handler-impl</artifactId>
+            <version>${usm.jwt-handler.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>fish.focus.uvms.maven</groupId>
+                    <artifactId>uvms-pom-logging-deps</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <!-- enforce-jdk-version -->
+        <profile>
+            <id>enforce-jdk-version</id>
+            <activation>
+                <property>
+                    <name>focus-pom.enforce.jdk.version.enabled</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <inherited>false</inherited>
+                        <executions>
+                            <execution>
+                                <id>enforce-jdk-version</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <enforceBytecodeVersion>
+                                            <maxJdkVersion>${focus-pom.java.version}</maxJdkVersion>
+                                            <!-- NOTE: xstream do contain support for multiple jdk:s -->
+                                            <excludes>
+                                                <exclude>com.thoughtworks.xstream:xstream</exclude>
+                                            </excludes>
+                                        </enforceBytecodeVersion>
+                                    </rules>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <build>
         <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-enforcer-plugin</artifactId>
-            <inherited>false</inherited>
-            <executions>
-              <execution>
-                <id>enforce-jdk-version</id>
-                <goals>
-                  <goal>enforce</goal>
-                </goals>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                  <rules>
-                    <enforceBytecodeVersion>
-                      <maxJdkVersion>${focus-pom.java.version}</maxJdkVersion>
-                      <!-- NOTE: xstream do contain support for multiple jdk:s -->
-                      <excludes>
-                        <exclude>com.thoughtworks.xstream:xstream</exclude>
-                      </excludes>
-                    </enforceBytecodeVersion>
-                  </rules>
+                    <excludes>
+                        <exclude>**/*ITest.java</exclude>
+                    </excludes>
                 </configuration>
-              </execution>
-            </executions>
-          </plugin>
+            </plugin>
         </plugins>
-      </build>
-    </profile>
-  </profiles>
-    
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <exclude>**/*ITest.java</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-       	
+    </build>
+
 </project>
